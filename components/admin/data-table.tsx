@@ -336,7 +336,7 @@ export function DataTable<Row extends RowData, Sort extends string>({
                           <button
                             type="button"
                             onClick={header.column.getToggleSortingHandler()}
-                            className="-mx-2 inline-flex h-10 items-center gap-2 rounded-sm px-2 hover:bg-secondary"
+                            className="-mx-2 inline-flex h-11 items-center gap-2 rounded-sm px-2 hover:bg-secondary lg:h-10"
                           >
                             <table.FlexRender header={header} />
                             <SortIcon direction={sorted} />
