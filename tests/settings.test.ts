@@ -126,13 +126,13 @@ afterAll(async () => {
 });
 
 describe("settings API", () => {
-  it("lets both roles read the settings", async () => {
-    for (const cookie of [owner, editor]) {
-      const response = await call("/api/admin/settings", "GET", { cookie });
-      expect(response.status).toBe(200);
-      const body = (await response.json()) as SettingsDto;
-      expect(Array.isArray(body.phones)).toBe(true);
-    }
+  it("lets the owner read the settings and keeps editors out", async () => {
+    const response = await call("/api/admin/settings", "GET", { cookie: owner });
+    expect(response.status).toBe(200);
+    const body = (await response.json()) as SettingsDto;
+    expect(Array.isArray(body.phones)).toBe(true);
+    expect(body.searchIndexing).toBe(true);
+    expect((await call("/api/admin/settings", "GET", { cookie: editor })).status).toBe(403);
   });
 
   it("saves, normalises and returns the settings, then expires the public cache", async () => {
@@ -157,19 +157,42 @@ describe("settings API", () => {
     );
     expect(revalidateTag).toHaveBeenCalledWith("settings", { expire: 0 });
 
-    const again = await call("/api/admin/settings", "GET", { cookie: editor });
+    const again = await call("/api/admin/settings", "GET", { cookie: owner });
     expect(await again.json()).toEqual(saved);
   });
 
-  it("lets an editor save too", async () => {
-    const response = await put(
+  it("refuses an editor and keeps every language of a field on save", async () => {
+    const refused = await put(
       input({ consultationNotifyEmail: `notify-${run}@cewm.test` }),
       editor,
     );
+    expect(refused.status).toBe(403);
+
+    const response = await put(
+      input({
+        consultationNotifyEmail: `notify-${run}@cewm.test`,
+        address: {
+          az: "Ağ Şəhər, Bakı",
+          ru: "Ак Шехер, Баку",
+          en: "White City, Baku",
+          de: "Weiße Stadt, Baku",
+        },
+        searchIndexing: false,
+      }),
+    );
     expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({
+    const saved = (await response.json()) as SettingsDto;
+    expect(saved).toMatchObject({
       consultationNotifyEmail: `notify-${run}@cewm.test`,
+      address: {
+        az: "Ağ Şəhər, Bakı",
+        ru: "Ак Шехер, Баку",
+        en: "White City, Baku",
+        de: "Weiße Stadt, Baku",
+      },
+      searchIndexing: false,
     });
+    expect((await getSiteSettings()).searchIndexing).toBe(false);
   });
 
   it("rejects a company name with MMC", async () => {
@@ -322,6 +345,8 @@ describe("public settings and structured data", () => {
       seoDescription: null,
       ogImageId: null,
       catalogueFileId: null,
+      textOverrides: {},
+      searchIndexing: true,
       updatedAt: new Date(),
     };
     const mediaRow = {
@@ -333,6 +358,7 @@ describe("public settings and structured data", () => {
       size: 100,
       sha256: "x",
       alt: { az: "CEWM" },
+      caption: null,
       lqip: null,
       originalId: null,
       cleanupStatus: null,

@@ -14,6 +14,7 @@ import {
   PanelsTopLeft,
   Route,
   Settings,
+  Type,
   Users,
   type LucideIcon,
 } from "lucide-react";
@@ -79,8 +80,27 @@ export const adminNavigation: AdminNavGroup[] = [
       },
       { title: "Hero filmləri", href: "/admin/hero-films", icon: Clapperboard, ready: true },
       { title: "Menyular", href: "/admin/menus", icon: Menu, ready: true },
-      { title: "Yönləndirmələr", href: "/admin/redirects", icon: Route, ready: true },
-      { title: "SEO və tənzimləmələr", href: "/admin/settings", icon: Settings, ready: true },
+      {
+        title: "Sayt mətnləri",
+        href: "/admin/site-texts",
+        icon: Type,
+        ownerOnly: true,
+        ready: true,
+      },
+      {
+        title: "Yönləndirmələr",
+        href: "/admin/redirects",
+        icon: Route,
+        ownerOnly: true,
+        ready: true,
+      },
+      {
+        title: "SEO və tənzimləmələr",
+        href: "/admin/settings",
+        icon: Settings,
+        ownerOnly: true,
+        ready: true,
+      },
     ],
   },
   {

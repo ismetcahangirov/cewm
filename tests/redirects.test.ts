@@ -88,11 +88,17 @@ describe("admin redirects API", () => {
     expect(response.headers.get("location")).toBe(`http://localhost:3000/mehsullar/${run}`);
   });
 
-  it("lets an editor create redirects", async () => {
-    const response = await create(
-      { fromPath: `${base}-editor`, toPath: "/mehsullar", statusCode: 302 },
+  it("keeps editors out of the redirects and lets the owner create them", async () => {
+    const refused = await create(
+      { fromPath: `${base}-refused`, toPath: "/mehsullar", statusCode: 302 },
       editor,
     );
+    expect(refused.status).toBe(403);
+    const response = await create({
+      fromPath: `${base}-editor`,
+      toPath: "/mehsullar",
+      statusCode: 302,
+    });
     expect(response.status).toBe(201);
   });
 

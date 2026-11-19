@@ -6,6 +6,7 @@ import { VisitBeacon } from "@/components/site/visit-beacon";
 import { env } from "@/lib/env";
 import { locales } from "@/lib/i18n/config";
 import { getRequestDictionary } from "@/lib/i18n/server";
+import { getSiteSettings } from "@/lib/public/settings";
 
 import "../site.css";
 
@@ -16,8 +17,12 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { dict } = await getRequestDictionary();
+  const [{ dict }, { searchIndexing }] = await Promise.all([
+    getRequestDictionary(),
+    getSiteSettings(),
+  ]);
   return {
+    ...(searchIndexing ? {} : { robots: { index: false, follow: false } }),
     metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL),
     title: { default: dict.meta.siteName, template: `%s | ${dict.meta.siteName}` },
     description: dict.meta.description,

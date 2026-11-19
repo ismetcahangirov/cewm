@@ -38,6 +38,7 @@ export type SiteSettings = {
   legalName: string | null;
   seoTitle: Localized | null;
   seoDescription: Localized | null;
+  searchIndexing: boolean;
 };
 
 function image(row: MediaRow | undefined): SiteImage | null {
@@ -73,6 +74,7 @@ export function toSiteSettings(row: SettingsRow | null, mediaRows: MediaRow[]): 
     legalName: row?.legalName ?? null,
     seoTitle: row?.seoTitle ?? null,
     seoDescription: row?.seoDescription ?? null,
+    searchIndexing: row?.searchIndexing ?? true,
   };
 }
 

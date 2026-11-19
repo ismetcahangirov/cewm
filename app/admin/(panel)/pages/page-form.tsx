@@ -34,7 +34,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatDateTime } from "@/lib/admin/format";
-import { filledLocales, formRichText, formText, hasLocaleError } from "@/lib/admin/form-values";
+import {
+  copyEmptyFromDefault,
+  filledLocales,
+  formRichText,
+  formText,
+  hasLocaleError,
+} from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import {
   useCreatePageMutation,
@@ -185,7 +191,13 @@ export function PageForm({ page }: { page: PageDetailDto | null }) {
         <FormLayout
           main={
             <FormSection title={t("Məzmun")}>
-              <LocaleTabs invalid={textInvalid} filled={filledLocales(title)}>
+              <LocaleTabs
+                onCopyFromDefault={(locale) =>
+                  copyEmptyFromDefault(form, ["title", "content"], locale)
+                }
+                invalid={textInvalid}
+                filled={filledLocales(title)}
+              >
                 {(locale) => (
                   <>
                     <FormField

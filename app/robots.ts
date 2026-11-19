@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
+import { connection } from "next/server";
 
-import { env } from "@/lib/env";
+import { getSiteSettings } from "@/lib/public/settings";
+import { buildRobots } from "@/lib/seo/robots";
 
-export default function robots(): MetadataRoute.Robots {
-  return {
-    rules: [{ userAgent: "*", allow: "/", disallow: ["/admin", "/api"] }],
-    sitemap: new URL("/sitemap.xml", env.NEXT_PUBLIC_SITE_URL).toString(),
-  };
+export default async function robots(): Promise<MetadataRoute.Robots> {
+  await connection();
+  const { searchIndexing } = await getSiteSettings();
+  return buildRobots(searchIndexing);
 }

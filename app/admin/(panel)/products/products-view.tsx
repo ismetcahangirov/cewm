@@ -15,6 +15,8 @@ import {
   X,
 } from "lucide-react";
 import Image from "next/image";
+import { LocaleCompleteness } from "@/components/admin/locale-tabs";
+import { filledLocales } from "@/lib/admin/form-values";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
@@ -249,6 +251,12 @@ export function ProductsView({ role }: { role: UserRole }) {
             ) : (
               <span className="text-muted-foreground">{t("Kateqoriyasız")}</span>
             ),
+        }),
+        column.display({
+          id: "locales",
+          header: t("Dillər"),
+          meta: { label: t("Dillər"), mobile: "detail" },
+          cell: ({ row }) => <LocaleCompleteness filled={filledLocales(row.original.name)} />,
         }),
         column.accessor("status", {
           header: t("Status"),

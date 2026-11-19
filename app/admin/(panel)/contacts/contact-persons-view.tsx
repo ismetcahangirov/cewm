@@ -1,5 +1,7 @@
 "use client";
 
+import { LocaleCompleteness } from "@/components/admin/locale-tabs";
+import { filledLocales } from "@/lib/admin/form-values";
 import { ArrowDown, ArrowUp, Ellipsis, Pencil, Plus, Trash2, UserRound } from "lucide-react";
 import { useMemo, useState, type ComponentProps } from "react";
 import { toast } from "sonner";
@@ -110,6 +112,13 @@ function ContactPersonCard({
       </button>
       <div className="flex min-h-11 flex-col gap-0.5 px-3 py-2 text-meta">
         <span className="truncate">{text(member.role)}</span>
+        <LocaleCompleteness
+          filled={{
+            ru: filledLocales(member.name).ru && filledLocales(member.role).ru,
+            en: filledLocales(member.name).en && filledLocales(member.role).en,
+            de: filledLocales(member.name).de && filledLocales(member.role).de,
+          }}
+        />
         <span className="flex items-center gap-2 text-muted-foreground">
           <span className="min-w-0 flex-1 truncate">
             {member.phones[0] ?? member.email ?? t("Əlaqə məlumatı yoxdur")}

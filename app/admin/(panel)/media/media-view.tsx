@@ -1,13 +1,19 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Copy, Search, Trash2 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronLeft, ChevronRight, Copy, RefreshCw, Search, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { ConfirmDialog } from "@/components/admin/confirm-dialog";
 import { fileName, MediaThumb } from "@/components/admin/image-picker";
 import { LocaleTabs } from "@/components/admin/locale-tabs";
-import { MediaDropzone, UploadProgressList, useMediaUpload } from "@/components/admin/media-upload";
+import {
+  MediaDropzone,
+  putWithProgress,
+  UploadProgressList,
+  useMediaUpload,
+} from "@/components/admin/media-upload";
 import { EmptyState, PageHeader } from "@/components/admin/page-header";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,12 +40,23 @@ import type { MessageKey } from "@/lib/admin/i18n";
 import { filledLocales } from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import { usageParts, usageSummary } from "@/lib/admin/media-labels";
-import { useDeleteMediaMutation, useGetMediaQuery, useUpdateMediaMutation } from "@/lib/api/admin";
+import {
+  useDeleteMediaMutation,
+  useGetMediaQuery,
+  useGetMediaUsageQuery,
+  useReplaceMediaMutation,
+  useRequestUploadMutation,
+  useUpdateMediaMutation,
+} from "@/lib/api/admin";
 import { apiErrorMessage } from "@/lib/api/types";
 import type { Locale } from "@/lib/i18n/config";
 import { cn } from "@/lib/utils";
 import {
+  acceptByKind,
   formatFileSize,
+  mediaKindOf,
+  mediaTypeOf,
+  mediaTypes,
   type MediaKind,
   type MediaLibraryItem,
   type MediaSortField,
@@ -49,7 +66,6 @@ const pageSize = 50;
 
 const kindOptions: { value: MediaKind | "all"; label: MessageKey }[] = [
   { value: "image", label: "Şəkillər" },
-  { value: "video", label: "Videolar" },
   { value: "video", label: "Videolar" },
   { value: "document", label: "Sənədlər" },
   { value: "all", label: "Bütün fayllar" },
@@ -75,7 +91,20 @@ function MediaDetails({ item, onClose }: { item: MediaLibraryItem; onClose: () =
     en: item.alts?.en ?? "",
     de: item.alts?.de ?? "",
   });
+  const [caption, setCaption] = useState<Record<Locale, string>>({
+    az: item.captions?.az ?? "",
+    ru: item.captions?.ru ?? "",
+    en: item.captions?.en ?? "",
+    de: item.captions?.de ?? "",
+  });
   const [confirming, setConfirming] = useState(false);
+  const [replaceProgress, setReplaceProgress] = useState<number | null>(null);
+  const replaceInput = useRef<HTMLInputElement>(null);
+  const { data: usageItems = [] } = useGetMediaUsageQuery(item.id, {
+    skip: item.usageTotal === 0,
+  });
+  const [requestUpload] = useRequestUploadMutation();
+  const [replaceMedia] = useReplaceMediaMutation();
   const [updateMedia, { isLoading: saving }] = useUpdateMediaMutation();
   const [deleteMedia] = useDeleteMediaMutation();
   const parts = usageParts(item.usage, t);
@@ -83,7 +112,7 @@ function MediaDetails({ item, onClose }: { item: MediaLibraryItem; onClose: () =
 
   async function save() {
     try {
-      await updateMedia({ id: item.id, alt }).unwrap();
+      await updateMedia({ id: item.id, alt, caption }).unwrap();
       toast.success(t("Alt mətn saxlanıldı."));
     } catch (error) {
       toast.error(apiErrorMessage(error));
@@ -99,6 +128,35 @@ function MediaDetails({ item, onClose }: { item: MediaLibraryItem; onClose: () =
     } catch (error) {
       toast.error(apiErrorMessage(error));
       return false;
+    }
+  }
+
+  async function replace(file: File) {
+    const type = mediaTypeOf(file);
+    if (!type || mediaTypes[type].kind !== mediaKindOf(item.mimeType)) {
+      toast.error(t("Yeni fayl köhnə ilə eyni növdə olmalıdır."));
+      return;
+    }
+    if (file.size > mediaTypes[type].maxSize) {
+      toast.error(t("Fayl icazə verilən ölçüdən böyükdür."));
+      return;
+    }
+    setReplaceProgress(0);
+    try {
+      const ticket = await requestUpload({
+        fileName: file.name,
+        contentType: type,
+        size: file.size,
+      }).unwrap();
+      await putWithProgress(ticket.url, file, ticket.headers, (fraction) =>
+        setReplaceProgress(Math.round(fraction * 100)),
+      );
+      await replaceMedia({ id: item.id, key: ticket.key }).unwrap();
+      toast.success(t("Fayl əvəz olundu. Saytda hər yerdə yenisi görünür."));
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : apiErrorMessage(error));
+    } finally {
+      setReplaceProgress(null);
     }
   }
 
@@ -143,6 +201,26 @@ function MediaDetails({ item, onClose }: { item: MediaLibraryItem; onClose: () =
             </>
           ) : null}
         </dl>
+        {usageItems.length ? (
+          <section className="flex flex-col gap-2">
+            <h3 className="text-meta font-medium">{t("Harada istifadə olunur")}</h3>
+            <ul className="flex flex-col gap-1 text-meta">
+              {usageItems.map((usage) => (
+                <li key={`${usage.kind}-${usage.id}`}>
+                  <Link
+                    href={usage.href}
+                    className="underline underline-offset-4 hover:no-underline"
+                  >
+                    {usage.label ??
+                      (usage.id === "home-sections"
+                        ? t("Ana səhifə bölmələri")
+                        : t("sayt tənzimləmələri"))}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ) : null}
         {isImage ? (
           <section className="flex flex-col gap-3">
             <h3 className="text-meta font-medium">{t("Alt mətn")}</h3>
@@ -168,6 +246,28 @@ function MediaDetails({ item, onClose }: { item: MediaLibraryItem; onClose: () =
             </p>
           </section>
         ) : null}
+        {isImage ? (
+          <section className="flex flex-col gap-3">
+            <h3 className="text-meta font-medium">{t("Şəkil altı yazı")}</h3>
+            <LocaleTabs filled={filledLocales(caption)} required={false}>
+              {(locale) => (
+                <div className="flex flex-col gap-2">
+                  <Label htmlFor={`caption-${locale}`} className="text-meta font-medium">
+                    {t("Şəkil altı yazı ({locale})", { locale: locale.toUpperCase() })}
+                  </Label>
+                  <Input
+                    id={`caption-${locale}`}
+                    value={caption[locale]}
+                    maxLength={500}
+                    onChange={(event) =>
+                      setCaption((current) => ({ ...current, [locale]: event.target.value }))
+                    }
+                  />
+                </div>
+              )}
+            </LocaleTabs>
+          </section>
+        ) : null}
       </div>
       <SheetFooter className="flex-row flex-wrap border-t border-border">
         {isImage ? (
@@ -175,6 +275,30 @@ function MediaDetails({ item, onClose }: { item: MediaLibraryItem; onClose: () =
             {t("Saxla")}
           </Button>
         ) : null}
+        <input
+          ref={replaceInput}
+          type="file"
+          className="sr-only"
+          tabIndex={-1}
+          aria-hidden="true"
+          accept={acceptByKind[mediaKindOf(item.mimeType) ?? "image"]}
+          onChange={(event) => {
+            const file = event.target.files?.[0];
+            event.target.value = "";
+            if (file) void replace(file);
+          }}
+        />
+        <Button
+          type="button"
+          variant="outline"
+          disabled={replaceProgress !== null}
+          onClick={() => replaceInput.current?.click()}
+        >
+          <RefreshCw strokeWidth={1.5} />
+          {replaceProgress === null
+            ? t("Faylı əvəz et")
+            : t("Əvəz edilir {progress}%", { progress: replaceProgress })}
+        </Button>
         <Button type="button" variant="outline" onClick={copyLink}>
           <Copy strokeWidth={1.5} />
           {t("Keçidi kopyala")}
@@ -191,7 +315,9 @@ function MediaDetails({ item, onClose }: { item: MediaLibraryItem; onClose: () =
         </Button>
         {item.usageTotal > 0 ? (
           <p className="w-full text-meta text-muted-foreground">
-            {t("İstifadə olunan faylı silmək olmaz.")}
+            {t(
+              "İstifadə olunan faylı silmək olmaz. Əvvəlcə yuxarıdakı yerlərdən çıxarın və ya faylı əvəz edin.",
+            )}
           </p>
         ) : null}
       </SheetFooter>

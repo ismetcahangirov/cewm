@@ -2,13 +2,24 @@ import "server-only";
 
 import { createHash, randomBytes } from "node:crypto";
 
-import { and, asc, count, desc, eq, ilike, inArray, or, sql, type SQL } from "drizzle-orm";
+import { and, asc, count, desc, eq, ilike, inArray, ne, or, sql, type SQL } from "drizzle-orm";
 import sharp from "sharp";
 
 import type { Page } from "@/lib/api/types";
 import { getDb } from "@/lib/db";
 import { containsPattern } from "@/lib/db/like";
-import { media } from "@/lib/db/schema";
+import {
+  brands,
+  categories,
+  clientLogos,
+  contactPersons,
+  heroFilms,
+  media,
+  pages,
+  posts,
+  products,
+  settings,
+} from "@/lib/db/schema";
 import { deleteMediaObject, presignUpload, readMediaBytes } from "@/lib/media";
 import { routes } from "@/lib/routes";
 import { slugify } from "@/lib/slug";
@@ -21,6 +32,7 @@ import {
   type MediaListArgs,
   type MediaType,
   type MediaUsage,
+  type MediaUsageItem,
   type UploadRequestInput,
   type UploadTicket,
 } from "@/lib/validation/media";
@@ -39,6 +51,7 @@ export function toMediaDto(row: MediaRow): MediaDto {
     size: row.size,
     alt: row.alt?.az ?? null,
     alts: row.alt ?? null,
+    captions: row.caption ?? null,
     createdAt: row.createdAt.toISOString(),
   };
 }
@@ -103,6 +116,7 @@ export async function listMedia(args: MediaListArgs): Promise<Page<MediaLibraryI
       ilike(sql`${media.alt} ->> 'az'`, pattern),
       ilike(sql`${media.alt} ->> 'ru'`, pattern),
       ilike(sql`${media.alt} ->> 'en'`, pattern),
+      ilike(sql`${media.alt} ->> 'de'`, pattern),
     );
     if (match) filters.push(match);
   }
@@ -292,9 +306,206 @@ export async function completeUpload(
   return { status: "created", media: toMediaDto(row) };
 }
 
-export async function updateMediaAlt(id: string, alt: Localized | null): Promise<MediaDto | null> {
-  const [row] = await getDb().update(media).set({ alt }).where(eq(media.id, id)).returning();
+export async function updateMediaText(
+  id: string,
+  text: { alt: Localized | null; caption?: Localized | null },
+): Promise<MediaDto | null> {
+  const [row] = await getDb()
+    .update(media)
+    .set(text.caption === undefined ? { alt: text.alt } : { alt: text.alt, caption: text.caption })
+    .where(eq(media.id, id))
+    .returning();
   return row ? toMediaDto(row) : null;
+}
+
+export async function mediaUsageItems(id: string): Promise<MediaUsageItem[]> {
+  const db = getDb();
+  const row = await findMedia(id);
+  if (!row) return [];
+  const needle = `%"/media/${row.key}"%`;
+  const embeds = (column: SQL) => sql`${column}::text like ${needle}`;
+
+  const [
+    productRows,
+    categoryRows,
+    brandRows,
+    postRows,
+    pageRows,
+    clientRows,
+    contactRows,
+    filmRows,
+    settingRows,
+    embedProducts,
+    embedCategories,
+    embedPages,
+    embedPosts,
+  ] = await Promise.all([
+    db
+      .select({ id: products.id, name: products.name })
+      .from(products)
+      .where(
+        sql`${products.videoId} = ${id} or ${products.videoPosterId} = ${id}
+          or exists (select 1 from product_images pi where pi.product_id = ${products.id} and pi.media_id = ${id})
+          or exists (select 1 from product_documents pd where pd.product_id = ${products.id} and pd.media_id = ${id})`,
+      ),
+    db
+      .select({ id: categories.id, name: categories.name })
+      .from(categories)
+      .where(eq(categories.imageId, id)),
+    db.select({ id: brands.id, name: brands.name }).from(brands).where(eq(brands.logoId, id)),
+    db.select({ id: posts.id, name: posts.title }).from(posts).where(eq(posts.coverId, id)),
+    db.select({ id: pages.id, name: pages.title }).from(pages).where(eq(pages.coverId, id)),
+    db
+      .select({ id: clientLogos.id, name: clientLogos.name })
+      .from(clientLogos)
+      .where(eq(clientLogos.imageId, id)),
+    db
+      .select({ id: contactPersons.id, name: contactPersons.name })
+      .from(contactPersons)
+      .where(eq(contactPersons.photoId, id)),
+    db
+      .select({ id: heroFilms.id, name: heroFilms.name })
+      .from(heroFilms)
+      .where(eq(heroFilms.posterId, id)),
+    db
+      .select({
+        siteMedia: sql<boolean>`${id}::uuid in (${settings.logoLightId}, ${settings.logoDarkId}, ${settings.faviconId}, ${settings.ogImageId}, ${settings.catalogueFileId})`,
+        homeMedia: sql<boolean>`exists (select 1 from jsonb_array_elements(${settings.homeSections}) hb where hb -> 'block' ->> 'mediaId' = ${id}::text or hb -> 'block' ->> 'posterId' = ${id}::text)`,
+        homeEmbed: embeds(sql`${settings.homeSections}`),
+      })
+      .from(settings),
+    db
+      .select({ id: products.id, name: products.name })
+      .from(products)
+      .where(or(embeds(sql`${products.description}`), embeds(sql`${products.shortDescription}`))),
+    db
+      .select({ id: categories.id, name: categories.name })
+      .from(categories)
+      .where(embeds(sql`${categories.description}`)),
+    db
+      .select({ id: pages.id, name: pages.title })
+      .from(pages)
+      .where(embeds(sql`${pages.content}`)),
+    db
+      .select({ id: posts.id, name: posts.title })
+      .from(posts)
+      .where(embeds(sql`${posts.content}`)),
+  ]);
+
+  const named = (
+    kind: MediaUsageItem["kind"],
+    rows: { id: string; name: string | { az: string } }[],
+    href: (itemId: string) => string,
+  ): MediaUsageItem[] =>
+    rows.map((item) => ({
+      kind,
+      id: item.id,
+      label: typeof item.name === "string" ? item.name : item.name.az,
+      href: href(item.id),
+    }));
+
+  const items: MediaUsageItem[] = [
+    ...named("products", productRows, (itemId) => `/admin/products/${itemId}`),
+    ...named("categories", categoryRows, (itemId) => `/admin/categories/${itemId}`),
+    ...named("brands", brandRows, () => "/admin/brands"),
+    ...named("posts", postRows, (itemId) => `/admin/blog/${itemId}`),
+    ...named("pages", pageRows, (itemId) => `/admin/pages/${itemId}`),
+    ...named("clients", clientRows, () => "/admin/clients"),
+    ...named("contacts", contactRows, () => "/admin/contacts"),
+    ...named("films", filmRows, () => "/admin/hero-films"),
+    ...named("content", embedProducts, (itemId) => `/admin/products/${itemId}`),
+    ...named("content", embedCategories, (itemId) => `/admin/categories/${itemId}`),
+    ...named("content", embedPages, (itemId) => `/admin/pages/${itemId}`),
+    ...named("content", embedPosts, (itemId) => `/admin/blog/${itemId}`),
+  ];
+  const site = settingRows[0];
+  if (site?.siteMedia) {
+    items.push({ kind: "settings", id: "settings", label: null, href: "/admin/settings" });
+  }
+  if (site?.homeMedia || site?.homeEmbed) {
+    items.push({
+      kind: "settings",
+      id: "home-sections",
+      label: null,
+      href: "/admin/home-sections",
+    });
+  }
+  return items;
+}
+
+export type ReplaceMediaResult =
+  | { status: "replaced"; media: MediaDto }
+  | { status: "missing" | "invalid" | "too-large" | "duplicate" | "not-found"; message: string };
+
+const embeddedColumns = [
+  ["products", "description"],
+  ["products", "short_description"],
+  ["categories", "description"],
+  ["pages", "content"],
+  ["posts", "content"],
+  ["settings", "home_sections"],
+] as const;
+
+export async function replaceMedia(id: string, key: string): Promise<ReplaceMediaResult> {
+  const db = getDb();
+  const current = await findMedia(id);
+  if (!current) return { status: "not-found", message: "Fayl tapılmadı." };
+
+  const declared = declaredTypeOf(key);
+  const body = await readMediaBytes(key);
+  if (!body || !declared) {
+    return { status: "missing", message: "Fayl yüklənməyib. Yenidən cəhd edin." };
+  }
+  if (body.length > mediaTypes[declared].maxSize) {
+    await deleteMediaObject(key);
+    return { status: "too-large", message: "Fayl icazə verilən ölçüdən böyükdür." };
+  }
+  const inspected = await inspect(body, declared);
+  if (
+    !inspected ||
+    mediaKindOf(inspected.mimeType) !== mediaKindOf(declared) ||
+    mediaKindOf(inspected.mimeType) !== mediaKindOf(current.mimeType)
+  ) {
+    await deleteMediaObject(key);
+    return { status: "invalid", message: "Yeni fayl köhnə ilə eyni növdə olmalıdır." };
+  }
+
+  const sha256 = createHash("sha256").update(body).digest("hex");
+  const [duplicate] = await db
+    .select({ id: media.id })
+    .from(media)
+    .where(and(eq(media.sha256, sha256), eq(media.size, body.length), ne(media.id, id)))
+    .limit(1);
+  if (duplicate) {
+    await deleteMediaObject(key);
+    return { status: "duplicate", message: "Bu fayl kitabxanada artıq var." };
+  }
+
+  const [row] = await db
+    .update(media)
+    .set({
+      key,
+      mimeType: inspected.mimeType,
+      width: inspected.width,
+      height: inspected.height,
+      size: body.length,
+      sha256,
+      lqip: inspected.lqip,
+    })
+    .where(eq(media.id, id))
+    .returning();
+  if (!row) throw new Error("Media row was not updated");
+
+  const from = `/media/${current.key}`;
+  const to = `/media/${key}`;
+  for (const [table, column] of embeddedColumns) {
+    const target = sql.identifier(column);
+    await db.execute(
+      sql`update ${sql.identifier(table)} set ${target} = replace(${target}::text, ${from}, ${to})::jsonb where ${target}::text like ${`%${from}%`}`,
+    );
+  }
+  await deleteMediaObject(current.key);
+  return { status: "replaced", media: toMediaDto(row) };
 }
 
 export type DeleteMediaResult = "deleted" | "missing" | "in-use";

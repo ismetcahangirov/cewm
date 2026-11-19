@@ -1,5 +1,7 @@
 "use client";
 
+import { LocaleCompleteness } from "@/components/admin/locale-tabs";
+import { filledLocales } from "@/lib/admin/form-values";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Ellipsis, ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
 import Image from "next/image";
@@ -103,6 +105,12 @@ export function PostsView() {
               </span>
             </Link>
           ),
+        }),
+        column.display({
+          id: "locales",
+          header: t("Dillər"),
+          meta: { label: t("Dillər"), mobile: "detail" },
+          cell: ({ row }) => <LocaleCompleteness filled={filledLocales(row.original.title)} />,
         }),
         column.display({
           id: "status",

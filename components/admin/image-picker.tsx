@@ -279,7 +279,7 @@ export function ImagePicker({
   const [open, setOpen] = useState(false);
   const t = useT();
   const noun = t.message(label);
-  const lowered = t.locale === "az" ? noun : noun.toLocaleLowerCase(t.locale);
+  const lowered = t.locale === "az" || t.locale === "de" ? noun : noun.toLocaleLowerCase(t.locale);
 
   return (
     <div className="flex flex-wrap items-start gap-3">

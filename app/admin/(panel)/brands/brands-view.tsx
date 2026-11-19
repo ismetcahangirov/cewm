@@ -1,5 +1,7 @@
 "use client";
 
+import { LocaleCompleteness } from "@/components/admin/locale-tabs";
+import { filledLocales } from "@/lib/admin/form-values";
 import { ArrowDown, ArrowUp, Ellipsis, Pencil, Plus, Trash2 } from "lucide-react";
 import { useMemo, useState, type ComponentProps } from "react";
 import { toast } from "sonner";
@@ -107,6 +109,7 @@ function LogoCard({
         <span className="min-w-0 flex-1 truncate text-muted-foreground">
           {t("{count} məhsul", { count: logo.productCount })}
         </span>
+        <LocaleCompleteness filled={filledLocales(logo.description)} />
         {logo.isActive ? null : <Badge variant="outline">{t("Gizli")}</Badge>}
       </div>
     </div>

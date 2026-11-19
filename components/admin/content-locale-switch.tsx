@@ -1,6 +1,8 @@
 "use client";
 
 import { Languages } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import {
   Select,
@@ -33,6 +35,21 @@ export function ContentLocaleSwitch() {
   const locale = useAppSelector((state) => state.editor.contentLocale);
   const dispatch = useAppDispatch();
   const t = useT();
+  const router = useRouter();
+
+  async function remember(value: Locale) {
+    try {
+      const response = await fetch("/api/admin/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ adminLocale: value }),
+      });
+      if (!response.ok) throw new Error("profile");
+      router.refresh();
+    } catch {
+      toast.error(t("Dil yadda saxlanılmadı."));
+    }
+  }
 
   return (
     <Select
@@ -41,6 +58,7 @@ export function ContentLocaleSwitch() {
         if (!isLocale(value)) return;
         dispatch(setContentLocale(value));
         document.cookie = `${contentLocaleCookie}=${value}; path=/admin; max-age=31536000; samesite=lax`;
+        void remember(value);
       }}
     >
       <SelectTrigger size="sm" aria-label={t("Dil")} className="gap-2">

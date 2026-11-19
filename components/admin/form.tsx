@@ -156,7 +156,7 @@ export function FormActions({ children, className }: { children: ReactNode; clas
   return (
     <div
       className={cn(
-        "sticky bottom-0 z-10 -mx-5 flex justify-end gap-2 border-t border-border bg-white px-5 py-3 sm:-mx-7.5 sm:px-7.5 md:static md:mx-0 md:border-0 md:bg-transparent md:p-0",
+        "sticky bottom-0 z-10 -mx-4 flex justify-end gap-2 border-t border-border bg-white px-4 py-3 sm:-mx-8 sm:px-8 md:static md:mx-0 md:border-0 md:bg-transparent md:p-0",
         className,
       )}
     >

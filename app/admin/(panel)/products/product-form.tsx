@@ -37,7 +37,13 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { formatDateTime } from "@/lib/admin/format";
-import { filledLocales, formRichText, formText, hasLocaleError } from "@/lib/admin/form-values";
+import {
+  copyEmptyFromDefault,
+  filledLocales,
+  formRichText,
+  formText,
+  hasLocaleError,
+} from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import {
   useBulkProductsMutation,
@@ -315,7 +321,13 @@ export function ProductForm({
           main={
             <>
               <FormSection title={t("Əsas məlumat")}>
-                <LocaleTabs invalid={textInvalid} filled={filledLocales(name)}>
+                <LocaleTabs
+                  onCopyFromDefault={(locale) =>
+                    copyEmptyFromDefault(form, ["name", "shortDescription", "description"], locale)
+                  }
+                  invalid={textInvalid}
+                  filled={filledLocales(name)}
+                >
                   {(locale) => (
                     <>
                       <FormField

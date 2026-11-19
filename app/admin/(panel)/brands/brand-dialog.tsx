@@ -19,7 +19,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { filledLocales, formText, hasLocaleError } from "@/lib/admin/form-values";
+import {
+  copyEmptyFromDefault,
+  filledLocales,
+  formText,
+  hasLocaleError,
+} from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import { useCreateBrandMutation, useUpdateBrandMutation } from "@/lib/api/brands";
 import { locales, type Locale } from "@/lib/i18n/config";
@@ -142,7 +147,12 @@ export function BrandDialog({ brand, onClose }: { brand: BrandDto | null; onClos
               />
             )}
           />
-          <LocaleTabs invalid={invalid} filled={filledLocales(description)} required={false}>
+          <LocaleTabs
+            onCopyFromDefault={(locale) => copyEmptyFromDefault(form, ["description"], locale)}
+            invalid={invalid}
+            filled={filledLocales(description)}
+            required={false}
+          >
             {(locale) => (
               <FormField
                 control={form.control}

@@ -13,6 +13,6 @@ export async function generateMetadata(): Promise<Metadata> {
 export const instant = false;
 
 export default async function SettingsPage() {
-  await requireAdminUser();
+  await requireAdminUser("owner");
   return <SettingsEditor />;
 }

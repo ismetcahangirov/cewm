@@ -4,7 +4,7 @@ import { inArray } from "drizzle-orm";
 import type { MetadataRoute } from "next";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
-import robots from "@/app/robots";
+import { buildRobots } from "@/lib/seo/robots";
 import { getDb } from "@/lib/db";
 import {
   categories,
@@ -27,6 +27,11 @@ import { buildLlmsTxt, getLlmsSource } from "@/lib/seo/llms";
 import { buildSitemap, querySitemapSource } from "@/lib/seo/sitemap";
 
 vi.mock("next/cache", () => ({ cacheTag: vi.fn(), cacheLife: vi.fn() }));
+
+vi.mock("next/server", async (original) => ({
+  ...(await original<typeof import("next/server")>()),
+  connection: async () => undefined,
+}));
 
 const siteUrl = "https://cewm.example";
 const paths = {
@@ -111,6 +116,7 @@ const settings: SiteSettings = {
   legalName: "CEWM",
   seoTitle: null,
   seoDescription: null,
+  searchIndexing: true,
 };
 
 describe("JSON-LD builders", () => {
@@ -185,9 +191,13 @@ describe("JSON-LD builders", () => {
 
 describe("robots.txt", () => {
   it("allows the site, keeps crawlers out of admin and API and names the sitemap", () => {
-    const result = robots();
+    const result = buildRobots(true);
     expect(result.rules).toEqual([{ userAgent: "*", allow: "/", disallow: ["/admin", "/api"] }]);
     expect(result.sitemap).toMatch(/\/sitemap\.xml$/);
+  });
+
+  it("keeps every crawler out while indexing is switched off", () => {
+    expect(buildRobots(false).rules).toEqual([{ userAgent: "*", disallow: "/" }]);
   });
 });
 

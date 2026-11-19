@@ -11,6 +11,8 @@ import type {
   MediaDto,
   MediaLibraryItem,
   MediaListArgs,
+  MediaUsageItem,
+  ReplaceMediaInput,
   UpdateMediaInput,
   UploadRequestInput,
   UploadTicket,
@@ -93,6 +95,20 @@ export const adminApi = baseApi.injectEndpoints({
     updateMedia: build.mutation<MediaDto, UpdateMediaInput & { id: string }>({
       query: ({ id, ...body }) => ({ url: `admin/media/${id}`, method: "PATCH", body }),
       invalidatesTags: [{ type: "Media", id: "LIST" }],
+    }),
+    getMediaUsage: build.query<MediaUsageItem[], string>({
+      query: (id) => `admin/media/${id}/usage`,
+      providesTags: (_result, _error, id) => [{ type: "Media", id }],
+    }),
+    replaceMedia: build.mutation<MediaDto, ReplaceMediaInput & { id: string }>({
+      query: ({ id, ...body }) => ({ url: `admin/media/${id}/replace`, method: "POST", body }),
+      invalidatesTags: (_result, _error, { id }) => [
+        { type: "Media", id: "LIST" },
+        { type: "Media", id },
+        { type: "Product", id: "LIST" },
+        { type: "Category", id: "LIST" },
+        { type: "Brand", id: "LIST" },
+      ],
     }),
     deleteMedia: build.mutation<void, string>({
       query: (id) => ({ url: `admin/media/${id}`, method: "DELETE" }),
@@ -220,6 +236,8 @@ export const {
   useRequestUploadMutation,
   useCompleteUploadMutation,
   useUpdateMediaMutation,
+  useGetMediaUsageQuery,
+  useReplaceMediaMutation,
   useDeleteMediaMutation,
   useGetProductsQuery,
   useGetProductQuery,

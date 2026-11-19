@@ -1,7 +1,17 @@
 import { sql } from "drizzle-orm";
-import { check, integer, jsonb, pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
+import {
+  boolean,
+  check,
+  integer,
+  jsonb,
+  pgTable,
+  text,
+  timestamp,
+  uuid,
+} from "drizzle-orm/pg-core";
 
 import type { RichTextDoc } from "../../content/rich-text";
+import type { Locale } from "../../i18n/config";
 import type { Localized } from "../../i18n/localized";
 import { localized } from "./columns";
 import { media } from "./media";
@@ -21,6 +31,8 @@ export type SettingsHero = {
   ctaHref: string | null;
   filmId: string | null;
 };
+
+export type SettingsTextOverrides = Record<string, Partial<Record<Locale, string>>>;
 
 export const homeSectionKeys = ["categories", "products", "brands", "clients", "posts"] as const;
 
@@ -90,6 +102,8 @@ export const settings = pgTable(
     seoTitle: localized("seo_title"),
     seoDescription: localized("seo_description"),
     ogImageId: uuid("og_image_id").references(() => media.id, { onDelete: "set null" }),
+    textOverrides: jsonb("text_overrides").$type<SettingsTextOverrides>().notNull().default({}),
+    searchIndexing: boolean("search_indexing").notNull().default(true),
     catalogueFileId: uuid("catalogue_file_id").references(() => media.id, {
       onDelete: "set null",
     }),
