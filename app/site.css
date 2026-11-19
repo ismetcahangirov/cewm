@@ -207,6 +207,7 @@
   inset-inline: 0;
   height: 55%;
   pointer-events: none;
+  transition: opacity var(--motion-base) var(--ease-standard);
 }
 
 .hero-scrim-top {

@@ -43,7 +43,13 @@ const localManifestSchema = z.object({
   name: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
   version: z.number().int().positive(),
   format: z.enum(films.heroFilmFormats),
-  tiers: z.object({ desktop: tierSchema, mobile: tierSchema.optional() }),
+  tiers: z.object({
+    desktop: tierSchema,
+    mobile: tierSchema.optional(),
+    wide: tierSchema.optional(),
+  }),
+  motion: z.array(z.tuple([z.number(), z.number(), z.number()])).optional(),
+  pace: z.array(z.number()).optional(),
   posters: z.object({ desktop: posterSchema, mobile: posterSchema.optional() }),
 });
 
@@ -154,23 +160,20 @@ async function worker(): Promise<void> {
 }
 await Promise.all(Array.from({ length: 8 }, worker));
 
+function bucketTier(tier: z.infer<typeof tierSchema> | undefined) {
+  return tier ? { width: tier.width, height: tier.height, count: tier.count } : undefined;
+}
+
 const bucketManifest = films.heroFilmManifestSchema.parse({
   version: manifest.version,
   format: manifest.format,
   tiers: {
-    desktop: {
-      width: manifest.tiers.desktop.width,
-      height: manifest.tiers.desktop.height,
-      count: manifest.tiers.desktop.count,
-    },
-    mobile: manifest.tiers.mobile
-      ? {
-          width: manifest.tiers.mobile.width,
-          height: manifest.tiers.mobile.height,
-          count: manifest.tiers.mobile.count,
-        }
-      : undefined,
+    desktop: bucketTier(manifest.tiers.desktop),
+    mobile: bucketTier(manifest.tiers.mobile),
+    wide: bucketTier(manifest.tiers.wide),
   },
+  motion: manifest.motion,
+  pace: manifest.pace,
   posters: {
     desktop: {
       key: posterKeys.desktop,

@@ -38,6 +38,7 @@ import {
   heroFilmManifestSchema,
   type HeroFilmFormat,
   type HeroFilmManifest,
+  type HeroFilmTier,
 } from "@/lib/validation/hero-films";
 import { isCustomSection, normalizeHomeSections } from "@/lib/validation/home-sections";
 
@@ -86,7 +87,12 @@ export type HeroFilm = {
   format: HeroFilmFormat;
   firstFrame: string;
   framePattern: string;
-  tiers: { desktop: HeroFilmTierFrames; mobile: HeroFilmTierFrames | null };
+  tiers: {
+    desktop: HeroFilmTierFrames;
+    mobile: HeroFilmTierFrames | null;
+    wide: HeroFilmTierFrames | null;
+  };
+  motion: string | null;
   poster: PublicImage | null;
   mobilePoster: HeroFilmPoster | null;
 };
@@ -149,7 +155,7 @@ function toHeroFilm(
 ): HeroFilm {
   const prefix = film.keyPrefix;
   const format = manifest?.format ?? film.format;
-  const pattern = (tier?: "desktop" | "mobile") =>
+  const pattern = (tier?: HeroFilmTier) =>
     routes.media(`${tier ? `${prefix}/${tier}` : prefix}/{frame}.${format}`);
   const desktop: HeroFilmTierFrames = manifest
     ? { ...manifest.tiers.desktop, frames: pattern("desktop") }
@@ -162,6 +168,7 @@ function toHeroFilm(
   const mobile = manifest?.tiers.mobile
     ? { ...manifest.tiers.mobile, frames: pattern("mobile") }
     : null;
+  const wide = manifest?.tiers.wide ? { ...manifest.tiers.wide, frames: pattern("wide") } : null;
   const mobilePoster = manifest?.posters?.mobile;
   const desktopPoster = manifest?.posters?.desktop;
   return {
@@ -172,7 +179,8 @@ function toHeroFilm(
     format,
     firstFrame: routes.media(heroFilmFrameKey(prefix, 0, format, manifest ? "desktop" : undefined)),
     framePattern: desktop.frames,
-    tiers: { desktop, mobile },
+    tiers: { desktop, mobile, wide },
+    motion: manifest?.motion?.length ? routes.media(heroFilmManifestKey(prefix)) : null,
     poster:
       poster ??
       (desktopPoster

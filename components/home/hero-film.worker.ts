@@ -4,16 +4,14 @@ type InitMessage = {
   type: "init";
   frames: string[];
   decode: Size;
-  ladder: Size;
-  ladderStep: number;
   ahead: number;
   behind: number;
 };
 
 type InMessage =
   | InitMessage
-  | { type: "seek"; index: number; direction: number }
-  | { type: "resize"; decode: Size; ladder: Size; generation: number }
+  | { type: "seek"; position: number; direction: number }
+  | { type: "resize"; decode: Size; generation: number }
   | { type: "visibility"; hidden: boolean };
 
 type Scope = {
@@ -26,14 +24,14 @@ const scope = globalThis as unknown as Scope;
 const passes = [8, 4, 2, 1];
 const maxFetches = 6;
 const maxDecodes = 2;
+const leadFactor = 3;
 
 let config: InitMessage | null = null;
 let blobs: (Blob | null)[] = [];
 const fetching = new Set<number>();
-const decoding = new Set<string>();
-const sentWindow = new Set<number>();
-const sentLadder = new Set<number>();
-let center = 0;
+const decoding = new Set<number>();
+const sent = new Set<number>();
+let position = 0;
 let direction = 1;
 let generation = 0;
 let paused = false;
@@ -43,22 +41,49 @@ let failed = false;
 let decodedAny = false;
 let failures = 0;
 
+function reach() {
+  const ahead = config?.ahead ?? 0;
+  const behind = config?.behind ?? 0;
+  return direction >= 0
+    ? { before: behind, after: ahead + 1 }
+    : { before: ahead, after: behind + 1 };
+}
+
 function inWindow(index: number) {
-  if (!config) return false;
-  const ahead = direction >= 0 ? config.ahead : config.behind;
-  const behind = direction >= 0 ? config.behind : config.ahead;
-  return index >= center - behind && index <= center + ahead;
+  const { before, after } = reach();
+  const base = Math.floor(position);
+  return index >= base - before && index <= base + after;
+}
+
+function windowOrder(span: number): number[] {
+  if (!config) return [];
+  const count = config.frames.length;
+  const base = Math.floor(position);
+  const { before, after } = reach();
+  const forward = direction >= 0 ? after * span : before * span;
+  const backward = direction >= 0 ? before * span : after * span;
+  const order: number[] = [];
+  for (let step = 0; step <= Math.max(forward, backward); step += 1) {
+    const ahead = direction >= 0 ? base + step : base + 1 - step;
+    const behind = direction >= 0 ? base - step : base + 1 + step;
+    if (step <= forward && ahead >= 0 && ahead < count) order.push(ahead);
+    if (step > 0 && step <= backward && behind >= 0 && behind < count) order.push(behind);
+  }
+  return order;
 }
 
 function nextToFetch(): number | null {
   if (!config) return null;
+  for (const index of windowOrder(leadFactor)) {
+    if (!blobs[index] && !fetching.has(index)) return index;
+  }
   const count = config.frames.length;
   for (const step of passes) {
     let best: number | null = null;
     let bestDistance = Number.POSITIVE_INFINITY;
     for (let index = 0; index < count; index += step) {
       if (blobs[index] || fetching.has(index)) continue;
-      const distance = Math.abs(index - center) * (inWindow(index) ? 0.25 : 1);
+      const distance = Math.abs(index - position);
       if (distance < bestDistance) {
         bestDistance = distance;
         best = index;
@@ -83,7 +108,7 @@ function pump() {
         blobs[index] = blob;
         bytes += blob.size;
         loaded += 1;
-        scope.postMessage({ type: "progress", loaded, bytes });
+        scope.postMessage({ type: "progress", loaded, bytes, total: blobs.length });
         schedule();
       })
       .catch(() => {
@@ -94,57 +119,33 @@ function pump() {
   schedule();
 }
 
-function wanted(): { index: number; ladder: boolean } | null {
-  if (!config) return null;
-  let best: { index: number; ladder: boolean } | null = null;
-  let bestDistance = Number.POSITIVE_INFINITY;
-  const count = config.frames.length;
-  const ahead = direction >= 0 ? config.ahead : config.behind;
-  const behind = direction >= 0 ? config.behind : config.ahead;
-  for (
-    let index = Math.max(0, center - behind);
-    index <= Math.min(count - 1, center + ahead);
-    index += 1
-  ) {
-    if (!blobs[index] || sentWindow.has(index) || decoding.has(`w${index}`)) continue;
-    const distance = Math.abs(index - center) + (index < center === direction >= 0 ? 0.5 : 0);
-    if (distance < bestDistance) {
-      bestDistance = distance;
-      best = { index, ladder: false };
-    }
+function wanted(): number | null {
+  for (const index of windowOrder(1)) {
+    if (!inWindow(index)) continue;
+    if (blobs[index] && !sent.has(index) && !decoding.has(index)) return index;
   }
-  if (best) return best;
-  for (let index = 0; index < count; index += config.ladderStep) {
-    if (!blobs[index] || sentLadder.has(index) || decoding.has(`l${index}`)) continue;
-    const distance = Math.abs(index - center);
-    if (distance < bestDistance) {
-      bestDistance = distance;
-      best = { index, ladder: true };
-    }
-  }
-  return best;
+  return null;
 }
 
 function schedule() {
   if (!config || paused || failed) return;
   while (decoding.size < maxDecodes) {
-    const job = wanted();
-    if (!job) return;
-    const key = `${job.ladder ? "l" : "w"}${job.index}`;
-    const size = job.ladder ? config.ladder : config.decode;
-    const blob = blobs[job.index];
+    const index = wanted();
+    if (index === null) return;
+    const blob = blobs[index];
     if (!blob) return;
-    decoding.add(key);
+    const size = config.decode;
+    decoding.add(index);
+    sent.add(index);
     const started = performance.now();
     const jobGeneration = generation;
-    (job.ladder ? sentLadder : sentWindow).add(job.index);
     void createImageBitmap(blob, {
       resizeWidth: size.width,
       resizeHeight: size.height,
       resizeQuality: "high",
     })
       .then((bitmap) => {
-        decoding.delete(key);
+        decoding.delete(index);
         decodedAny = true;
         if (jobGeneration !== generation) {
           bitmap.close();
@@ -153,8 +154,7 @@ function schedule() {
         scope.postMessage(
           {
             type: "frame",
-            index: job.index,
-            ladder: job.ladder,
+            index,
             generation: jobGeneration,
             decodeMs: performance.now() - started,
             bitmap,
@@ -163,8 +163,8 @@ function schedule() {
         );
       })
       .catch(() => {
-        decoding.delete(key);
-        (job.ladder ? sentLadder : sentWindow).delete(job.index);
+        decoding.delete(index);
+        sent.delete(index);
         failures += 1;
         if (!decodedAny && failures >= 2) {
           failed = true;
@@ -184,17 +184,16 @@ scope.onmessage = (event) => {
       pump();
       break;
     case "seek":
-      center = message.index;
+      position = message.position;
       direction = message.direction;
-      for (const index of [...sentWindow]) if (!inWindow(index)) sentWindow.delete(index);
+      for (const index of [...sent]) if (!inWindow(index)) sent.delete(index);
       pump();
       break;
     case "resize":
       if (!config) return;
-      config = { ...config, decode: message.decode, ladder: message.ladder };
+      config = { ...config, decode: message.decode };
       generation = message.generation;
-      sentWindow.clear();
-      sentLadder.clear();
+      sent.clear();
       schedule();
       break;
     case "visibility":
