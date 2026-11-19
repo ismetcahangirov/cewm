@@ -16,7 +16,10 @@
     "breadcrumb": "Brotkrumennavigation",
     "contactUs": "Kontakt aufnehmen",
     "previous": "Zurück",
-    "next": "Weiter"
+    "next": "Weiter",
+    "contact": "Kontakt",
+    "openMenu": "Menü öffnen",
+    "closeMenu": "Menü schließen"
   },
   "contact": {
     "title": "Kontakt",
@@ -34,14 +37,42 @@
   "footer": {
     "contacts": "Kontakt",
     "followUs": "Folgen Sie uns",
-    "rights": "Alle Rechte vorbehalten."
+    "rights": "Alle Rechte vorbehalten.",
+    "navigation": "Menü",
+    "brands": "Marken"
   },
   "home": {
     "categoriesTitle": "Produktkategorien",
     "productsTitle": "Ausgewählte Maschinen",
     "brandsTitle": "Marken, die wir vertreten",
     "clientsTitle": "Unsere Kunden",
-    "postsTitle": "Blog"
+    "postsTitle": "Blog",
+    "categoriesEyebrow": "Katalog",
+    "productsEyebrow": "Maschinen",
+    "brandsEyebrow": "Partner",
+    "clientsEyebrow": "Kunden",
+    "postsEyebrow": "Beiträge",
+    "consultationEyebrow": "Anfrage",
+    "statementEyebrow": "Über uns",
+    "statement": "CEWM ist der HOMAG-Partner in Aserbaidschan. Wir unterstützen Möbelhersteller und Holzbearbeitungsbetriebe bei der Auswahl von Maschinen für Zuschnitt, Kantenanleimen, CNC-Bearbeitung, Bohren, Montage und Verpackung.",
+    "chapters": {
+      "exterior": {
+        "label": "Fassade",
+        "text": "Fassadenplatten, Fenster- und Türelemente: CNC-Bearbeitung und Zuschnitt."
+      },
+      "threshold": {
+        "label": "Treppe und Türen",
+        "text": "Treppenstufen, Türzargen und Trennwände."
+      },
+      "living": {
+        "label": "Wohnraum",
+        "text": "Korpusmöbel und Regale: Zuschnitt, Kantenanleimen, Bohren."
+      },
+      "kitchen": {
+        "label": "Küche",
+        "text": "Küchenfronten und Korpusse, vom Zuschnitt bis zu Montage und Verpackung."
+      }
+    }
   },
   "catalog": {
     "title": "Produkte",

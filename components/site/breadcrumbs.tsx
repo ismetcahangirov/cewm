@@ -20,11 +20,11 @@ export function Breadcrumbs({
   const last = items.length - 1;
   return (
     <>
-      <nav aria-label={label} className={cx("text-meta", className)}>
+      <nav aria-label={label} className={cx("text-small", className)}>
         <ol
           className={cx(
             "flex flex-wrap items-center",
-            tone === "light" ? "text-white" : "text-muted",
+            tone === "light" ? "text-white" : "text-ink-muted",
           )}
         >
           {items.map((item, index) => (
@@ -37,7 +37,7 @@ export function Breadcrumbs({
               {item.href && index !== last ? (
                 <Link
                   href={item.href}
-                  className="inline-flex min-h-11 items-center transition-colors duration-200 hover:text-black"
+                  className="hover:text-ink inline-flex min-h-11 items-center transition-colors duration-200"
                 >
                   {item.label}
                 </Link>

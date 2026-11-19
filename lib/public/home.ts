@@ -26,7 +26,14 @@ import type {
 import { localePath, type Locale } from "@/lib/i18n/config";
 import { pickExact, pickLocale, type Localized } from "@/lib/i18n/localized";
 import { routes } from "@/lib/routes";
-import { heroFilmFrameKey, type HeroFilmFormat } from "@/lib/validation/hero-films";
+import { readMediaBytes } from "@/lib/media";
+import {
+  heroFilmFrameKey,
+  heroFilmManifestKey,
+  heroFilmManifestSchema,
+  type HeroFilmFormat,
+  type HeroFilmManifest,
+} from "@/lib/validation/hero-films";
 import { isCustomSection, normalizeHomeSections } from "@/lib/validation/home-sections";
 
 import { imageColumns, productCards, type ProductCardItem } from "./catalog";
@@ -57,14 +64,26 @@ export type HomeSection =
   | { key: HomeSectionKey; visible: boolean; title: string | null }
   | { key: "custom"; id: string; visible: boolean; block: CustomBlock };
 
+export type HeroFilmTierFrames = {
+  count: number;
+  width: number;
+  height: number;
+  frames: string;
+};
+
+export type HeroFilmPoster = { src: string; width: number; height: number };
+
 export type HeroFilm = {
+  version: number;
   frameCount: number;
   width: number;
   height: number;
   format: HeroFilmFormat;
   firstFrame: string;
   framePattern: string;
+  tiers: { desktop: HeroFilmTierFrames; mobile: HeroFilmTierFrames | null };
   poster: PublicImage | null;
+  mobilePoster: HeroFilmPoster | null;
 };
 
 export type HomeHero = {
@@ -99,6 +118,71 @@ function internalHref(href: string | null, locale: Locale): string | null {
   return href.startsWith("/") ? localePath(locale, href) : href;
 }
 
+async function readFilmManifest(prefix: string): Promise<HeroFilmManifest | null> {
+  try {
+    const bytes = await readMediaBytes(heroFilmManifestKey(prefix));
+    if (!bytes) return null;
+    const parsed = heroFilmManifestSchema.safeParse(JSON.parse(bytes.toString("utf8")));
+    return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+
+type FilmRow = typeof heroFilms.$inferSelect;
+
+function toHeroFilm(
+  film: FilmRow,
+  manifest: HeroFilmManifest | null,
+  poster: PublicImage | null,
+): HeroFilm {
+  const prefix = film.keyPrefix;
+  const format = manifest?.format ?? film.format;
+  const pattern = (tier?: "desktop" | "mobile") =>
+    routes.media(`${tier ? `${prefix}/${tier}` : prefix}/{frame}.${format}`);
+  const desktop: HeroFilmTierFrames = manifest
+    ? { ...manifest.tiers.desktop, frames: pattern("desktop") }
+    : {
+        count: film.frameCount,
+        width: film.frameWidth,
+        height: film.frameHeight,
+        frames: pattern(),
+      };
+  const mobile = manifest?.tiers.mobile
+    ? { ...manifest.tiers.mobile, frames: pattern("mobile") }
+    : null;
+  const mobilePoster = manifest?.posters?.mobile;
+  const desktopPoster = manifest?.posters?.desktop;
+  return {
+    version: manifest?.version ?? 1,
+    frameCount: desktop.count,
+    width: desktop.width,
+    height: desktop.height,
+    format,
+    firstFrame: routes.media(heroFilmFrameKey(prefix, 0, format, manifest ? "desktop" : undefined)),
+    framePattern: desktop.frames,
+    tiers: { desktop, mobile },
+    poster:
+      poster ??
+      (desktopPoster
+        ? {
+            src: routes.media(desktopPoster.key),
+            width: desktopPoster.width,
+            height: desktopPoster.height,
+            alt: "",
+            blurDataURL: null,
+          }
+        : null),
+    mobilePoster: mobilePoster
+      ? {
+          src: routes.media(mobilePoster.key),
+          width: mobilePoster.width,
+          height: mobilePoster.height,
+        }
+      : null,
+  };
+}
+
 export async function getHero(locale: Locale): Promise<HomeHero | null> {
   "use cache";
   cacheTag(publicTags.settings);
@@ -119,20 +203,13 @@ export async function getHero(locale: Locale): Promise<HomeHero | null> {
   const headline = pickLocale(hero.headline, locale);
   const label = hero.ctaLabel ? pickLocale(hero.ctaLabel, locale) : null;
   const href = internalHref(hero.ctaHref, locale);
+  const manifest = film ? await readFilmManifest(film.film.keyPrefix) : null;
   return {
     headline,
     subline: hero.subline ? pickLocale(hero.subline, locale) || null : null,
     cta: label && href ? { label, href } : null,
     film: film
-      ? {
-          frameCount: film.film.frameCount,
-          width: film.film.frameWidth,
-          height: film.film.frameHeight,
-          format: film.film.format,
-          firstFrame: routes.media(heroFilmFrameKey(film.film.keyPrefix, 0, film.film.format)),
-          framePattern: routes.media(`${film.film.keyPrefix}/{frame}.${film.film.format}`),
-          poster: toPublicImage(film.poster, locale, headline),
-        }
+      ? toHeroFilm(film.film, manifest, toPublicImage(film.poster, locale, headline))
       : null,
   };
 }

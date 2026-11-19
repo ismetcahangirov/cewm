@@ -69,13 +69,13 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
         <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-small">
           {product.brand ? (
             <div className="flex gap-2">
-              <dt className="text-muted">{dict.product.brand}</dt>
+              <dt className="text-ink-muted">{dict.product.brand}</dt>
               <dd>{product.brand.name}</dd>
             </div>
           ) : null}
           {product.sku ? (
             <div className="flex gap-2">
-              <dt className="text-muted">{dict.product.model}</dt>
+              <dt className="text-ink-muted">{dict.product.model}</dt>
               <dd>{product.sku}</dd>
             </div>
           ) : null}
@@ -91,7 +91,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
             height={cover.height}
             sizes="(min-width: 1024px) 50vw, 100vw"
             priority
-            className="h-auto w-full bg-light object-contain"
+            className="bg-mist h-auto w-full object-contain"
           />
         ) : null}
         <div className="flex flex-col gap-8">
@@ -134,7 +134,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
                 <tbody>
                   {product.specs.map((spec, index) => (
                     <tr key={`${spec.label}-${index}`} className="border-b border-line">
-                      <th scope="row" className="py-3 pr-4 font-normal text-muted">
+                      <th scope="row" className="text-ink-muted py-3 pr-4 font-normal">
                         {spec.label}
                       </th>
                       <td className="py-3">
@@ -190,7 +190,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
                     className="inline-flex min-h-11 items-center gap-3 text-navy underline decoration-cyan underline-offset-4"
                   >
                     {document.title}
-                    <span className="text-meta text-muted no-underline">
+                    <span className="text-ink-muted text-small no-underline">
                       PDF, {formatFileSize(document.size)}
                     </span>
                   </a>
@@ -214,7 +214,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
                     width={image.width}
                     height={image.height}
                     sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className="h-auto w-full bg-light object-contain"
+                    className="bg-mist h-auto w-full object-contain"
                   />
                 </li>
               ))}

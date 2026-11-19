@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   htmlLimitedBots: /.*/,
   skipTrailingSlashRedirect: true,
+  experimental: { globalNotFound: true },
   images: {
     formats: ["image/avif", "image/webp"],
     localPatterns: [

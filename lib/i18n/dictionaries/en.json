@@ -16,7 +16,10 @@
     "breadcrumb": "Breadcrumb",
     "contactUs": "Contact us",
     "previous": "Previous",
-    "next": "Next"
+    "next": "Next",
+    "contact": "Contact",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu"
   },
   "contact": {
     "title": "Contact",
@@ -34,14 +37,42 @@
   "footer": {
     "contacts": "Contact",
     "followUs": "Follow us",
-    "rights": "All rights reserved."
+    "rights": "All rights reserved.",
+    "navigation": "Navigation",
+    "brands": "Brands"
   },
   "home": {
     "categoriesTitle": "Product categories",
     "productsTitle": "Featured machinery",
     "brandsTitle": "Brands we represent",
     "clientsTitle": "Our clients",
-    "postsTitle": "Blog"
+    "postsTitle": "Blog",
+    "categoriesEyebrow": "Catalogue",
+    "productsEyebrow": "Machinery",
+    "brandsEyebrow": "Partners",
+    "clientsEyebrow": "Customers",
+    "postsEyebrow": "Blog",
+    "consultationEyebrow": "Request",
+    "statementEyebrow": "About us",
+    "statement": "CEWM is HOMAG's partner in Azerbaijan. We help furniture and woodworking manufacturers choose machinery for cutting, edge banding, CNC machining, drilling, assembly and packaging.",
+    "chapters": {
+      "exterior": {
+        "label": "Facade",
+        "text": "Facade panels, window and door units: CNC machining and cutting."
+      },
+      "threshold": {
+        "label": "Stairs and doors",
+        "text": "Stair treads, door frames and partitions."
+      },
+      "living": {
+        "label": "Living room",
+        "text": "Cabinet furniture and shelving: cutting, edge banding, drilling."
+      },
+      "kitchen": {
+        "label": "Kitchen",
+        "text": "Kitchen fronts and carcasses, from cutting to assembly and packaging."
+      }
+    }
   },
   "catalog": {
     "title": "Products",

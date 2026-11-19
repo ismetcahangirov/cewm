@@ -16,7 +16,7 @@ export function PageHeading({
   children?: ReactNode;
 }) {
   return (
-    <div className="bg-light">
+    <div className="bg-mist">
       <div className="container-page py-8">
         <Breadcrumbs items={breadcrumbs} label={breadcrumbLabel} />
         <h1 className="mt-2 text-h1">{title}</h1>
