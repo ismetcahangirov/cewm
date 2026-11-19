@@ -142,7 +142,7 @@ function CategoryRowContent({
           <Image src={node.image.src} alt="" fill sizes="40px" className="object-contain" />
         ) : null}
       </span>
-      <div className="relative min-w-0 flex-1 text-meta">
+      <div className="relative flex min-h-11 min-w-0 flex-1 flex-col justify-center text-meta">
         <Link
           href={`/admin/categories/${node.id}`}
           className="block truncate font-medium after:absolute after:inset-0 hover:underline"

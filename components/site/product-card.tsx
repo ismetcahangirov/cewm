@@ -5,8 +5,10 @@ import { ArrowRightIcon } from "@/components/icons/iconsax";
 import { cx } from "@/lib/cx";
 import type { ProductCardItem } from "@/lib/public/catalog";
 
+import { ModelText } from "./model-text";
+
 export const productCardSizes =
-  "(min-width: 1536px) 25vw, (min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw";
+  "(min-width: 1536px) 34vw, (min-width: 1024px) 46vw, (min-width: 640px) 70vw, 140vw";
 
 export function ProductCard({
   product,
@@ -53,7 +55,7 @@ export function ProductCard({
             prefetch={false}
             className="decoration-1 underline-offset-4 group-hover/card:underline after:absolute after:inset-0"
           >
-            {product.name}
+            <ModelText text={product.name} />
           </Link>
         </Heading>
         {moreLabel ? (

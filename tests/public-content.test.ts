@@ -46,7 +46,8 @@ describe("public content", () => {
       lqip: null,
     };
     expect(toPublicImage(row, "en", "x")).toMatchObject({ src: "/media/wp/a.jpg", alt: "Desk" });
-    expect(toPublicImage(row, "ru", "x")?.alt).toBe("Masa");
+    expect(toPublicImage(row, "ru", "x")?.alt).toBe("x");
+    expect(toPublicImage(row, "ru", "")?.alt).toBe("Masa");
     expect(toPublicImage({ ...row, alt: null }, "az", "Fallback")?.alt).toBe("Fallback");
     expect(toPublicImage({ ...row, width: null }, "az", "x")).toBeNull();
   });

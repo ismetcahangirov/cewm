@@ -48,7 +48,7 @@ function Heading({ id, children }: { id: string; children: ReactNode }) {
 }
 
 const rowLink =
-  "inline-flex min-h-11 items-center gap-3 transition-colors duration-200 ease-standard hover:text-cyan";
+  "inline-flex min-h-11 min-w-11 items-center gap-3 transition-colors duration-200 ease-standard hover:text-cyan";
 
 export async function SiteFooter({ locale, dict }: { locale: Locale; dict: Dictionary }) {
   await connection();
@@ -92,7 +92,7 @@ export async function SiteFooter({ locale, dict }: { locale: Locale; dict: Dicti
                     {address}
                   </a>
                 ) : (
-                  <span className="inline-flex min-h-11 items-center gap-3">
+                  <span className="inline-flex min-h-11 min-w-11 items-center gap-3">
                     <LocationIcon size={20} className="shrink-0 text-cyan" />
                     {address}
                   </span>
@@ -127,7 +127,7 @@ export async function SiteFooter({ locale, dict }: { locale: Locale; dict: Dicti
               </li>
             ) : null}
             {hours ? (
-              <li className="inline-flex min-h-11 items-center gap-3">
+              <li className="inline-flex min-h-11 min-w-11 items-center gap-3">
                 <ClockIcon size={20} className="shrink-0 text-cyan" />
                 {hours}
               </li>
@@ -190,7 +190,7 @@ export async function SiteFooter({ locale, dict }: { locale: Locale; dict: Dicti
                       <ExportSquareIcon size={16} className="text-on-navy-muted" />
                     </a>
                   ) : (
-                    <span className="inline-flex min-h-11 items-center">{brand.name}</span>
+                    <span className="inline-flex min-h-11 min-w-11 items-center">{brand.name}</span>
                   )}
                 </li>
               ))}

@@ -34,7 +34,7 @@ export function ForgotPasswordForm() {
   const back = (
     <Link
       href={adminPaths.login}
-      className="inline-flex min-h-11 items-center gap-2 self-start text-meta text-graphite underline-offset-4 hover:underline md:min-h-0"
+      className="inline-flex min-h-11 items-center gap-2 self-start text-meta text-graphite underline-offset-4 hover:underline lg:min-h-0"
     >
       <ArrowLeft className="size-4" strokeWidth={1.5} />
       {t("Girişə qayıt")}

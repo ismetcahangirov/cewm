@@ -328,6 +328,7 @@ export function DataTable<Row extends RowData, Sort extends string>({
                         }
                         className={cn(
                           "h-12 px-3 text-left align-middle font-medium text-heading",
+                          meta?.mobile === "title" && "w-full max-w-0",
                           meta?.className,
                         )}
                       >
@@ -335,7 +336,7 @@ export function DataTable<Row extends RowData, Sort extends string>({
                           <button
                             type="button"
                             onClick={header.column.getToggleSortingHandler()}
-                            className="-mx-2 inline-flex h-10 items-center gap-2 rounded-sm px-2 hover:bg-secondary"
+                            className="-mx-2 inline-flex h-11 items-center gap-2 rounded-sm px-2 hover:bg-secondary lg:h-10"
                           >
                             <table.FlexRender header={header} />
                             <SortIcon direction={sorted} />
@@ -383,6 +384,7 @@ export function DataTable<Row extends RowData, Sort extends string>({
                           key={cell.id}
                           className={cn(
                             "h-12 px-3 py-2 align-middle",
+                            cell.column.columnDef.meta?.mobile === "title" && "w-full max-w-0",
                             cell.column.columnDef.meta?.className,
                           )}
                         >

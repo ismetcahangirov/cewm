@@ -165,7 +165,7 @@ export const ru = {
   "Üstünlük {number} ({locale})": "Преимущество {number} ({locale})",
   "Üstünlük {number}: sil": "Преимущество {number}: удалить",
   "Maşının əsas üstünlüklərini qısa cümlələrlə əlavə edin, hər sətirdə bir üstünlük.":
-    "Добавьте главные преимущества машины короткими фразами, по одному в строке.",
+    "Добавьте главные преимущества станка короткими фразами, по одному в строке.",
   "Üstünlük əlavə et": "Добавить преимущество",
   Sənədlər: "Документы",
   "PDF broşürlər və kataloqlar. Fayl bir dəfə yüklənir, adı hər dil üçün ayrıca yazılır.":
@@ -184,7 +184,7 @@ export const ru = {
   "Model kodu": "Код модели",
   "İstehsalçının model kodu. Axtarışda istifadə olunur.":
     "Код модели производителя. Используется в поиске.",
-  "Göstərici, məs. Kəsmə uzunluğu": "Параметр, напр. Длина реза",
+  "Göstərici, məs. Kəsmə uzunluğu": "Характеристика, напр. Длина реза",
   "Dəyər, məs. 3200": "Значение, напр. 3200",
   "Vahid, məs. mm": "Единица, напр. мм",
   "Vahid {number} ({locale})": "Единица {number} ({locale})",
@@ -204,7 +204,7 @@ export const ru = {
     "Не более {count} {count|преимущества|преимуществ|преимуществ}.",
   "Ən çox {count} sənəd ola bilər.": "Не более {count} {count|документа|документов|документов}.",
   "Ən çox {count} göstərici ola bilər.":
-    "Не более {count} {count|параметра|параметров|параметров}.",
+    "Не более {count} {count|характеристики|характеристик|характеристик}.",
   "Ən çox {count} şəkil ola bilər.":
     "Не более {count} {count|изображения|изображений|изображений}.",
   "Ən çox {count} əlaqəli məhsul seçmək olar.":

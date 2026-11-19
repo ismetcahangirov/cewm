@@ -1,6 +1,6 @@
 import type { media } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
-import { pickLocale } from "@/lib/i18n/localized";
+import { pickExact } from "@/lib/i18n/localized";
 import { routes } from "@/lib/routes";
 
 export type PublicImage = {
@@ -27,12 +27,12 @@ export function toPublicImage(
   fallbackAlt: string,
 ): PublicImage | null {
   if (!row?.key || !row.width || !row.height) return null;
-  const alt = row.alt ? pickLocale(row.alt, locale) : "";
+  const alt = pickExact(row.alt, locale) ?? (fallbackAlt || pickExact(row.alt, "az") || "");
   return {
     src: routes.media(row.key),
     width: row.width,
     height: row.height,
-    alt: alt || fallbackAlt,
+    alt,
     blurDataURL: row.lqip,
   };
 }

@@ -91,7 +91,7 @@ export function CategoryMultiSelect({
               <li key={node.id}>
                 <label
                   className={cn(
-                    "flex min-h-11 cursor-pointer items-center gap-3 rounded-sm px-2 text-meta hover:bg-secondary md:min-h-9",
+                    "flex min-h-11 cursor-pointer items-center gap-3 rounded-sm px-2 text-meta hover:bg-secondary lg:min-h-9",
                     node.depth && !term ? "pl-8" : null,
                   )}
                 >
@@ -128,7 +128,7 @@ export function CategoryMultiSelect({
                 type="button"
                 onClick={() => toggle(node.id)}
                 aria-label={t("{name} kateqoriyasını çıxar", { name: text(node.name) })}
-                className="-my-2 flex size-11 items-center justify-center rounded-sm hover:bg-chip md:my-0 md:size-8"
+                className="-my-2 flex size-11 items-center justify-center rounded-sm hover:bg-chip lg:my-0 lg:size-8"
               >
                 <X className="size-4" strokeWidth={1.5} />
               </button>

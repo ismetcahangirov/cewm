@@ -48,7 +48,7 @@ export function Breadcrumbs({
                 <Link
                   href={item.href}
                   prefetch={false}
-                  className="hover:text-ink inline-flex min-h-11 items-center transition-colors duration-200"
+                  className="hover:text-ink inline-flex min-h-11 min-w-11 items-center transition-colors duration-200"
                 >
                   {item.label}
                 </Link>

@@ -6,6 +6,7 @@ import {
   Ellipsis,
   Eye,
   EyeOff,
+  ImageOff,
   Pencil,
   Plus,
   RotateCcw,
@@ -155,7 +156,11 @@ function Thumbnail({ product }: { product: ProductListItemDto }) {
     <span className="relative size-10 shrink-0 border border-border bg-surface">
       {product.thumbnail ? (
         <Image src={product.thumbnail.src} alt="" fill sizes="40px" className="object-contain" />
-      ) : null}
+      ) : (
+        <span className="absolute inset-0 flex items-center justify-center text-muted-foreground">
+          <ImageOff className="size-4" strokeWidth={1.5} aria-hidden="true" />
+        </span>
+      )}
     </span>
   );
 }
@@ -210,7 +215,7 @@ export function ProductsView({ role }: { role: UserRole }) {
           cell: ({ row }) => (
             <Link
               href={`/admin/products/${row.original.id}`}
-              className="flex min-w-0 items-center gap-3 hover:underline"
+              className="flex min-h-11 min-w-0 items-center gap-3 hover:underline"
             >
               <Thumbnail product={row.original} />
               <span className="min-w-0">

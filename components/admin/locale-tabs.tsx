@@ -56,7 +56,7 @@ export function LocaleTabs({
 
   return (
     <Tabs value={active} onValueChange={(value) => setActive(value as Locale)}>
-      <TabsList aria-label={t("Məzmun dili")}>
+      <TabsList aria-label={t("Məzmun dili")} className="max-w-full overflow-x-auto">
         {locales.map((locale) => (
           <TabsTrigger
             key={locale}
@@ -92,7 +92,7 @@ export function LocaleTabs({
                   type="button"
                   variant="outline"
                   size="sm"
-                  className="h-auto min-h-11 max-w-full text-left whitespace-normal md:min-h-8"
+                  className="h-auto min-h-11 max-w-full text-left whitespace-normal lg:min-h-8"
                   onClick={() => onCopyFromDefault(locale)}
                 >
                   <Copy strokeWidth={1.5} />

@@ -1,7 +1,7 @@
 {
   "meta": {
     "siteName": "CEWM",
-    "description": "CEWM: Azərbaycanda HOMAG ağac emalı avadanlıqlarının tərəfdaşı. Mebel və ağac emalı istehsalçıları üçün dəzgahlar və konsultasiya.",
+    "description": "CEWM: Azərbaycanda HOMAG ağac emalı avadanlıqlarının tərəfdaşı. Mebel və ağac emalı istehsalçıları üçün maşınlar və konsultasiya.",
     "homeTitle": "CEWM: Azərbaycanda HOMAG ağac emalı avadanlıqları"
   },
   "common": {
@@ -55,7 +55,7 @@
     "postsEyebrow": "Bloq",
     "consultationEyebrow": "Müraciət",
     "statementEyebrow": "Haqqımızda",
-    "statement": "CEWM HOMAG-ın Azərbaycandakı tərəfdaşıdır. Mebel və ağac emalı istehsalçılarına kəsmə, kənar örtmə, CNC emalı, deşmə, montaj və qablaşdırma üçün avadanlıq seçməkdə kömək edirik.",
+    "statement": "CEWM HOMAG-ın Azərbaycandakı tərəfdaşıdır. Mebel və ağac emalı istehsalçılarına kəsmə, kənar bantlama, CNC emalı, deşmə, montaj və qablaşdırma üçün avadanlıq seçməkdə kömək edirik.",
     "chapters": {
       "exterior": {
         "label": "Fasad",
@@ -67,7 +67,7 @@
       },
       "living": {
         "label": "Qonaq otağı",
-        "text": "Korpus mebeli və rəflər: kəsmə, kənar örtmə, deşmə."
+        "text": "Korpus mebeli və rəflər: kəsmə, kənar bantlama, deşmə."
       },
       "kitchen": {
         "label": "Mətbəx",
@@ -77,9 +77,9 @@
   },
   "catalog": {
     "title": "Məhsullar",
-    "description": "CEWM kataloqu: HOMAG və partnyor brendlərin ağac emalı dəzgahları və avadanlıqları.",
+    "description": "CEWM kataloqu: HOMAG və partnyor brendlərin ağac emalı maşınları və avadanlıqları.",
     "indexTitle": "Məhsul kateqoriyaları",
-    "indexDescription": "Kəsmə, kənar örtmə, CNC emal mərkəzləri, deşmə, montaj, qablaşdırma texnologiyası və proqram təminatı.",
+    "indexDescription": "Kəsmə, kənar bantlama, CNC emal mərkəzləri, deşmə, montaj, qablaşdırma texnologiyası və proqram təminatı.",
     "categories": "Kateqoriyalar",
     "count": "{shown} / {total} məhsul",
     "loadMore": "Daha çox",

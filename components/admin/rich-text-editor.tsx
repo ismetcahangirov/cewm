@@ -330,7 +330,7 @@ export function RichTextEditor({
           )}
         </div>
       ) : (
-        <div className="h-11 border-b border-border md:h-10" />
+        <div className="h-11 border-b border-border lg:h-10" />
       )}
       <EditorContent editor={editor} />
       {minimal ? null : (

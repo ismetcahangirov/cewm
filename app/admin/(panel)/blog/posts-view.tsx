@@ -94,7 +94,7 @@ export function PostsView() {
           cell: ({ row }) => (
             <Link
               href={`/admin/blog/${row.original.id}`}
-              className="flex min-w-0 items-center gap-3 hover:underline"
+              className="flex min-h-11 min-w-0 items-center gap-3 hover:underline"
             >
               <Cover post={row.original} />
               <span className="min-w-0">

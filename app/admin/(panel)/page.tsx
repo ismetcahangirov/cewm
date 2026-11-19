@@ -21,7 +21,7 @@ function ArrowLink({ href, children }: { href: string; children: ReactNode }) {
   return (
     <Link
       href={href}
-      className="group inline-flex min-h-11 items-center gap-3 text-small text-graphite md:min-h-0"
+      className="group inline-flex min-h-11 items-center gap-3 text-small text-graphite lg:min-h-0"
     >
       <ArrowRight
         className="size-4 transition-transform duration-300 group-hover:translate-x-1 motion-reduce:transition-none"
