@@ -19,6 +19,7 @@
     "storage:cors": "tsx scripts/storage-cors.mts",
     "migrate:wp": "tsx --conditions=react-server scripts/migrate-wp/index.mts",
     "check:redirects": "tsx scripts/check-redirects.mts",
+    "check:seo": "tsx scripts/check-seo.mts",
     "hero:upload": "tsx scripts/hero-upload.mts"
   },
   "dependencies": {

@@ -13,6 +13,7 @@ import { formatPostDate, getPostPage, postsPerPage } from "@/lib/public/content"
 import { parsePageParam } from "@/lib/public/listing";
 import { staticPaths } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
+import { blogIndexable } from "@/lib/seo/corpus";
 import { pageMetadata, paginatedPaths } from "@/lib/seo/metadata";
 
 export async function generateMetadata({
@@ -25,6 +26,8 @@ export async function generateMetadata({
     title: dict.blog.title,
     description: dict.blog.description,
     paths: paginatedPaths(staticPaths(routes.blog()), page),
+    og: { kind: "blog" },
+    noIndex: !(await blogIndexable(locale)),
   });
 }
 

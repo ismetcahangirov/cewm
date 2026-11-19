@@ -5,7 +5,11 @@ import { getRequestDictionary } from "@/lib/i18n/server";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { dict } = await getRequestDictionary();
-  return { title: dict.notFound.title, description: dict.notFound.body };
+  return {
+    title: dict.notFound.title,
+    description: dict.notFound.body,
+    robots: { index: false, follow: false },
+  };
 }
 
 export default async function NotFound() {

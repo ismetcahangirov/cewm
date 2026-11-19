@@ -10,6 +10,7 @@ import { getCategoryTree } from "@/lib/public/catalog";
 import { staticPaths } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { markdownHref } from "@/lib/seo/rewrites";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { locale, dict } = await getRequestDictionary();
@@ -18,6 +19,8 @@ export async function generateMetadata(): Promise<Metadata> {
     title: dict.catalog.indexTitle,
     description: dict.catalog.indexDescription,
     paths: staticPaths(routes.categories()),
+    og: { kind: "categories" },
+    markdownPath: markdownHref(localePath(locale, routes.categories())),
   });
 }
 

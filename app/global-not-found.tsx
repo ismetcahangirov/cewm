@@ -19,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: `${dict.notFound.title} | ${dict.meta.siteName}`,
     description: dict.notFound.body,
+    robots: { index: false, follow: false },
   };
 }
 
