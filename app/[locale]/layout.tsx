@@ -17,10 +17,8 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const [{ dict }, { searchIndexing }] = await Promise.all([
-    getRequestDictionary(),
-    getSiteSettings(),
-  ]);
+  const { dict } = await getRequestDictionary();
+  const { searchIndexing } = await getSiteSettings();
   return {
     ...(searchIndexing ? {} : { robots: { index: false, follow: false } }),
     metadataBase: new URL(env.NEXT_PUBLIC_SITE_URL),
