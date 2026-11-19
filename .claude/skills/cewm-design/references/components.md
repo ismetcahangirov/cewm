@@ -40,8 +40,10 @@ examples in square brackets are placeholders, not copy.
   `Global` 20 px, a dropdown listing the language names in their own language), one CTA (filled
   cyan on navy: [Əlaqə]). Below `xl`: logo, language switch, menu button (Iconsax
   `HambergerMenu` 24 px, `aria-expanded`, `aria-controls`).
-- States `top`, `island`, `hidden` and their motion: `motion-recipes.md`, Header. On pages
-  without a film or dark hero the `top` state is a solid `bg-navy` full-width bar.
+- The header never gets smaller (owner decision, 2026-11-19): full width, `h-header`, logo
+  40 / 48 px and the container padding stay the same at every scroll position on every page,
+  and it never hides. Only the background changes (`clear` over the pinned film, `solid` navy
+  everywhere else): `motion-recipes.md`, Header.
 - Current page: `text-cyan` plus `aria-current="page"`.
 - Mobile menu: full-height navy sheet, links `text-h3`, language and contact at the bottom,
   focus trap, Escape and the close button (Iconsax `Add` rotated 45 degrees, 24 px) close it and
@@ -228,8 +230,8 @@ over the diff returns nothing.
 - A centred hero with headline, sub-headline, two buttons and three icon-in-a-circle feature
   cards. Ours is the split display headline over the film.
 - Gradient text, gradient blobs, mesh gradients, glows, neon borders, cyan glows on navy.
-- Glassmorphism everywhere. Glass is allowed in two places only: the header island and the one
-  arriving card of the stack, fine pointers only.
+- Glassmorphism everywhere. Glass is allowed in one place only: the one arriving card of the
+  card stack, fine pointers only.
 - "Stats" rows with giant numbers and plus signs (`500+ machines`, `20+ years`) unless the owner
   gives a real, sourced number; testimonial carousels with stars and stock avatars; "trusted by"
   logo walls of brands that are not real partners.
@@ -256,10 +258,10 @@ over the diff returns nothing.
 - Hover-only information does not exist: everything revealed on hover is also visible or
   reachable on touch (`RowPreview` thumbnails, card links).
 - Per-width changes of the motion system: film tier below 1024; card stack and callout lines
-  become lists below 1024 / 768; the header island keeps links only from 1280.
+  become lists below 1024 / 768; the header shows inline links from 1280, a menu button below.
 - Images: `sizes` matches the layout at each breakpoint; art-directed posters below 1024.
-- Landscape phones (height under 500 px): pinned scenes are unpinned (`@media (max-height:
-  500px)`), the header does not hide.
+- Landscape phones (height under 500 px): pinned scenes and the sticky card stack are unpinned
+  (`@media (max-height: 500px)`); the header stays as on every other width.
 
 ## Admin (shadcn/ui)
 
