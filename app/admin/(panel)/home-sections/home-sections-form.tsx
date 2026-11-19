@@ -29,20 +29,19 @@ import {
 } from "@/lib/validation/home-sections";
 import type { MediaDto } from "@/lib/validation/media";
 import type { ProductOptionDto } from "@/lib/validation/products";
-import { heroSlideLimit } from "@/lib/validation/settings";
 
-import { HeroSlides } from "./hero-slides";
+import { HeroFields } from "./hero-fields";
 import { SectionList, type SectionDefaults } from "./section-list";
 
 function toFormValues(data: HomeSectionsDto): HomeSectionsInput {
   return {
-    heroSlides: data.heroSlides.map((slide) => ({
-      imageId: slide.imageId,
-      mobileImageId: slide.mobileImageId ?? "",
-      title: formText(slide.title),
-      lead: formText(slide.lead),
-      href: slide.href ?? "",
-    })),
+    hero: {
+      headline: formText(data.hero?.headline),
+      subline: formText(data.hero?.subline),
+      ctaLabel: formText(data.hero?.ctaLabel),
+      ctaHref: data.hero?.ctaHref ?? "",
+      filmId: data.hero?.filmId ?? "",
+    },
     sections: data.sections.map((section) =>
       section.key === "custom"
         ? {
@@ -120,10 +119,10 @@ export function HomeSectionsForm({
         title={t("Ana səhifə bölmələri")}
         description={
           data.updatedAt
-            ? t("Slaydlar, bölmələrin sırası və seçilmiş məhsullar. Son dəyişiklik: {date}", {
+            ? t("Hero, bölmələrin sırası və seçilmiş məhsullar. Son dəyişiklik: {date}", {
                 date: formatDateTime(data.updatedAt, t.locale),
               })
-            : t("Slaydlar, bölmələrin sırası və seçilmiş məhsullar.")
+            : t("Hero, bölmələrin sırası və seçilmiş məhsullar.")
         }
         actions={<span className="max-md:hidden">{saveButton}</span>}
       />
@@ -132,20 +131,19 @@ export function HomeSectionsForm({
         <FormLayout
           main={
             <>
-              <FormSection title={t("Slaydlar")}>
+              <FormSection title={t("Hero")}>
                 <p className="text-meta text-muted-foreground">
                   {t(
-                    "Ana səhifənin ən yuxarısında növbə ilə göstərilir, ən çox {max} slayd. Sıranı sürüşdürərək və ya oxlarla dəyişin.",
-                    { max: heroSlideLimit },
+                    "Ana səhifənin ən yuxarısı: başlıq, alt mətn, düymə və scroll ilə oynadılan film.",
                   )}
                 </p>
-                <HeroSlides mediaById={mediaById} remember={remember} />
+                <HeroFields films={data.films} />
               </FormSection>
 
               <FormSection title={t("Bölmələr")}>
                 <p className="text-meta text-muted-foreground">
                   {t(
-                    "Slaydlardan sonra bu sıra ilə göstərilir. Gizlədilən bölmə saytda görünmür, amma ayarları saxlanılır. «Bölmə əlavə et» ilə başlıq, mətn, düymə, şəkil və ya video olan öz bölmənizi qurun.",
+                    "Hero-dan sonra bu sıra ilə göstərilir. Gizlədilən bölmə saytda görünmür, amma ayarları saxlanılır. «Bölmə əlavə et» ilə başlıq, mətn, düymə, şəkil və ya video olan öz bölmənizi qurun.",
                   )}
                 </p>
                 <SectionList defaults={defaults} mediaById={mediaById} remember={remember} />

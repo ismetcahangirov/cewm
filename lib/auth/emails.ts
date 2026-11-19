@@ -11,12 +11,12 @@ type PasswordEmail = {
 
 const copy = {
   invite: {
-    subject: "Mebline idarə panelinə dəvət",
-    lead: "Sizi Mebline saytının idarə panelinə dəvət etdilər. Daxil olmaq üçün şifrənizi təyin edin.",
+    subject: "CEWM idarə panelinə dəvət",
+    lead: "Sizi CEWM saytının idarə panelinə dəvət etdilər. Daxil olmaq üçün şifrənizi təyin edin.",
     action: "Şifrəni təyin et",
   },
   reset: {
-    subject: "Mebline idarə paneli: şifrənin bərpası",
+    subject: "CEWM idarə paneli: şifrənin bərpası",
     lead: "Şifrəni bərpa etmək üçün sorğu göndərilib. Yeni şifrə təyin etmək üçün linkə keçin.",
     action: "Yeni şifrə təyin et",
   },

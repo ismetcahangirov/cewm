@@ -41,15 +41,20 @@ const sources: Record<HomeSectionKey, { text: MessageKey; href: string; link: Me
     href: "#featured-products",
     link: "Siyahıya keç",
   },
-  projects: {
-    text: "Dərc olunmuş ilk 8 layihə, layihələr səhifəsindəki sıra ilə. Bölmə gizlədiləndə «Təklif al» bloku qalır.",
-    href: "/admin/projects",
-    link: "Layihələr",
+  brands: {
+    text: "Aktiv brendlər, brendlər səhifəsindəki sıra ilə.",
+    href: "/admin/brands",
+    link: "Brendlər",
   },
-  logos: {
-    text: "Aktiv referans və partnyor loqoları, hərəkət edən lent kimi.",
-    href: "/admin/logos",
-    link: "Partnyorlar",
+  clients: {
+    text: "Aktiv müştəri loqoları, müştərilər səhifəsindəki sıra ilə.",
+    href: "/admin/clients",
+    link: "Müştərilər",
+  },
+  posts: {
+    text: "Ən son dərc olunmuş 3 bloq yazısı.",
+    href: "/admin/blog",
+    link: "Bloq",
   },
 };
 
@@ -60,11 +65,11 @@ function newCustomSection(id: string): SectionInput {
     key: "custom",
     id,
     visible: true,
-    title: { az: "", ru: "", en: "" },
+    title: { az: "", ru: "", en: "", de: "" },
     block: {
-      eyebrow: { az: "", ru: "", en: "" },
+      eyebrow: { az: "", ru: "", en: "", de: "" },
       body: null,
-      linkLabel: { az: "", ru: "", en: "" },
+      linkLabel: { az: "", ru: "", en: "", de: "" },
       href: "",
       mediaKind: "image",
       mediaId: "",
@@ -242,6 +247,7 @@ export function SectionList({
                   filled={{
                     ru: Boolean(section?.title?.ru),
                     en: Boolean(section?.title?.en),
+                    de: Boolean(section?.title?.de),
                   }}
                 >
                   {(locale) => (

@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useT } from "@/lib/admin/i18n/use-t";
 import { useGetCategoriesQuery, useGetProductQuery } from "@/lib/api/admin";
+import { useGetBrandsQuery } from "@/lib/api/brands";
 import { isApiError } from "@/lib/api/types";
 
 import { ProductForm } from "./product-form";
@@ -26,9 +27,11 @@ function EditorSkeleton() {
 export function ProductEditor({ id }: { id?: string }) {
   const t = useT();
   const categories = useGetCategoriesQuery();
+  const brands = useGetBrandsQuery();
   const product = useGetProductQuery(id ?? "", { skip: !id, refetchOnMountOrArgChange: true });
 
-  if (categories.isLoading || (id && product.isLoading)) return <EditorSkeleton />;
+  if (categories.isLoading || brands.isLoading || (id && product.isLoading))
+    return <EditorSkeleton />;
 
   if (id && product.isError) {
     const missing = isApiError(product.error) && product.error.status === 404;
@@ -50,6 +53,7 @@ export function ProductEditor({ id }: { id?: string }) {
       key={product.data?.id ?? "new"}
       product={id ? (product.data ?? null) : null}
       categories={categories.data ?? []}
+      brands={(brands.data ?? []).map((brand) => ({ id: brand.id, name: brand.name }))}
     />
   );
 }

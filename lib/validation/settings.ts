@@ -12,8 +12,8 @@ import type { Localized } from "@/lib/i18n/localized";
 import { normalizeAzerbaijaniPhone } from "@/lib/phone";
 
 import { localizedOptional, localizedText, optionalText, uuid } from "./fields";
-import { mediaKindOf, type MediaDto } from "./media";
-import { azerbaijaniMobileOrLandlinePhone, optionalEmail } from "./quote-requests";
+import type { MediaDto } from "./media";
+import { azerbaijaniMobileOrLandlinePhone, optionalEmail } from "./consultation-requests";
 
 export { socialNetworks, type SocialNetwork };
 
@@ -31,15 +31,9 @@ export const settingsLimits = {
   socials: socialNetworks.length,
 } as const;
 
-export const heroSlideLimit = 3;
-
-export const heroSlideMinWidth = 1600;
-
-export const heroSlideMobileMinWidth = 900;
-
 export const legalNameWithoutMmc = optionalText(160).refine(
   (value) => !value || !/(^|[^\p{L}\p{N}])mmc($|[^\p{L}\p{N}])/iu.test(value),
-  "Şirkətin adı «MMC» olmadan yazılır, məsələn «Mebline».",
+  "Şirkətin adı «MMC» olmadan yazılır, məsələn «CEWM».",
 );
 
 const httpsUrl = (message: string) =>
@@ -77,7 +71,7 @@ const sitePath = /^\/(?!\/)[^\s\\]*$/;
 
 const httpsLink = z.url({ protocol: /^https$/ });
 
-export const heroSlideHref = z
+export const siteHref = z
   .string()
   .trim()
   .max(500, "Ən çox 500 simvol ola bilər.")
@@ -87,47 +81,6 @@ export const heroSlideHref = z
   )
   .nullish()
   .transform((value) => value || null);
-
-export function heroSlideImageError(
-  image: { mimeType: string; width: number | null; height: number | null } | undefined,
-): string | null {
-  if (!image) return "Şəkil tapılmadı.";
-  if (mediaKindOf(image.mimeType) !== "image") return "JPG, PNG və ya WebP şəkil seçin.";
-  if (!image.width || !image.height) return "Şəklin ölçüləri bilinmir. Şəkli yenidən yükləyin.";
-  if (image.width <= image.height) {
-    return `Slayd şəkli üfüqi olmalıdır: eni hündürlüyündən böyük. Bu şəkil ${image.width} × ${image.height} px-dir.`;
-  }
-  if (image.width < heroSlideMinWidth) {
-    return `Slayd şəklinin eni ən azı ${heroSlideMinWidth} px olmalıdır. Bu şəklin eni ${image.width} px-dir.`;
-  }
-  return null;
-}
-
-export function heroSlideMobileImageError(
-  image: { mimeType: string; width: number | null; height: number | null } | undefined,
-): string | null {
-  if (!image) return "Şəkil tapılmadı.";
-  if (mediaKindOf(image.mimeType) !== "image") return "JPG, PNG və ya WebP şəkil seçin.";
-  if (!image.width || !image.height) return "Şəklin ölçüləri bilinmir. Şəkli yenidən yükləyin.";
-  if (image.height <= image.width) {
-    return `Mobil şəkil şaquli olmalıdır: hündürlüyü enindən böyük. Bu şəkil ${image.width} × ${image.height} px-dir.`;
-  }
-  if (image.width < heroSlideMobileMinWidth) {
-    return `Mobil şəklin eni ən azı ${heroSlideMobileMinWidth} px olmalıdır. Bu şəklin eni ${image.width} px-dir.`;
-  }
-  return null;
-}
-
-export const heroSlideSchema = z.object({
-  imageId: uuid("Şəkil seçin."),
-  mobileImageId: z
-    .union([z.literal(""), uuid("Şəkil seçin.")])
-    .nullish()
-    .transform((value) => value || null),
-  title: localizedText(80, "Slaydın başlığını yazın."),
-  lead: localizedOptional(200),
-  href: heroSlideHref,
-});
 
 const phoneRowSchema = z.object({
   label: localizedText(60, "Nömrənin adını yazın, məsələn «Ofis»."),
@@ -205,7 +158,7 @@ export const settingsInputSchema = z.object({
   seoDescription: localizedOptional(320),
   ogImageId: uuid().nullable(),
   legalName: legalNameWithoutMmc,
-  quoteNotifyEmail: optionalEmail,
+  consultationNotifyEmail: optionalEmail,
   catalogueFileId: uuid().nullable(),
 });
 
@@ -230,6 +183,6 @@ export type SettingsDto = {
   seoTitle: Localized | null;
   seoDescription: Localized | null;
   legalName: string | null;
-  quoteNotifyEmail: string | null;
+  consultationNotifyEmail: string | null;
   updatedAt: string | null;
 };

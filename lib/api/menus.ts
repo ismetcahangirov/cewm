@@ -25,7 +25,6 @@ export const menusApi = baseApi.injectEndpoints({
         { type: "Menu", id: "TARGETS" },
         { type: "Category", id: "LIST" },
         { type: "Page", id: "LIST" },
-        { type: "Project", id: "LIST" },
       ],
     }),
     createMenu: build.mutation<MenuSummaryDto, CreateMenuInput>({

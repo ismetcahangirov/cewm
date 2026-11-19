@@ -21,6 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { filledLocales } from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import type { Locale } from "@/lib/i18n/config";
 import { locales } from "@/lib/i18n/config";
@@ -41,11 +42,15 @@ import { CategoryTargetSelect } from "./category-target-select";
 
 function toFormValues(item: MenuItemFields | null): MenuItemFieldsInput {
   return {
-    label: { az: item?.label.az ?? "", ru: item?.label.ru ?? "", en: item?.label.en ?? "" },
+    label: {
+      az: item?.label.az ?? "",
+      ru: item?.label.ru ?? "",
+      en: item?.label.en ?? "",
+      de: item?.label.de ?? "",
+    },
     target: item?.target ?? "category",
     categoryId: item?.categoryId ?? null,
     pageId: item?.pageId ?? null,
-    projectId: item?.projectId ?? null,
     url: item?.url ?? "",
   };
 }
@@ -141,7 +146,7 @@ export function MenuItemDialog({
     if (form.getValues("label.az").trim()) return;
     form.setValue(
       "label",
-      { az: title.az, ru: title.ru ?? "", en: title.en ?? "" },
+      { az: title.az, ru: title.ru ?? "", en: title.en ?? "", de: title.de ?? "" },
       { shouldDirty: true, shouldValidate: true },
     );
   }
@@ -253,30 +258,6 @@ export function MenuItemDialog({
               )}
             />
           ) : null}
-          {target === "project" ? (
-            <FormField
-              control={form.control}
-              name="projectId"
-              label={t("Layihə")}
-              required
-              render={({ field, id, invalid: fieldInvalid, describedBy }) => (
-                <ContentSelect
-                  id={id}
-                  options={targets.projects}
-                  value={field.value}
-                  placeholder={t("Layihə seçin")}
-                  empty={t("Hələ layihə yoxdur.")}
-                  invalid={fieldInvalid}
-                  describedBy={describedBy}
-                  onBlur={field.onBlur}
-                  onChange={(option) => {
-                    field.onChange(option.id);
-                    fillLabel(option.title);
-                  }}
-                />
-              )}
-            />
-          ) : null}
           {target === "url" ? (
             <FormField
               control={form.control}
@@ -307,7 +288,7 @@ export function MenuItemDialog({
               )}
             </p>
           ) : null}
-          <LocaleTabs invalid={invalid} filled={{ ru: Boolean(label?.ru), en: Boolean(label?.en) }}>
+          <LocaleTabs invalid={invalid} filled={filledLocales(label)}>
             {(locale) => (
               <FormField
                 control={form.control}

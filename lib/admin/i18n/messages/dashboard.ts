@@ -14,13 +14,9 @@ export const ru = {
   Müraciətlər: "Заявки",
   Məhsullar: "Товары",
   "{published} dərc olunub, {draft} qaralama": "Опубликовано: {published}, черновики: {draft}",
-  Layihələr: "Проекты",
   Qaralamalar: "Черновики",
-  "Məhsul, layihə, səhifə və bloq": "Товары, проекты, страницы и блог",
   "Son müraciətlər": "Последние заявки",
   Hamısı: "Все",
-  "Hələ müraciət yoxdur. Saytdan gələn təklif sorğuları burada görünəcək.":
-    "Заявок пока нет. Здесь появятся запросы предложений с сайта.",
   Ad: "Имя",
   Telefon: "Телефон",
   Məhsul: "Товар",
@@ -28,7 +24,6 @@ export const ru = {
   Tarix: "Дата",
   "Tez keçidlər": "Быстрые ссылки",
   "Yeni məhsul əlavə et": "Добавить товар",
-  "Yeni layihə əlavə et": "Добавить проект",
   "Media kitabxanası": "Медиатека",
   "Əlaqə məlumatları və SEO": "Контакты и SEO",
   Tapılmadı: "Не найдено",
@@ -37,6 +32,7 @@ export const ru = {
   "Səhifə tapılmadı": "Страница не найдена",
   "Bu ünvanda bölmə yoxdur və ya element silinib.":
     "По этому адресу нет раздела, или элемент был удалён.",
+  "Məhsul, səhifə və bloq": "Товары, страницы и блог",
 } satisfies Messages;
 
 export const en: Record<keyof typeof ru, string> = {
@@ -53,13 +49,9 @@ export const en: Record<keyof typeof ru, string> = {
   Müraciətlər: "Requests",
   Məhsullar: "Products",
   "{published} dərc olunub, {draft} qaralama": "Published: {published}, drafts: {draft}",
-  Layihələr: "Projects",
   Qaralamalar: "Drafts",
-  "Məhsul, layihə, səhifə və bloq": "Products, projects, pages and blog",
   "Son müraciətlər": "Latest requests",
   Hamısı: "All",
-  "Hələ müraciət yoxdur. Saytdan gələn təklif sorğuları burada görünəcək.":
-    "No requests yet. Quote requests from the site will appear here.",
   Ad: "Name",
   Telefon: "Phone",
   Məhsul: "Product",
@@ -67,7 +59,6 @@ export const en: Record<keyof typeof ru, string> = {
   Tarix: "Date",
   "Tez keçidlər": "Quick links",
   "Yeni məhsul əlavə et": "Add a product",
-  "Yeni layihə əlavə et": "Add a project",
   "Media kitabxanası": "Media library",
   "Əlaqə məlumatları və SEO": "Contact details and SEO",
   Tapılmadı: "Not found",
@@ -76,4 +67,41 @@ export const en: Record<keyof typeof ru, string> = {
   "Səhifə tapılmadı": "Page not found",
   "Bu ünvanda bölmə yoxdur və ya element silinib.":
     "There is no section at this address, or the item was deleted.",
+  "Məhsul, səhifə və bloq": "Products, pages and blog",
+};
+
+export const de: Record<keyof typeof ru, string> = {
+  "İdarə paneli": "Dashboard",
+  "Xoş gəldiniz, {name}.": "Willkommen, {name}.",
+  "Sayt ziyarətçiləri": "Website-Besucher",
+  "Bu gün": "Heute",
+  "Son 7 gün": "Letzte 7 Tage",
+  "Son 30 gün": "Letzte 30 Tage",
+  "Unikal ziyarətçilər, Bakı vaxtı ilə. Botlar və daxil olmuş istifadəçilər sayılmır.":
+    "Eindeutige Besucher, nach Bakuer Zeit. Bots und angemeldete Benutzer werden nicht gezählt.",
+  "Bu həftə yeni müraciətlər": "Neue Anfragen diese Woche",
+  "Cavab gözləyən: {count}": "Warten auf Antwort: {count}",
+  Müraciətlər: "Anfragen",
+  Məhsullar: "Produkte",
+  "{published} dərc olunub, {draft} qaralama": "Veröffentlicht: {published}, Entwürfe: {draft}",
+  Qaralamalar: "Entwürfe",
+  "Son müraciətlər": "Neueste Anfragen",
+  Hamısı: "Alle",
+  Ad: "Name",
+  Telefon: "Telefon",
+  Məhsul: "Produkt",
+  Status: "Status",
+  Tarix: "Datum",
+  "Tez keçidlər": "Schnellzugriff",
+  "Yeni məhsul əlavə et": "Neues Produkt hinzufügen",
+  "Media kitabxanası": "Mediathek",
+  "Əlaqə məlumatları və SEO": "Kontaktdaten und SEO",
+  Tapılmadı: "Nicht gefunden",
+  "İdarə panelinə qayıt": "Zurück zum Dashboard",
+  "Bu bölmə növbəti mərhələdə əlavə olunacaq.":
+    "Dieser Bereich wird in der nächsten Phase hinzugefügt.",
+  "Səhifə tapılmadı": "Seite nicht gefunden",
+  "Bu ünvanda bölmə yoxdur və ya element silinib.":
+    "Unter dieser Adresse gibt es keinen Bereich, oder das Element wurde gelöscht.",
+  "Məhsul, səhifə və bloq": "Produkte, Seiten und Blog",
 };

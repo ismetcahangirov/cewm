@@ -24,7 +24,7 @@ export async function checkImage(field: string, id: string | null): Promise<Doma
 }
 
 export function slugConflictFor(
-  table: "pages" | "posts" | "projects" | "vacancies",
+  table: "pages" | "posts",
   message: string,
 ): (cause: unknown) => DomainError | null {
   return (cause) => {
@@ -39,6 +39,6 @@ export function slugConflictFor(
   };
 }
 
-export function menuItemCount(column: "page_id" | "project_id", id: SQL): SQL<number> {
+export function menuItemCount(column: "page_id" | "category_id", id: SQL): SQL<number> {
   return sql<number>`(select count(*) from ${menuItems} mi where mi.${sql.raw(column)} = ${id})::int`;
 }

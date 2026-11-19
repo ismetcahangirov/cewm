@@ -160,7 +160,7 @@ export function PhoneRows() {
         size="sm"
         className="self-start"
         disabled={fields.length >= settingsLimits.phones}
-        onClick={() => append({ label: { az: "", ru: "", en: "" }, number: "" })}
+        onClick={() => append({ label: { az: "", ru: "", en: "", de: "" }, number: "" })}
       >
         <Plus strokeWidth={1.5} />
         {t("Nömrə əlavə et")}
@@ -204,7 +204,7 @@ export function EmailRows() {
                     type="email"
                     inputMode="email"
                     autoComplete="off"
-                    placeholder="office@mebline.az"
+                    placeholder="info@example.com"
                     maxLength={254}
                     aria-invalid={Boolean(message)}
                     aria-describedby={message ? `${inputId}-error` : undefined}
@@ -323,7 +323,7 @@ export function SocialRows() {
                       type="url"
                       inputMode="url"
                       autoComplete="off"
-                      placeholder="https://www.instagram.com/mebline.az"
+                      placeholder="https://www.instagram.com/..."
                       maxLength={500}
                       aria-invalid={Boolean(urlMessage)}
                       aria-describedby={urlMessage ? `${urlId}-error` : undefined}

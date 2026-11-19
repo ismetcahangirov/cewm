@@ -13,15 +13,16 @@ import {
   type CustomBlockTone,
   type HomeSectionKey,
   type SettingsCustomSection,
-  type SettingsHeroSlide,
+  type SettingsHero,
   type SettingsHomeSection,
 } from "@/lib/db/schema/settings";
 import type { Localized } from "@/lib/i18n/localized";
 
-import { localizedOptional, localizedRichText, optionalText, uuid } from "./fields";
+import { localizedOptional, localizedRichText, localizedText, optionalText, uuid } from "./fields";
+import type { HeroFilmOptionDto } from "./hero-films";
 import type { MediaDto } from "./media";
 import type { ProductOptionDto } from "./products";
-import { heroSlideHref, heroSlideLimit, heroSlideSchema } from "./settings";
+import { siteHref } from "./settings";
 
 export {
   customBlockLayouts,
@@ -49,11 +50,12 @@ export const homeFeaturedMax = 48;
 export const homeSectionLabels: Record<HomeSectionKey, MessageKey> = {
   categories: "Kateqoriyalar",
   products: "Seçilmiş məhsullar",
-  projects: "Layihələr və təklif bloku",
-  logos: "Partnyorlar",
+  brands: "Brendlər",
+  clients: "Müştərilər",
+  posts: "Bloq",
 };
 
-export const titledHomeSections: readonly HomeSectionKey[] = ["categories", "products", "projects"];
+export const titledHomeSections: readonly HomeSectionKey[] = homeSectionKeys;
 
 export function normalizeHomeSections(
   stored: readonly SettingsHomeSection[],
@@ -93,11 +95,16 @@ export function normalizeHomeSections(
 }
 
 const sectionTitle = z
-  .object({ az: optionalText(120), ru: optionalText(120), en: optionalText(120) })
+  .object({
+    az: optionalText(120),
+    ru: optionalText(120),
+    en: optionalText(120),
+    de: optionalText(120),
+  })
   .nullish()
   .transform((value): Localized | null =>
-    value?.az || value?.ru || value?.en
-      ? { az: value.az ?? "", ru: value.ru ?? null, en: value.en ?? null }
+    value?.az || value?.ru || value?.en || value?.de
+      ? { az: value.az ?? "", ru: value.ru ?? null, en: value.en ?? null, de: value.de ?? null }
       : null,
   );
 
@@ -111,7 +118,7 @@ const customBlockSchema = z
     eyebrow: localizedOptional(60),
     body: localizedRichText,
     linkLabel: localizedOptional(40),
-    href: heroSlideHref,
+    href: siteHref,
     mediaKind: z.enum(customBlockMediaKinds, "Media növünü seçin."),
     mediaId: optionalMediaId,
     posterId: optionalMediaId,
@@ -186,10 +193,32 @@ const customSectionSchema = z
 
 const sectionSchema = z.discriminatedUnion("key", [customSectionSchema, builtInSectionSchema]);
 
+export const heroSchema = z
+  .object({
+    headline: localizedText(120, "Hero başlığını yazın."),
+    subline: localizedOptional(300),
+    ctaLabel: localizedOptional(40),
+    ctaHref: siteHref,
+    filmId: z
+      .union([z.literal(""), uuid("Film düzgün deyil.")])
+      .nullish()
+      .transform((value) => value || null),
+  })
+  .superRefine((hero, context) => {
+    if (hero.ctaLabel && !hero.ctaHref) {
+      context.addIssue({ code: "custom", path: ["ctaHref"], message: "Düymə üçün link yazın." });
+    }
+    if (hero.ctaHref && !hero.ctaLabel) {
+      context.addIssue({
+        code: "custom",
+        path: ["ctaLabel", "az"],
+        message: "Düymənin mətnini yazın.",
+      });
+    }
+  });
+
 export const homeSectionsInputSchema = z.object({
-  heroSlides: z
-    .array(heroSlideSchema)
-    .max(heroSlideLimit, `Ən çox ${heroSlideLimit} slayd ola bilər.`),
+  hero: heroSchema,
   sections: z
     .array(sectionSchema)
     .refine((sections) => {
@@ -220,7 +249,8 @@ export type HomeSectionsInput = z.input<typeof homeSectionsInputSchema>;
 export type HomeSectionsValues = z.output<typeof homeSectionsInputSchema>;
 
 export type HomeSectionsDto = {
-  heroSlides: SettingsHeroSlide[];
+  hero: SettingsHero | null;
+  films: HeroFilmOptionDto[];
   sections: SettingsHomeSection[];
   featured: ProductOptionDto[];
   media: MediaDto[];

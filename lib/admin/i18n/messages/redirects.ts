@@ -99,3 +99,53 @@ export const en: Record<keyof typeof ru, string> = {
   "Bu ünvana gələn ziyarətçilər və axtarış sistemləri «Səhifə tapılmadı» görəcək.":
     "Visitors and search engines coming to this URL will see “Page not found”.",
 };
+
+export const de: Record<keyof typeof ru, string> = {
+  Yönləndirmələr: "Weiterleitungen",
+  "Yönləndirmə saxlanıldı.": "Weiterleitung gespeichert.",
+  "Yönləndirmə əlavə olundu.": "Weiterleitung hinzugefügt.",
+  "{count} köhnə yönləndirmə də yeni ünvana yönəldildi.":
+    "{count} {count|alte Weiterleitung wurde|alte Weiterleitungen wurden} ebenfalls auf die neue Adresse umgestellt.",
+  "Yönləndirməni redaktə et": "Weiterleitung bearbeiten",
+  "Yeni yönləndirmə": "Neue Weiterleitung",
+  "Köhnə ünvana gələn ziyarətçi bir addımda yeni ünvana keçir. Dəyişiklik saytda dərhal görünür.":
+    "Besucher der alten Adresse gelangen in einem Schritt zur neuen. Die Änderung ist sofort auf der Website wirksam.",
+  "Köhnə ünvan": "Alte Adresse",
+  "Tam linki də yapışdıra bilərsiniz: domen və sondakı «/» atılır.":
+    "Sie können auch einen vollständigen Link einfügen: Die Domain und ein abschließender „/“ werden entfernt.",
+  "Yeni ünvan": "Neue Adresse",
+  "Saytdakı ünvan, məsələn /mehsullar/rehber-destleri.":
+    "Adresse auf der Website, zum Beispiel /mehsullar/rehber-destleri.",
+  Növ: "Typ",
+  "Köhnə saytın ünvanları üçün 301 seçin: axtarış sistemləri yeni ünvanı yadda saxlayır.":
+    "Wählen Sie 301 für Adressen der alten Website: Suchmaschinen übernehmen dann die neue Adresse.",
+  "301 · daimi (tövsiyə olunur)": "301 · dauerhaft (empfohlen)",
+  "302 · müvəqqəti": "302 · vorübergehend",
+  "307 · müvəqqəti, metod saxlanılır": "307 · vorübergehend, Methode bleibt erhalten",
+  "308 · daimi, metod saxlanılır": "308 · dauerhaft, Methode bleibt erhalten",
+  "Ləğv et": "Abbrechen",
+  Saxlanılır: "Wird gespeichert…",
+  Saxla: "Speichern",
+  "Əlavə et": "Hinzufügen",
+  "Bütün ünvanlar": "Alle Adressen",
+  Səhifələr: "Seiten",
+  "Şəkillər və fayllar": "Bilder und Dateien",
+  Kod: "Code",
+  Yaradılıb: "Erstellt",
+  "Yönləndirmə silindi.": "Weiterleitung gelöscht.",
+  "{name}: əməliyyatlar": "{name}: Aktionen",
+  "Redaktə et": "Bearbeiten",
+  "Saytda yoxla": "Auf der Website prüfen",
+  Sil: "Löschen",
+  "Köhnə saytın ünvanları yeni səhifələrə bir addımda (301) yönləndirilir. Dəyişikliklər saytda dərhal görünür.":
+    "Adressen der alten Website werden in einem Schritt (301) auf die neuen Seiten weitergeleitet. Änderungen sind sofort auf der Website wirksam.",
+  "Yenidən yüklə": "Neu laden",
+  "Yönləndirmələr yüklənmədi.": "Die Weiterleitungen konnten nicht geladen werden.",
+  "Köhnə və ya yeni ünvan ilə axtar": "Nach alter oder neuer Adresse suchen",
+  "Ünvan növü": "Adresstyp",
+  "Seçimə uyğun yönləndirmə tapılmadı.": "Keine Weiterleitungen entsprechen der Auswahl.",
+  "Hələ yönləndirmə yoxdur.": "Noch keine Weiterleitungen.",
+  "«{name}» yönləndirməsi silinsin?": "Weiterleitung „{name}“ löschen?",
+  "Bu ünvana gələn ziyarətçilər və axtarış sistemləri «Səhifə tapılmadı» görəcək.":
+    "Besucher und Suchmaschinen sehen unter dieser Adresse „Seite nicht gefunden“.",
+};

@@ -75,9 +75,6 @@ export const ru = {
   Səhifə: "Страница",
   "Səhifə seçin": "Выберите страницу",
   "Hələ səhifə yoxdur.": "Страниц пока нет.",
-  Layihə: "Проект",
-  "Layihə seçin": "Выберите проект",
-  "Hələ layihə yoxdur.": "Проектов пока нет.",
   Ünvan: "Адрес",
   "https:// ilə tam ünvan, saytdakı yol (/layiheler), tel:+994... və ya mailto:...":
     "Полный адрес с https://, путь на сайте (/layiheler), tel:+994... или mailto:...",
@@ -103,13 +100,9 @@ export const ru = {
   "Kateqoriya: {name}": "Категория: {name}",
   "Kateqoriya gizlidir, saytda göstərilməyəcək.": "Категория скрыта, на сайте не будет показана.",
   "Səhifə tapılmadı.": "Страница не найдена.",
-  "Layihə tapılmadı.": "Проект не найден.",
   "Səhifə: {name}": "Страница: {name}",
-  "Layihə: {name}": "Проект: {name}",
   "Səhifə dərc olunmayıb, saytda göstərilməyəcək.":
     "Страница не опубликована, на сайте не будет показана.",
-  "Layihə dərc olunmayıb, saytda göstərilməyəcək.":
-    "Проект не опубликован, на сайте не будет показан.",
 } satisfies Messages;
 
 export const en: Record<keyof typeof ru, string> = {
@@ -186,9 +179,6 @@ export const en: Record<keyof typeof ru, string> = {
   Səhifə: "Page",
   "Səhifə seçin": "Choose a page",
   "Hələ səhifə yoxdur.": "No pages yet.",
-  Layihə: "Project",
-  "Layihə seçin": "Choose a project",
-  "Hələ layihə yoxdur.": "No projects yet.",
   Ünvan: "URL",
   "https:// ilə tam ünvan, saytdakı yol (/layiheler), tel:+994... və ya mailto:...":
     "A full URL with https://, a path on the site (/layiheler), tel:+994... or mailto:...",
@@ -216,11 +206,116 @@ export const en: Record<keyof typeof ru, string> = {
   "Kateqoriya gizlidir, saytda göstərilməyəcək.":
     "The category is hidden and will not be shown on the site.",
   "Səhifə tapılmadı.": "Page not found.",
-  "Layihə tapılmadı.": "Project not found.",
   "Səhifə: {name}": "Page: {name}",
-  "Layihə: {name}": "Project: {name}",
   "Səhifə dərc olunmayıb, saytda göstərilməyəcək.":
     "The page is not published and will not be shown on the site.",
-  "Layihə dərc olunmayıb, saytda göstərilməyəcək.":
-    "The project is not published and will not be shown on the site.",
+};
+
+export const de: Record<keyof typeof ru, string> = {
+  Menyular: "Menüs",
+  "Menyular yüklənmədi.": "Die Menüs konnten nicht geladen werden.",
+  "Hələ menyu yoxdur.": "Noch keine Menüs vorhanden.",
+  "Menyu yüklənmədi.": "Das Menü konnte nicht geladen werden.",
+  "Yenidən yüklə": "Neu laden",
+  "Kateqoriya seçin": "Kategorie auswählen",
+  "Kateqoriya axtar": "Kategorien suchen",
+  Axtar: "Suchen",
+  Kateqoriyalar: "Kategorien",
+  gizli: "ausgeblendet",
+  "Heç nə tapılmadı.": "Nichts gefunden.",
+  "«{name}» sütunu yaradıldı.": "Spalte „{name}“ wurde erstellt.",
+  "Yeni altbilgi sütunu": "Neue Fußzeilenspalte",
+  "Başlıq saytın altbilgisində sütunun üstündə göstərilir.":
+    "Der Titel wird in der Fußzeile der Website über der Spalte angezeigt.",
+  "Başlıq ({locale})": "Titel ({locale})",
+  "Ləğv et": "Abbrechen",
+  Yaradılır: "Wird erstellt…",
+  Yarat: "Erstellen",
+  "Sütunların sırası saxlanıldı.": "Spaltenreihenfolge gespeichert.",
+  "Sütunların sırası": "Spaltenreihenfolge",
+  "Altbilgidə sütunlar soldan sağa bu sırada göstərilir. Dəyişiklik dərhal saxlanılır.":
+    "In der Fußzeile werden die Spalten von links nach rechts in dieser Reihenfolge angezeigt. Änderungen werden sofort gespeichert.",
+  "{name}: yerini dəyiş": "{name}: verschieben",
+  "{name}: sola": "{name}: nach links",
+  "{name}: sağa": "{name}: nach rechts",
+  Sola: "Nach links",
+  Sağa: "Nach rechts",
+  Bağla: "Schließen",
+  "Altbilgi: {name}": "Fußzeile: {name}",
+  "Menyuda ən çox {max} element ola bilər.":
+    "Ein Menü kann höchstens {max} {max|Eintrag|Einträge} enthalten.",
+  "Menyuda səhvlər var. Qeyd olunan yerləri düzəldin.":
+    "Das Menü enthält Fehler. Bitte korrigieren Sie die markierten Stellen.",
+  "Menyu saxlanıldı, saytda yeniləndi.": "Menü gespeichert und auf der Website aktualisiert.",
+  "Xəta baş verdi. Yenidən cəhd edin.":
+    "Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
+  "«{name}» sütunu silindi.": "Spalte „{name}“ wurde gelöscht.",
+  Saxlanılır: "Wird gespeichert…",
+  Saxla: "Speichern",
+  "Əvvəlcə dəyişiklikləri saxlayın.": "Speichern Sie zuerst Ihre Änderungen.",
+  "Yuxarı menyu (mobil menyu da) və altbilgi sütunları.":
+    "Hauptmenü (auch das mobile Menü) und Spalten der Fußzeile.",
+  "Yeni sütun": "Neue Spalte",
+  "Sütunun başlığı": "Spaltentitel",
+  Elementlər: "Einträge",
+  "Saytın yuxarı menyusu və mobil menyu. Ən çox 3 səviyyə: sürüşdürərək sıranı dəyişin, sağa çəkərək alt element edin. Telefonda sətir menyusundan istifadə edin.":
+    "Das Hauptmenü der Website und das mobile Menü. Höchstens 3 Ebenen: Ziehen Sie Einträge, um die Reihenfolge zu ändern, und nach rechts, um sie zu Untereinträgen zu machen. Auf dem Smartphone verwenden Sie das Zeilenmenü.",
+  "Altbilgi sütununda keçidlər bir səviyyəlidir. Sürüşdürərək və ya sətir menyusundan sıranı dəyişin.":
+    "Links in einer Fußzeilenspalte haben nur eine Ebene. Ändern Sie die Reihenfolge per Ziehen oder über das Zeilenmenü.",
+  "Element əlavə et": "Eintrag hinzufügen",
+  "Bu menyuda hələ element yoxdur.": "Dieses Menü hat noch keine Einträge.",
+  "Sütunu sil": "Spalte löschen",
+  "Elementi redaktə et": "Eintrag bearbeiten",
+  "Alt element əlavə et": "Untereintrag hinzufügen",
+  "«{name}» silinsin?": "„{name}“ löschen?",
+  "Alt elementləri ilə birlikdə ({count}) silinəcək.":
+    "Wird zusammen mit den Untereinträgen ({count}) gelöscht.",
+  "Dəyişiklik «Saxla» basılanda saytda tətbiq olunur.":
+    "Die Änderung wird auf der Website wirksam, sobald Sie auf „Speichern“ klicken.",
+  Sil: "Löschen",
+  "«{name}» sütunu silinsin?": "Spalte „{name}“ löschen?",
+  "Sütun və içindəki bütün keçidlər saytın altbilgisindən götürüləcək.":
+    "Die Spalte und alle ihre Links werden aus der Fußzeile der Website entfernt.",
+  "Kateqoriya və səhifə siyahısı yüklənmədi. Səhifəni yeniləyin.":
+    "Die Liste der Kategorien und Seiten konnte nicht geladen werden. Bitte laden Sie die Seite neu.",
+  "(dərc olunmayıb)": "(nicht veröffentlicht)",
+  "Dəyişiklik menyunu «Saxla» ilə saxlayanda saytda görünəcək.":
+    "Die Änderung erscheint auf der Website, sobald Sie das Menü mit „Speichern“ speichern.",
+  "Hara aparır": "Verlinkt auf",
+  Kateqoriya: "Kategorie",
+  "Gizli kateqoriya saytda göstərilmir.":
+    "Eine ausgeblendete Kategorie wird auf der Website nicht angezeigt.",
+  Səhifə: "Seite",
+  "Səhifə seçin": "Seite auswählen",
+  "Hələ səhifə yoxdur.": "Noch keine Seiten vorhanden.",
+  Ünvan: "Adresse",
+  "https:// ilə tam ünvan, saytdakı yol (/layiheler), tel:+994... və ya mailto:...":
+    "Vollständige Adresse mit https://, ein Pfad auf der Website (/layiheler), tel:+994... oder mailto:...",
+  "Başlıq keçid deyil: altındakı elementləri qruplaşdırır. Alt elementi olmayan başlıq saytda göstərilmir.":
+    "Eine Überschrift ist kein Link: Sie gruppiert die Einträge darunter. Eine Überschrift ohne Untereinträge wird auf der Website nicht angezeigt.",
+  "Ad ({locale})": "Name ({locale})",
+  "Tətbiq et": "Übernehmen",
+  "Əlavə et": "Hinzufügen",
+  "Adsız element": "Unbenannter Eintrag",
+  "{name}: əməliyyatlar": "{name}: Aktionen",
+  "Redaktə et": "Bearbeiten",
+  Yuxarı: "Nach oben",
+  Aşağı: "Nach unten",
+  "Yuxarıdakının altına keçir": "Unter den Eintrag darüber verschieben",
+  "Bir səviyyə yuxarı çıxar": "Eine Ebene nach oben verschieben",
+  Element: "Eintrag",
+  "Menyu elementləri": "Menüeinträge",
+  "Başlıq (keçidsiz)": "Überschrift (ohne Link)",
+  "Keçid (URL)": "Link (URL)",
+  "Alt elementi yoxdur, saytda göstərilməyəcək.":
+    "Keine Untereinträge, wird auf der Website nicht angezeigt.",
+  "Keçid: {url}": "Link: {url}",
+  "Kateqoriya tapılmadı.": "Kategorie nicht gefunden.",
+  "Kateqoriya: {name}": "Kategorie: {name}",
+  "Kateqoriya gizlidir, saytda göstərilməyəcək.":
+    "Die Kategorie ist ausgeblendet und wird auf der Website nicht angezeigt.",
+  "Səhifə tapılmadı.": "Seite nicht gefunden.",
+  "Səhifə: {name}": "Seite: {name}",
+  "Səhifə dərc olunmayıb, saytda göstərilməyəcək.":
+    "Die Seite ist nicht veröffentlicht und wird auf der Website nicht angezeigt.",
 };

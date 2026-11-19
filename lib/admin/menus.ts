@@ -4,7 +4,7 @@ import { and, asc, eq, inArray, like, notInArray, sql } from "drizzle-orm";
 
 import type { DomainError } from "@/lib/api/server";
 import { getDb } from "@/lib/db";
-import { categories, menuItems, menus, pages, projects } from "@/lib/db/schema";
+import { categories, menuItems, menus, pages } from "@/lib/db/schema";
 import type { Localized } from "@/lib/i18n/localized";
 import { slugify, uniqueSlug } from "@/lib/slug";
 import {
@@ -75,7 +75,6 @@ function buildItems(rows: ItemRow[]): MenuItemDto[] {
       target: row.target,
       categoryId: row.categoryId,
       pageId: row.pageId,
-      projectId: row.projectId,
       url: row.url,
       children: build(row.id),
     }));
@@ -127,26 +126,19 @@ async function checkTargets(entries: FlatEntry[]): Promise<DomainError | null> {
   ];
   const categoryIds = ids((item) => item.categoryId);
   const pageIds = ids((item) => item.pageId);
-  const projectIds = ids((item) => item.projectId);
-  const [foundCategories, foundPages, foundProjects] = await Promise.all([
+  const [foundCategories, foundPages] = await Promise.all([
     categoryIds.length
       ? db.select({ id: categories.id }).from(categories).where(inArray(categories.id, categoryIds))
       : [],
     pageIds.length ? db.select({ id: pages.id }).from(pages).where(inArray(pages.id, pageIds)) : [],
-    projectIds.length
-      ? db.select({ id: projects.id }).from(projects).where(inArray(projects.id, projectIds))
-      : [],
   ]);
-  const known = new Set([...foundCategories, ...foundPages, ...foundProjects].map((row) => row.id));
+  const known = new Set([...foundCategories, ...foundPages].map((row) => row.id));
   const fields: Record<string, string> = {};
   for (const { item, path } of entries) {
     if (item.categoryId && !known.has(item.categoryId)) {
       fields[`${path}.categoryId`] = "Kateqoriya tapılmadı.";
     }
     if (item.pageId && !known.has(item.pageId)) fields[`${path}.pageId`] = "Səhifə tapılmadı.";
-    if (item.projectId && !known.has(item.projectId)) {
-      fields[`${path}.projectId`] = "Layihə tapılmadı.";
-    }
   }
   if (!Object.keys(fields).length) return null;
   return { status: 400, message: "Bəzi elementlərin hədəfi tapılmadı.", fields };
@@ -207,7 +199,6 @@ export async function saveMenu(
           target: item.target,
           categoryId: item.categoryId,
           pageId: item.pageId,
-          projectId: item.projectId,
           url: item.url,
           sortOrder: entry.index,
         };
@@ -311,7 +302,7 @@ export async function reorderFooterMenus(
 
 export async function listMenuTargets(): Promise<MenuTargetsDto> {
   const db = getDb();
-  const [categoryRows, pageRows, projectRows] = await Promise.all([
+  const [categoryRows, pageRows] = await Promise.all([
     db
       .select({
         id: categories.id,
@@ -326,15 +317,6 @@ export async function listMenuTargets(): Promise<MenuTargetsDto> {
       .select({ id: pages.id, title: pages.title, slug: pages.slug, status: pages.status })
       .from(pages)
       .orderBy(sql`${pages.title} ->> 'az'`),
-    db
-      .select({
-        id: projects.id,
-        title: projects.title,
-        slug: projects.slug,
-        status: projects.status,
-      })
-      .from(projects)
-      .orderBy(asc(projects.sortOrder), sql`${projects.title} ->> 'az'`),
   ]);
   return {
     categories: categoryRows.map((row) => ({
@@ -345,12 +327,6 @@ export async function listMenuTargets(): Promise<MenuTargetsDto> {
       isActive: row.isActive,
     })),
     pages: pageRows.map((row) => ({
-      id: row.id,
-      title: row.title,
-      slug: row.slug,
-      isPublished: row.status === "published",
-    })),
-    projects: projectRows.map((row) => ({
       id: row.id,
       title: row.title,
       slug: row.slug,

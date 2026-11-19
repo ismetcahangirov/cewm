@@ -35,6 +35,7 @@ export function SeoSection({
         filled={{
           ru: Boolean(title?.ru || description?.ru),
           en: Boolean(title?.en || description?.en),
+          de: Boolean(title?.de || description?.de),
         }}
       >
         {(locale) => (

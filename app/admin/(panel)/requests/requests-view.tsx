@@ -43,21 +43,21 @@ import type { UserRole } from "@/lib/auth/roles";
 import { telHref } from "@/lib/contact-links";
 import { formatAzerbaijaniPhone } from "@/lib/phone";
 import {
-  quoteRequestStatusLabels,
-  type QuoteRequestListItemDto,
-  type QuoteRequestSortField,
-  type QuoteRequestStatusFilter,
-} from "@/lib/validation/quote-requests";
+  consultationRequestStatusLabels,
+  type ConsultationRequestListItemDto,
+  type ConsultationRequestSortField,
+  type ConsultationRequestStatusFilter,
+} from "@/lib/validation/consultation-requests";
 
-const column = createColumnHelper<DataTableFeatures, QuoteRequestListItemDto>();
+const column = createColumnHelper<DataTableFeatures, ConsultationRequestListItemDto>();
 
-const emptyPage: Page<QuoteRequestListItemDto> = { rows: [], rowCount: 0 };
+const emptyPage: Page<ConsultationRequestListItemDto> = { rows: [], rowCount: 0 };
 
 export function RequestsView({ role }: { role: UserRole }) {
   const t = useT();
-  const list = useListState<QuoteRequestSortField>({ sort: "createdAt", order: "desc" });
-  const [status, setStatus] = useState<QuoteRequestStatusFilter>("all");
-  const [deleting, setDeleting] = useState<QuoteRequestListItemDto | null>(null);
+  const list = useListState<ConsultationRequestSortField>({ sort: "createdAt", order: "desc" });
+  const [status, setStatus] = useState<ConsultationRequestStatusFilter>("all");
+  const [deleting, setDeleting] = useState<ConsultationRequestListItemDto | null>(null);
   const {
     data = emptyPage,
     isLoading,
@@ -68,7 +68,7 @@ export function RequestsView({ role }: { role: UserRole }) {
   const [updateRequest] = useUpdateRequestMutation();
   const [deleteRequest] = useDeleteRequestMutation();
 
-  const columns = useMemo<DataTableColumn<QuoteRequestListItemDto>[]>(
+  const columns = useMemo<DataTableColumn<ConsultationRequestListItemDto>[]>(
     () =>
       column.columns([
         column.accessor("createdAt", {
@@ -139,7 +139,7 @@ export function RequestsView({ role }: { role: UserRole }) {
     [t],
   );
 
-  async function markDone(request: QuoteRequestListItemDto) {
+  async function markDone(request: ConsultationRequestListItemDto) {
     try {
       await updateRequest({ id: request.id, status: "done" }).unwrap();
       toast.success(t("«{name}» cavablandı kimi qeyd olundu.", { name: request.name }));
@@ -148,7 +148,7 @@ export function RequestsView({ role }: { role: UserRole }) {
     }
   }
 
-  async function remove(request: QuoteRequestListItemDto): Promise<boolean> {
+  async function remove(request: ConsultationRequestListItemDto): Promise<boolean> {
     try {
       await deleteRequest(request.id).unwrap();
       toast.success(t("«{name}» müraciəti silindi.", { name: request.name }));
@@ -159,7 +159,7 @@ export function RequestsView({ role }: { role: UserRole }) {
     }
   }
 
-  function rowActions(request: QuoteRequestListItemDto) {
+  function rowActions(request: ConsultationRequestListItemDto) {
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -199,11 +199,11 @@ export function RequestsView({ role }: { role: UserRole }) {
   }
 
   const filtered = Boolean(list.args.search || status !== "all");
-  const statusOptions: { value: QuoteRequestStatusFilter; label: string }[] = [
+  const statusOptions: { value: ConsultationRequestStatusFilter; label: string }[] = [
     { value: "all", label: t("Bütün müraciətlər") },
-    { value: "new", label: t.message(quoteRequestStatusLabels.new) },
-    { value: "in-progress", label: t.message(quoteRequestStatusLabels["in-progress"]) },
-    { value: "done", label: t.message(quoteRequestStatusLabels.done) },
+    { value: "new", label: t.message(consultationRequestStatusLabels.new) },
+    { value: "in-progress", label: t.message(consultationRequestStatusLabels["in-progress"]) },
+    { value: "done", label: t.message(consultationRequestStatusLabels.done) },
   ];
 
   return (
@@ -211,7 +211,7 @@ export function RequestsView({ role }: { role: UserRole }) {
       <PageHeader
         title={t("Müraciətlər")}
         description={t(
-          "Saytdakı «Təklif al» formasından gələn sorğular. Yeni müraciət açılanda «Baxılıb» olur.",
+          "Saytdakı konsultasiya formasından gələn sorğular. Yeni müraciət açılanda «Baxılıb» olur.",
         )}
         actions={
           <Button asChild variant="outline">
@@ -247,7 +247,7 @@ export function RequestsView({ role }: { role: UserRole }) {
             <Select
               value={status}
               onValueChange={(value) => {
-                setStatus(value as QuoteRequestStatusFilter);
+                setStatus(value as ConsultationRequestStatusFilter);
                 list.setPagination((old) => ({ ...old, pageIndex: 0 }));
               }}
             >
@@ -267,7 +267,7 @@ export function RequestsView({ role }: { role: UserRole }) {
             <EmptyState>
               {filtered
                 ? t("Seçimə uyğun müraciət tapılmadı.")
-                : t("Hələ müraciət yoxdur. Saytdan gələn təklif sorğuları burada görünəcək.")}
+                : t("Hələ müraciət yoxdur. Saytdan gələn konsultasiya sorğuları burada görünəcək.")}
             </EmptyState>
           }
         />

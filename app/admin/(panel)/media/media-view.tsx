@@ -31,6 +31,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Switch } from "@/components/ui/switch";
 import { formatDateTime } from "@/lib/admin/format";
 import type { MessageKey } from "@/lib/admin/i18n";
+import { filledLocales } from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import { usageParts, usageSummary } from "@/lib/admin/media-labels";
 import { useDeleteMediaMutation, useGetMediaQuery, useUpdateMediaMutation } from "@/lib/api/admin";
@@ -49,7 +50,7 @@ const pageSize = 50;
 const kindOptions: { value: MediaKind | "all"; label: MessageKey }[] = [
   { value: "image", label: "Şəkillər" },
   { value: "video", label: "Videolar" },
-  { value: "model", label: "3D modellər" },
+  { value: "video", label: "Videolar" },
   { value: "document", label: "Sənədlər" },
   { value: "all", label: "Bütün fayllar" },
 ];
@@ -72,6 +73,7 @@ function MediaDetails({ item, onClose }: { item: MediaLibraryItem; onClose: () =
     az: item.alts?.az ?? "",
     ru: item.alts?.ru ?? "",
     en: item.alts?.en ?? "",
+    de: item.alts?.de ?? "",
   });
   const [confirming, setConfirming] = useState(false);
   const [updateMedia, { isLoading: saving }] = useUpdateMediaMutation();
@@ -144,7 +146,7 @@ function MediaDetails({ item, onClose }: { item: MediaLibraryItem; onClose: () =
         {isImage ? (
           <section className="flex flex-col gap-3">
             <h3 className="text-meta font-medium">{t("Alt mətn")}</h3>
-            <LocaleTabs filled={{ ru: Boolean(alt.ru), en: Boolean(alt.en) }}>
+            <LocaleTabs filled={filledLocales(alt)}>
               {(locale) => (
                 <div className="flex flex-col gap-2">
                   <Label htmlFor={`alt-${locale}`} className="text-meta font-medium">
@@ -215,7 +217,7 @@ export function MediaView() {
   const [unused, setUnused] = useState(false);
   const [page, setPage] = useState(0);
   const [openId, setOpenId] = useState<string | null>(null);
-  const uploads = useMediaUpload(["image", "model", "document"]);
+  const uploads = useMediaUpload(["image", "video", "document"]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -257,11 +259,11 @@ export function MediaView() {
       <PageHeader
         title={t("Media")}
         description={t(
-          "Saytdakı bütün şəkillər, 3D modellər və sənədlər. Şəkillər saytda avtomatik WebP və AVIF ölçülərinə çevrilir.",
+          "Saytdakı bütün şəkillər, videolar və sənədlər. Hər fayl bir dəfə yüklənir və bütün dillərdə istifadə olunur. Şəkillər saytda avtomatik WebP və AVIF ölçülərinə çevrilir.",
         )}
       />
       <div className="flex flex-col gap-4">
-        <MediaDropzone kinds={["image", "model", "document"]} onFiles={uploadFiles} />
+        <MediaDropzone kinds={["image", "video", "document"]} onFiles={uploadFiles} />
         <UploadProgressList items={uploads.items} onDismiss={uploads.dismiss} />
 
         <div className="flex flex-wrap items-center gap-2">

@@ -17,28 +17,28 @@ import type { MediaDto } from "./media";
 export const reservedPageSlugs = [
   "mehsullar",
   "mehsul",
-  "layiheler",
+  "kateqoriyalar",
   "bloq",
-  "vakansiyalar",
   "admin",
   "api",
   "media",
   "ru",
   "en",
+  "de",
   "az",
   "_next",
 ] as const;
 
-export const pageKinds = ["about", "contact", "references", "partners", "quote"] as const;
+export const pageKinds = ["about", "contact", "consultation", "brands", "clients"] as const;
 
 export type PageKind = (typeof pageKinds)[number];
 
 export const pageKindLabels: Record<PageKind, string> = {
   about: "Haqqımızda",
   contact: "Əlaqə",
-  references: "Referanslar",
-  partners: "Partnyorlar",
-  quote: "Təklif al",
+  consultation: "Konsultasiya",
+  brands: "Brendlər",
+  clients: "Müştərilər",
 };
 
 export const freePageLabel = "Sərbəst səhifə";

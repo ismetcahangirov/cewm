@@ -34,7 +34,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { formatDateTime } from "@/lib/admin/format";
-import { formRichText, formText, hasLocaleError } from "@/lib/admin/form-values";
+import { filledLocales, formRichText, formText, hasLocaleError } from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import {
   useCreatePageMutation,
@@ -80,6 +80,7 @@ export function PageForm({ page }: { page: PageDetailDto | null }) {
     az: Boolean(page),
     ru: Boolean(page?.slug.ru),
     en: Boolean(page?.slug.en),
+    de: Boolean(page?.slug.de),
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [createPage] = useCreatePageMutation();
@@ -184,10 +185,7 @@ export function PageForm({ page }: { page: PageDetailDto | null }) {
         <FormLayout
           main={
             <FormSection title={t("Məzmun")}>
-              <LocaleTabs
-                invalid={textInvalid}
-                filled={{ ru: Boolean(title?.ru), en: Boolean(title?.en) }}
-              >
+              <LocaleTabs invalid={textInvalid} filled={filledLocales(title)}>
                 {(locale) => (
                   <>
                     <FormField
@@ -349,7 +347,7 @@ export function PageForm({ page }: { page: PageDetailDto | null }) {
                 onDescriptionChange={(locale, next) =>
                   form.setValue(`seoDescription.${locale}`, next, { shouldDirty: true })
                 }
-                fallbackTitle={(locale) => `${title?.[locale] || title?.az || ""} | Mebline`}
+                fallbackTitle={(locale) => `${title?.[locale] || title?.az || ""} | CEWM`}
                 fallbackDescription={(locale) =>
                   richTextToPlain(
                     (values.content?.[locale] ?? values.content?.az ?? null) as RichTextDoc | null,

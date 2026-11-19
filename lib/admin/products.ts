@@ -23,9 +23,11 @@ import { getDb } from "@/lib/db";
 import { uniqueViolation } from "@/lib/db/errors";
 import { containsPattern } from "@/lib/db/like";
 import {
+  brands,
   categories,
   media,
   productCategories,
+  productDocuments,
   productImages,
   productRelations,
   products,
@@ -68,6 +70,10 @@ const thumbnailKey = sql<string | null>`(select m.key from ${productImages} pi
 const thumbnailAlt = sql<string | null>`(select m.alt ->> 'az' from ${productImages} pi
   join ${media} m on m.id = pi.media_id
   where pi.product_id = products.id order by pi.position limit 1)`;
+
+const brandName = sql<
+  string | null
+>`(select b.name from ${brands} b where b.id = products.brand_id)`;
 
 const categoryNames = sql<Localized[] | null>`(select jsonb_agg(c.name order by c.sort_order)
   from ${productCategories} pc join ${categories} c on c.id = pc.category_id
@@ -123,6 +129,7 @@ export async function listProducts(args: ProductListArgs): Promise<Page<ProductL
         name: products.name,
         slug: products.slug,
         sku: products.sku,
+        brand: brandName,
         status: products.status,
         isFeatured: products.isFeatured,
         updatedAt: products.updatedAt,
@@ -145,6 +152,7 @@ export async function listProducts(args: ProductListArgs): Promise<Page<ProductL
       name: row.name,
       slug: row.slug,
       sku: row.sku,
+      brand: row.brand,
       status: row.status,
       isFeatured: row.isFeatured,
       thumbnail: row.thumbnailKey
@@ -186,7 +194,7 @@ export async function getProduct(id: string): Promise<ProductDetailDto | null> {
   const [row] = await db.select().from(products).where(eq(products.id, id));
   if (!row) return null;
 
-  const [categoryRows, imageRows, relatedRows] = await Promise.all([
+  const [categoryRows, imageRows, documentRows, relatedRows] = await Promise.all([
     db
       .select({ id: productCategories.categoryId })
       .from(productCategories)
@@ -197,6 +205,11 @@ export async function getProduct(id: string): Promise<ProductDetailDto | null> {
       .where(eq(productImages.productId, id))
       .orderBy(asc(productImages.position)),
     db
+      .select({ mediaId: productDocuments.mediaId, title: productDocuments.title })
+      .from(productDocuments)
+      .where(eq(productDocuments.productId, id))
+      .orderBy(asc(productDocuments.position)),
+    db
       .select({ id: productRelations.relatedId })
       .from(productRelations)
       .where(eq(productRelations.productId, id))
@@ -205,7 +218,8 @@ export async function getProduct(id: string): Promise<ProductDetailDto | null> {
 
   const mediaIds = [
     ...imageRows.map((image) => image.mediaId),
-    ...[row.modelId, row.modelPosterId].filter((value): value is string => Boolean(value)),
+    ...documentRows.map((document) => document.mediaId),
+    ...[row.videoId, row.videoPosterId].filter((value): value is string => Boolean(value)),
   ];
   const [mediaRows, related] = await Promise.all([
     findMediaByIds(mediaIds),
@@ -221,14 +235,18 @@ export async function getProduct(id: string): Promise<ProductDetailDto | null> {
     shortDescription: row.shortDescription,
     description: row.description,
     categoryIds: categoryRows.map((category) => category.id),
+    brandId: row.brandId,
+    benefits: row.benefits,
     specs: row.specs,
     images: imageRows.map((image) => ({
       mediaId: image.mediaId,
       alt: mediaById.get(image.mediaId)?.alt ?? { az: "" },
     })),
+    documents: documentRows,
     media: mediaRows.map(toMediaDto),
-    modelId: row.modelId,
-    modelPosterId: row.modelPosterId,
+    videoId: row.videoId,
+    videoUrl: row.videoUrl,
+    videoPosterId: row.videoPosterId,
     related,
     seoTitle: row.seoTitle,
     seoDescription: row.seoDescription,
@@ -256,9 +274,18 @@ async function checkReferences(
     if (found.length !== values.categoryIds.length) fields.categoryIds = "Kateqoriya tapılmadı.";
   }
 
+  if (values.brandId) {
+    const [brand] = await db
+      .select({ id: brands.id })
+      .from(brands)
+      .where(eq(brands.id, values.brandId));
+    if (!brand) fields.brandId = "Brend tapılmadı.";
+  }
+
   const mediaIds = [
     ...values.images.map((image) => image.mediaId),
-    ...[values.modelId, values.modelPosterId].filter((value): value is string => Boolean(value)),
+    ...values.documents.map((document) => document.mediaId),
+    ...[values.videoId, values.videoPosterId].filter((value): value is string => Boolean(value)),
   ];
   const mediaRows = await findMediaByIds(mediaIds);
   const kindById = new Map(mediaRows.map((row) => [row.id, mediaKindOf(row.mimeType)]));
@@ -268,11 +295,16 @@ async function checkReferences(
   values.images.forEach((image, index) => {
     if (!isImage(image.mediaId)) fields[`images.${index}.mediaId`] = "Şəkil tapılmadı.";
   });
-  if (values.modelId && kindById.get(values.modelId) !== "model") {
-    fields.modelId = "3D model GLB faylı olmalıdır.";
+  values.documents.forEach((document, index) => {
+    if (kindById.get(document.mediaId) !== "document") {
+      fields[`documents.${index}.mediaId`] = "PDF sənədi tapılmadı.";
+    }
+  });
+  if (values.videoId && kindById.get(values.videoId) !== "video") {
+    fields.videoId = "Video faylı tapılmadı.";
   }
-  if (values.modelPosterId && !isImage(values.modelPosterId)) {
-    fields.modelPosterId = "Poster şəkil olmalıdır.";
+  if (values.videoPosterId && !isImage(values.videoPosterId)) {
+    fields.videoPosterId = "Poster şəkil olmalıdır.";
   }
 
   if (values.relatedIds.length) {
@@ -319,11 +351,14 @@ export async function saveProduct(
     name: values.name,
     slug: values.slug,
     sku: values.sku,
+    brandId: values.brandId,
     shortDescription: values.shortDescription,
     description: values.description,
+    benefits: values.benefits.map((benefit) => benefit.text),
     specs: values.specs,
-    modelId: values.modelId,
-    modelPosterId: values.modelId ? values.modelPosterId : null,
+    videoId: values.videoId,
+    videoUrl: values.videoUrl,
+    videoPosterId: values.videoId || values.videoUrl ? values.videoPosterId : null,
     seoTitle: values.seoTitle,
     seoDescription: values.seoDescription,
     status: values.status,
@@ -373,6 +408,18 @@ export async function saveProduct(
           );
       }
 
+      await tx.delete(productDocuments).where(eq(productDocuments.productId, productId));
+      if (values.documents.length) {
+        await tx.insert(productDocuments).values(
+          values.documents.map((document, position) => ({
+            productId: productId,
+            mediaId: document.mediaId,
+            title: document.title,
+            position,
+          })),
+        );
+      }
+
       await tx.delete(productRelations).where(eq(productRelations.productId, productId));
       if (values.relatedIds.length) {
         await tx.insert(productRelations).values(
@@ -394,11 +441,17 @@ export async function saveProduct(
 }
 
 function copyName(name: Localized): Localized {
-  const suffix: Record<Locale, string> = { az: "(kopiya)", ru: "(копия)", en: "(copy)" };
+  const suffix: Record<Locale, string> = {
+    az: "(kopiya)",
+    ru: "(копия)",
+    en: "(copy)",
+    de: "(Kopie)",
+  };
   return {
     az: `${name.az} ${suffix.az}`,
     ru: name.ru ? `${name.ru} ${suffix.ru}` : null,
     en: name.en ? `${name.en} ${suffix.en}` : null,
+    de: name.de ? `${name.de} ${suffix.de}` : null,
   };
 }
 
@@ -411,6 +464,7 @@ export async function duplicateProduct(id: string): Promise<{ id: string } | nul
     az: await freeSlug("product", "az", `${source.slug.az}-kopiya`),
     ru: source.slug.ru ? await freeSlug("product", "ru", `${source.slug.ru}-kopiya`) : null,
     en: source.slug.en ? await freeSlug("product", "en", `${source.slug.en}-copy`) : null,
+    de: source.slug.de ? await freeSlug("product", "de", `${source.slug.de}-kopie`) : null,
   };
 
   return db.transaction(async (tx) => {
@@ -420,11 +474,14 @@ export async function duplicateProduct(id: string): Promise<{ id: string } | nul
         name: copyName(source.name),
         slug,
         sku: source.sku,
+        brandId: source.brandId,
         shortDescription: source.shortDescription,
         description: source.description,
+        benefits: source.benefits,
         specs: source.specs,
-        modelId: source.modelId,
-        modelPosterId: source.modelPosterId,
+        videoId: source.videoId,
+        videoUrl: source.videoUrl,
+        videoPosterId: source.videoPosterId,
         seoTitle: source.seoTitle,
         seoDescription: source.seoDescription,
         status: "draft",
@@ -437,6 +494,8 @@ export async function duplicateProduct(id: string): Promise<{ id: string } | nul
       select ${row.id}::uuid, category_id from ${productCategories} where product_id = ${id}`);
     await tx.execute(sql`insert into ${productImages} (product_id, media_id, position)
       select ${row.id}::uuid, media_id, position from ${productImages} where product_id = ${id}`);
+    await tx.execute(sql`insert into ${productDocuments} (product_id, media_id, title, position)
+      select ${row.id}::uuid, media_id, title, position from ${productDocuments} where product_id = ${id}`);
     await tx.execute(sql`insert into ${productRelations} (product_id, related_id, position)
       select ${row.id}::uuid, related_id, position from ${productRelations}
       where product_id = ${id} and related_id <> ${row.id}::uuid`);

@@ -23,15 +23,11 @@ export const ru = {
   Bax: "Открыть",
   "Cavablandı kimi qeyd et": "Отметить как отвеченную",
   Sil: "Удалить",
-  "Saytdakı «Təklif al» formasından gələn sorğular. Yeni müraciət açılanda «Baxılıb» olur.":
-    "Запросы из формы «Получить предложение» на сайте. Новая заявка при открытии становится «Просмотренной».",
   "Excel-ə ixrac": "Экспорт в Excel",
   "Yenidən yüklə": "Загрузить снова",
   "Müraciətlər yüklənmədi.": "Не удалось загрузить заявки.",
   "Ad, telefon, e-poçt və ya şirkət ilə axtar": "Поиск по имени, телефону, эл. почте или компании",
   "Seçimə uyğun müraciət tapılmadı.": "Заявок по выбранным условиям не найдено.",
-  "Hələ müraciət yoxdur. Saytdan gələn təklif sorğuları burada görünəcək.":
-    "Заявок пока нет. Здесь появятся запросы предложений с сайта.",
   "«{name}» müraciəti silinsin?": "Удалить заявку «{name}»?",
   "Müraciət həmişəlik silinəcək. Bu əməliyyat geri qaytarılmır.":
     "Заявка будет удалена навсегда. Это действие нельзя отменить.",
@@ -68,6 +64,11 @@ export const ru = {
   Dəyişib: "Изменено",
   "Müraciət həmişəlik silinəcək. Spam və ya təkrar sorğular üçün istifadə edin.":
     "Заявка будет удалена навсегда. Используйте для спама или повторных запросов.",
+  "CEWM: konsultasiya sorğunuz": "CEWM: ваш запрос на консультацию",
+  "Saytdakı konsultasiya formasından gələn sorğular. Yeni müraciət açılanda «Baxılıb» olur.":
+    "Заявки из формы консультации на сайте. Новая заявка при открытии становится «Просмотрена».",
+  "Hələ müraciət yoxdur. Saytdan gələn konsultasiya sorğuları burada görünəcək.":
+    "Заявок пока нет. Здесь появятся запросы на консультацию с сайта.",
 } satisfies Messages;
 
 export const en: Record<keyof typeof ru, string> = {
@@ -93,15 +94,11 @@ export const en: Record<keyof typeof ru, string> = {
   Bax: "View",
   "Cavablandı kimi qeyd et": "Mark as answered",
   Sil: "Delete",
-  "Saytdakı «Təklif al» formasından gələn sorğular. Yeni müraciət açılanda «Baxılıb» olur.":
-    "Requests from the “Request a quote” form on the site. A new request becomes “Seen” when opened.",
   "Excel-ə ixrac": "Export to Excel",
   "Yenidən yüklə": "Reload",
   "Müraciətlər yüklənmədi.": "Requests could not be loaded.",
   "Ad, telefon, e-poçt və ya şirkət ilə axtar": "Search by name, phone, email or company",
   "Seçimə uyğun müraciət tapılmadı.": "No requests match the selection.",
-  "Hələ müraciət yoxdur. Saytdan gələn təklif sorğuları burada görünəcək.":
-    "No requests yet. Quote requests from the site will appear here.",
   "«{name}» müraciəti silinsin?": "Delete request “{name}”?",
   "Müraciət həmişəlik silinəcək. Bu əməliyyat geri qaytarılmır.":
     "The request will be deleted permanently. This cannot be undone.",
@@ -138,4 +135,82 @@ export const en: Record<keyof typeof ru, string> = {
   Dəyişib: "Updated",
   "Müraciət həmişəlik silinəcək. Spam və ya təkrar sorğular üçün istifadə edin.":
     "The request will be deleted permanently. Use this for spam or duplicate requests.",
+  "CEWM: konsultasiya sorğunuz": "CEWM: your consultation request",
+  "Saytdakı konsultasiya formasından gələn sorğular. Yeni müraciət açılanda «Baxılıb» olur.":
+    "Requests from the consultation form on the site. A new request becomes “Viewed” when opened.",
+  "Hələ müraciət yoxdur. Saytdan gələn konsultasiya sorğuları burada görünəcək.":
+    "No requests yet. Consultation requests from the site will appear here.",
+};
+
+export const de: Record<keyof typeof ru, string> = {
+  Müraciət: "Anfrage",
+  Müraciətlər: "Anfragen",
+  "Bütün müraciətlər": "Alle Anfragen",
+  Yeni: "Neu",
+  Baxılıb: "Gelesen",
+  Cavablandı: "Beantwortet",
+  Azərbaycanca: "Aserbaidschanisch",
+  Rusca: "Russisch",
+  İngiliscə: "Englisch",
+  Tarix: "Datum",
+  Ad: "Name",
+  Telefon: "Telefon",
+  Şirkət: "Unternehmen",
+  Məhsul: "Produkt",
+  Status: "Status",
+  "E-poçt": "E-Mail",
+  "«{name}» cavablandı kimi qeyd olundu.": "„{name}“ als beantwortet markiert.",
+  "«{name}» müraciəti silindi.": "Anfrage „{name}“ wurde gelöscht.",
+  "{name}: əməliyyatlar": "{name}: Aktionen",
+  Bax: "Ansehen",
+  "Cavablandı kimi qeyd et": "Als beantwortet markieren",
+  Sil: "Löschen",
+  "Excel-ə ixrac": "Nach Excel exportieren",
+  "Yenidən yüklə": "Neu laden",
+  "Müraciətlər yüklənmədi.": "Die Anfragen konnten nicht geladen werden.",
+  "Ad, telefon, e-poçt və ya şirkət ilə axtar":
+    "Nach Name, Telefon, E-Mail oder Unternehmen suchen",
+  "Seçimə uyğun müraciət tapılmadı.": "Keine Anfragen entsprechen der Auswahl.",
+  "«{name}» müraciəti silinsin?": "Anfrage „{name}“ löschen?",
+  "Müraciət həmişəlik silinəcək. Bu əməliyyat geri qaytarılmır.":
+    "Die Anfrage wird endgültig gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.",
+  "Müraciətlərə qayıt": "Zurück zu den Anfragen",
+  "Müraciət tapılmadı.": "Anfrage nicht gefunden.",
+  "Müraciət yüklənmədi. Səhifəni yeniləyin.":
+    "Die Anfrage konnte nicht geladen werden. Bitte laden Sie die Seite neu.",
+  "Məhsul kataloqdan silinib.": "Das Produkt wurde aus dem Katalog entfernt.",
+  "Məhsul silinənlərdədir.": "Das Produkt befindet sich im Papierkorb.",
+  "Status: {status}.": "Status: {status}.",
+  "Qeyd saxlanıldı.": "Notiz gespeichert.",
+  "Müraciət silindi.": "Anfrage gelöscht.",
+  "Göndərilib: {date}": "Gesendet: {date}",
+  Əlaqə: "Kontakt",
+  "{name}: WhatsApp-da yaz": "{name}: Auf WhatsApp schreiben",
+  "WhatsApp-da yaz": "Auf WhatsApp schreiben",
+  Yazılmayıb: "Nicht angegeben",
+  Mesaj: "Nachricht",
+  "Müştəri mesaj yazmayıb.": "Der Kunde hat keine Nachricht hinterlassen.",
+  "Məhsullar ({count})": "Produkte ({count})",
+  "Müraciət konkret məhsul seçilmədən göndərilib.":
+    "Die Anfrage wurde ohne Auswahl eines bestimmten Produkts gesendet.",
+  "Müraciətin vəziyyəti": "Status der Anfrage",
+  "«Yeni» seçsəniz, müraciət yenidən oxunmamış sayılır.":
+    "Wenn Sie „Neu“ wählen, gilt die Anfrage wieder als ungelesen.",
+  "Daxili qeyd": "Interne Notiz",
+  Qeyd: "Notiz",
+  "Yalnız idarə panelində görünür, müştəriyə göndərilmir.":
+    "Nur im Dashboard sichtbar, wird nicht an den Kunden gesendet.",
+  "Qeydi saxla": "Notiz speichern",
+  Məlumat: "Details",
+  "Sayt dili": "Sprache der Website",
+  Göndərilib: "Gesendet",
+  "{date} (Bakı)": "{date} (Baku)",
+  Dəyişib: "Geändert",
+  "Müraciət həmişəlik silinəcək. Spam və ya təkrar sorğular üçün istifadə edin.":
+    "Die Anfrage wird endgültig gelöscht. Verwenden Sie dies für Spam oder doppelte Anfragen.",
+  "CEWM: konsultasiya sorğunuz": "CEWM: Ihre Beratungsanfrage",
+  "Saytdakı konsultasiya formasından gələn sorğular. Yeni müraciət açılanda «Baxılıb» olur.":
+    "Anfragen aus dem Beratungsformular der Website. Eine neue Anfrage wird beim Öffnen als „Gelesen“ markiert.",
+  "Hələ müraciət yoxdur. Saytdan gələn konsultasiya sorğuları burada görünəcək.":
+    "Noch keine Anfragen. Beratungsanfragen von der Website erscheinen hier.",
 };

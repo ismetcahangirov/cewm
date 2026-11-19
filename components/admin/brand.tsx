@@ -5,10 +5,10 @@ export function AdminBrand() {
         aria-hidden="true"
         className="flex size-8 shrink-0 items-center justify-center bg-graphite text-small font-medium text-white"
       >
-        M
+        C
       </span>
       <span className="truncate text-card text-heading group-data-[collapsible=icon]:hidden">
-        Mebline
+        CEWM
       </span>
     </span>
   );

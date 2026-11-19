@@ -2,13 +2,15 @@ import { z } from "zod";
 
 import "./locale";
 
-export const slugEntities = ["product", "category", "page", "post", "project", "vacancy"] as const;
+import { locales } from "@/lib/i18n/config";
+
+export const slugEntities = ["product", "category", "page", "post"] as const;
 
 export type SlugEntity = (typeof slugEntities)[number];
 
 export const slugCheckQuery = z.object({
   entity: z.enum(slugEntities),
-  locale: z.enum(["az", "ru", "en"]).optional().default("az"),
+  locale: z.enum(locales).optional().default("az"),
   slug: z.string().trim().max(96),
   excludeId: z
     .union([z.uuid(), z.literal("")])

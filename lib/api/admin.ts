@@ -72,8 +72,8 @@ export const adminApi = baseApi.injectEndpoints({
       query: (id) => ({ url: `admin/users/${id}/invite`, method: "POST" }),
     }),
     getUnreadRequestCount: build.query<{ count: number }, void>({
-      query: () => "admin/quote-requests/unread-count",
-      providesTags: [{ type: "QuoteRequest", id: "UNREAD" }],
+      query: () => "admin/consultation-requests/unread-count",
+      providesTags: [{ type: "ConsultationRequest", id: "UNREAD" }],
     }),
 
     getMedia: build.query<Page<MediaLibraryItem>, MediaListArgs>({

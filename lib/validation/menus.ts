@@ -19,7 +19,7 @@ export function menuMaxDepth(key: string): number {
   return isFooterMenu(key) ? 1 : 3;
 }
 
-export const menuItemTargets = ["none", "category", "page", "project", "url"] as const;
+export const menuItemTargets = ["none", "category", "page", "url"] as const;
 
 export type MenuItemTarget = (typeof menuItemTargets)[number];
 
@@ -27,7 +27,6 @@ export const menuItemTargetLabels: Record<MenuItemTarget, MessageKey> = {
   none: "Başlıq (keçidsiz)",
   category: "Kateqoriya",
   page: "Səhifə",
-  project: "Layihə",
   url: "Keçid (URL)",
 };
 
@@ -51,7 +50,6 @@ const itemFields = z.object({
   target: z.enum(menuItemTargets, "Keçid növünü seçin."),
   categoryId: uuid("Kateqoriyanı seçin.").nullish(),
   pageId: uuid("Səhifəni seçin.").nullish(),
-  projectId: uuid("Layihəni seçin.").nullish(),
   url: z.string().trim().max(2000, "Ən çox 2000 simvol ola bilər.").nullish(),
 });
 
@@ -62,7 +60,6 @@ type ItemFieldsOutput = z.output<typeof itemFields>;
 const referenceFields = {
   category: ["categoryId", "Kateqoriyanı seçin."],
   page: ["pageId", "Səhifəni seçin."],
-  project: ["projectId", "Layihəni seçin."],
 } as const;
 
 function checkTarget(value: ItemFieldsOutput, ctx: z.RefinementCtx): void {
@@ -88,17 +85,20 @@ export type MenuItemFields = {
   target: MenuItemTarget;
   categoryId: string | null;
   pageId: string | null;
-  projectId: string | null;
   url: string | null;
 };
 
 function normalize(value: ItemFieldsOutput): MenuItemFields {
   return {
-    label: { az: value.label.az, ru: value.label.ru ?? null, en: value.label.en ?? null },
+    label: {
+      az: value.label.az,
+      ru: value.label.ru ?? null,
+      en: value.label.en ?? null,
+      de: value.label.de ?? null,
+    },
     target: value.target,
     categoryId: value.target === "category" ? (value.categoryId ?? null) : null,
     pageId: value.target === "page" ? (value.pageId ?? null) : null,
-    projectId: value.target === "project" ? (value.projectId ?? null) : null,
     url: value.target === "url" ? (value.url ?? null) : null,
   };
 }
@@ -188,5 +188,4 @@ export type MenuContentOption = {
 export type MenuTargetsDto = {
   categories: MenuCategoryOption[];
   pages: MenuContentOption[];
-  projects: MenuContentOption[];
 };

@@ -52,8 +52,6 @@ export const ru = {
     "Квадратная иконка на вкладке браузера, не менее 512 × 512 px.",
   "Hüquqi məlumat": "Юридическая информация",
   "Şirkətin adı (saytın aşağı hissəsi)": "Название компании (внизу сайта)",
-  "«MMC» yazılmadan, məsələn «Mebline». Saytın aşağı hissəsində © ilə göstərilir.":
-    "Без «MMC», например «Mebline». Показывается внизу сайта со знаком ©.",
   "Müraciət bildirişləri": "Уведомления о заявках",
   "Bildiriş e-poçtu": "Эл. почта для уведомлений",
   "Saytdan gələn hər müraciət bu ünvana göndərilir. Boş qalsa, server tənzimləməsindəki ünvan istifadə olunur.":
@@ -75,6 +73,8 @@ export const ru = {
   Şəbəkə: "Сеть",
   "Sosial şəbəkə linki əlavə olunmayıb.": "Ссылки на соцсети не добавлены.",
   "Şəbəkə əlavə et": "Добавить сеть",
+  "«MMC» yazılmadan, məsələn «CEWM». Saytın aşağı hissəsində © ilə göstərilir.":
+    "Без «MMC», например «CEWM». Показывается внизу сайта со знаком ©.",
 } satisfies Messages;
 
 export const en: Record<keyof typeof ru, string> = {
@@ -127,8 +127,6 @@ export const en: Record<keyof typeof ru, string> = {
     "Square icon shown in the browser tab, at least 512 × 512 px.",
   "Hüquqi məlumat": "Legal information",
   "Şirkətin adı (saytın aşağı hissəsi)": "Company name (site footer)",
-  "«MMC» yazılmadan, məsələn «Mebline». Saytın aşağı hissəsində © ilə göstərilir.":
-    "Without “MMC”, for example “Mebline”. Shown at the bottom of the site with ©.",
   "Müraciət bildirişləri": "Request notifications",
   "Bildiriş e-poçtu": "Notification email",
   "Saytdan gələn hər müraciət bu ünvana göndərilir. Boş qalsa, server tənzimləməsindəki ünvan istifadə olunur.":
@@ -150,4 +148,83 @@ export const en: Record<keyof typeof ru, string> = {
   Şəbəkə: "Network",
   "Sosial şəbəkə linki əlavə olunmayıb.": "No social network links added.",
   "Şəbəkə əlavə et": "Add network",
+  "«MMC» yazılmadan, məsələn «CEWM». Saytın aşağı hissəsində © ilə göstərilir.":
+    "Without “MMC”, for example “CEWM”. Shown at the bottom of the site with ©.",
+};
+
+export const de: Record<keyof typeof ru, string> = {
+  "Ünvan ({locale})#address": "Adresse ({locale})",
+  "SEO və tənzimləmələr": "SEO und Einstellungen",
+  "Tənzimləmələr yüklənmədi.": "Die Einstellungen konnten nicht geladen werden.",
+  "Yenidən yüklə": "Neu laden",
+  "Saxlanıldı, saytda yeniləndi.": "Gespeichert und auf der Website aktualisiert.",
+  "Formada səhvlər var. Qırmızı sahələri düzəldin.":
+    "Das Formular enthält Fehler. Bitte korrigieren Sie die rot markierten Felder.",
+  Fayl: "Datei",
+  Şəkil: "Bild",
+  Saxlanılır: "Wird gespeichert…",
+  Saxla: "Speichern",
+  "Əlaqə məlumatları, loqo və axtarış sistemləri. Son dəyişiklik: {date}":
+    "Kontaktdaten, Logo und Suchmaschinen. Letzte Änderung: {date}",
+  "Əlaqə məlumatları, loqo və axtarış sistemləri.": "Kontaktdaten, Logo und Suchmaschinen.",
+  Əlaqə: "Kontakt",
+  Telefonlar: "Telefonnummern",
+  "Birinci nömrə saytın başlığında və axtarış sistemləri üçün əsas nömrədir. Sıranı sürüşdürərək dəyişin.":
+    "Die erste Nummer erscheint im Kopfbereich der Website und gilt für Suchmaschinen als Hauptnummer. Ändern Sie die Reihenfolge per Drag-and-drop.",
+  "E-poçt ünvanları": "E-Mail-Adressen",
+  "İş saatları ({locale})": "Öffnungszeiten ({locale})",
+  "Hər günü ayrı sətirdə yazmaq olar, məsələn «B.e.–Cümə: 09:00–18:00».":
+    "Sie können jeden Tag in eine eigene Zeile schreiben, zum Beispiel „Mo–Fr: 09:00–18:00“.",
+  "Xəritə linki": "Kartenlink",
+  "Google Maps və ya Yandex xəritəsində ofisin linki.":
+    "Link zum Büro in Google Maps oder Yandex Maps.",
+  "WhatsApp nömrəsi": "WhatsApp-Nummer",
+  "Ölkə kodu ilə, yalnız rəqəmlər: 994552555423. Saytda yalnız WhatsApp ikonu ilə link kimi göstərilir: nömrə mətn kimi yazılmır və ekranın küncündə üzən düymə olmur.":
+    "Mit Ländervorwahl, nur Ziffern: 994552555423. Auf der Website erscheint sie nur als Link mit dem WhatsApp-Symbol: Die Nummer wird nicht als Text angezeigt, und es gibt keinen schwebenden Button in der Bildschirmecke.",
+  "Sosial şəbəkələr": "Soziale Netzwerke",
+  "Saytın aşağı hissəsində ikon kimi göstərilir. Hər şəbəkə bir dəfə.":
+    "Werden als Symbole im unteren Bereich der Website angezeigt. Jedes Netzwerk nur einmal.",
+  "Axtarış sistemləri": "Suchmaschinen",
+  "Öz SEO mətni olmayan səhifələr üçün standart başlıq və təsvir.":
+    "Standardtitel und -beschreibung für Seiten ohne eigenen SEO-Text.",
+  "Paylaşım şəkli (OG)": "Vorschaubild beim Teilen (OG)",
+  "Link sosial şəbəkədə və ya mesajlaşmada paylaşılanda göstərilir. Tövsiyə: 1200 × 630 px, JPG və ya PNG.":
+    "Wird angezeigt, wenn ein Link in sozialen Netzwerken oder Messengern geteilt wird. Empfohlen: 1200 × 630 px, JPG oder PNG.",
+  "Loqo və ikon": "Logo und Symbol",
+  "Yeni loqo hazırlanır: gələndə burada dəyişin. SVG faylı da seçmək olar.":
+    "Ein neues Logo wird vorbereitet: Ersetzen Sie es hier, sobald es vorliegt. Sie können auch eine SVG-Datei auswählen.",
+  "Loqo (açıq fon üçün)": "Logo (für hellen Hintergrund)",
+  "Ağ fonda, qaranlıq loqo.": "Dunkles Logo auf weißem Hintergrund.",
+  "Loqo (tünd fon üçün)": "Logo (für dunklen Hintergrund)",
+  "Şəkil və ya tünd fon üzərində, açıq loqo.":
+    "Helles Logo auf einem Bild oder dunklen Hintergrund.",
+  Favikon: "Favicon",
+  "Brauzer vərəqində görünən kvadrat ikon, ən azı 512 × 512 px.":
+    "Quadratisches Symbol im Browser-Tab, mindestens 512 × 512 px.",
+  "Hüquqi məlumat": "Rechtliche Angaben",
+  "Şirkətin adı (saytın aşağı hissəsi)": "Firmenname (Fußzeile der Website)",
+  "Müraciət bildirişləri": "Benachrichtigungen über Anfragen",
+  "Bildiriş e-poçtu": "E-Mail für Benachrichtigungen",
+  "Saytdan gələn hər müraciət bu ünvana göndərilir. Boş qalsa, server tənzimləməsindəki ünvan istifadə olunur.":
+    "Jede Anfrage von der Website wird an diese Adresse gesendet. Bleibt das Feld leer, wird die Adresse aus den Servereinstellungen verwendet.",
+  "Kataloq faylı": "Katalogdatei",
+  "Kataloq (PDF)": "Katalog (PDF)",
+  "İstəyə bağlıdır. Saytda yükləmək üçün təklif olunan kataloq.":
+    "Optional. Der Katalog, der auf der Website zum Download angeboten wird.",
+  "{name}: yerini dəyiş": "{name}: verschieben",
+  "{name}: sil": "{name}: löschen",
+  "{name}: link": "{name}: Link",
+  "Ad ({locale})": "Bezeichnung ({locale})",
+  "Məsələn, Ofis": "Zum Beispiel: Büro",
+  Nömrə: "Nummer",
+  "Nömrə əlavə et": "Nummer hinzufügen",
+  "E-poçt": "E-Mail",
+  "Saytda göstəriləcək e-poçt ünvanı yoxdur.":
+    "Keine E-Mail-Adressen für die Anzeige auf der Website.",
+  "E-poçt əlavə et": "E-Mail hinzufügen",
+  Şəbəkə: "Netzwerk",
+  "Sosial şəbəkə linki əlavə olunmayıb.": "Keine Links zu sozialen Netzwerken hinzugefügt.",
+  "Şəbəkə əlavə et": "Netzwerk hinzufügen",
+  "«MMC» yazılmadan, məsələn «CEWM». Saytın aşağı hissəsində © ilə göstərilir.":
+    "Ohne „MMC“, zum Beispiel „CEWM“. Wird im unteren Bereich der Website mit © angezeigt.",
 };

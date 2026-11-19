@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Field, FieldError, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
+import { filledLocales } from "@/lib/admin/form-values";
 import { useT, type Translate } from "@/lib/admin/i18n/use-t";
 import {
   appendItem,
@@ -62,11 +63,16 @@ type TitleState = Record<Locale, string>;
 type Editing = { mode: "edit"; key: string } | { mode: "add"; parentKey: string | null };
 
 function titleState(title: Localized): TitleState {
-  return { az: title.az, ru: title.ru ?? "", en: title.en ?? "" };
+  return { az: title.az, ru: title.ru ?? "", en: title.en ?? "", de: title.de ?? "" };
 }
 
 function titleValue(title: TitleState): Localized {
-  return { az: title.az.trim(), ru: title.ru.trim() || null, en: title.en.trim() || null };
+  return {
+    az: title.az.trim(),
+    ru: title.ru.trim() || null,
+    en: title.en.trim() || null,
+    de: title.de.trim() || null,
+  };
 }
 
 function snapshot(title: TitleState, items: EditorItem[]): string {
@@ -298,10 +304,7 @@ function EditorForm({
         <FormAlert message={formError} />
         {isFooter ? (
           <FormSection title={t("Sütunun başlığı")}>
-            <LocaleTabs
-              invalid={{ az: Boolean(titleError) }}
-              filled={{ ru: Boolean(title.ru), en: Boolean(title.en) }}
-            >
+            <LocaleTabs invalid={{ az: Boolean(titleError) }} filled={filledLocales(title)}>
               {(locale) => (
                 <Field data-invalid={locale === "az" && Boolean(titleError)}>
                   <FieldLabel htmlFor={`menu-title-${locale}`} className="text-meta font-medium">

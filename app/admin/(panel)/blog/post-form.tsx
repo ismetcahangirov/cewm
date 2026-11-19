@@ -34,7 +34,7 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/lib/admin/format";
-import { formRichText, formText, hasLocaleError } from "@/lib/admin/form-values";
+import { filledLocales, formRichText, formText, hasLocaleError } from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import {
   useCreatePostMutation,
@@ -88,6 +88,7 @@ export function PostForm({ post }: { post: PostDetailDto | null }) {
     az: Boolean(post),
     ru: Boolean(post?.slug.ru),
     en: Boolean(post?.slug.en),
+    de: Boolean(post?.slug.de),
   });
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [createPost] = useCreatePostMutation();
@@ -204,10 +205,7 @@ export function PostForm({ post }: { post: PostDetailDto | null }) {
         <FormLayout
           main={
             <FormSection title={t("Məzmun")}>
-              <LocaleTabs
-                invalid={textInvalid}
-                filled={{ ru: Boolean(title?.ru), en: Boolean(title?.en) }}
-              >
+              <LocaleTabs invalid={textInvalid} filled={filledLocales(title)}>
                 {(locale) => (
                   <>
                     <FormField
@@ -398,7 +396,7 @@ export function PostForm({ post }: { post: PostDetailDto | null }) {
                 onDescriptionChange={(locale, next) =>
                   form.setValue(`seoDescription.${locale}`, next, { shouldDirty: true })
                 }
-                fallbackTitle={(locale) => `${title?.[locale] || title?.az || ""} | Mebline`}
+                fallbackTitle={(locale) => `${title?.[locale] || title?.az || ""} | CEWM`}
                 fallbackDescription={(locale) =>
                   (
                     values.excerpt?.[locale] ||

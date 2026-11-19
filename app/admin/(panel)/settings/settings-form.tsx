@@ -62,7 +62,7 @@ function toFormValues(settings: SettingsDto): SettingsInput {
     seoDescription: text(settings.seoDescription),
     ogImageId: settings.ogImageId,
     legalName: settings.legalName ?? "",
-    quoteNotifyEmail: settings.quoteNotifyEmail ?? "",
+    consultationNotifyEmail: settings.consultationNotifyEmail ?? "",
     catalogueFileId: settings.catalogueFileId,
   };
 }
@@ -187,6 +187,7 @@ export function SettingsForm({ settings }: { settings: SettingsDto }) {
                   filled={{
                     ru: Boolean(values.address?.ru || values.workingHours?.ru),
                     en: Boolean(values.address?.en || values.workingHours?.en),
+                    de: Boolean(values.address?.de || values.workingHours?.de),
                   }}
                 >
                   {(locale) => (
@@ -293,6 +294,7 @@ export function SettingsForm({ settings }: { settings: SettingsDto }) {
                   filled={{
                     ru: Boolean(values.seoTitle?.ru || values.seoDescription?.ru),
                     en: Boolean(values.seoTitle?.en || values.seoDescription?.en),
+                    de: Boolean(values.seoTitle?.de || values.seoDescription?.de),
                   }}
                 >
                   {(locale) => (
@@ -306,7 +308,7 @@ export function SettingsForm({ settings }: { settings: SettingsDto }) {
                       onDescriptionChange={(next) =>
                         form.setValue(`seoDescription.${locale}`, next, { shouldDirty: true })
                       }
-                      fallbackTitle={values.seoTitle?.az || "Mebline"}
+                      fallbackTitle={values.seoTitle?.az || "CEWM"}
                       fallbackDescription={values.seoDescription?.az ?? ""}
                       path="/"
                       errors={{
@@ -349,7 +351,7 @@ export function SettingsForm({ settings }: { settings: SettingsDto }) {
                   name="legalName"
                   label={t("Şirkətin adı (saytın aşağı hissəsi)")}
                   description={t(
-                    "«MMC» yazılmadan, məsələn «Mebline». Saytın aşağı hissəsində © ilə göstərilir.",
+                    "«MMC» yazılmadan, məsələn «CEWM». Saytın aşağı hissəsində © ilə göstərilir.",
                   )}
                   render={({ field, id, invalid, describedBy }) => (
                     <Input
@@ -367,7 +369,7 @@ export function SettingsForm({ settings }: { settings: SettingsDto }) {
               <FormSection title={t("Müraciət bildirişləri")}>
                 <FormField
                   control={form.control}
-                  name="quoteNotifyEmail"
+                  name="consultationNotifyEmail"
                   label={t("Bildiriş e-poçtu")}
                   description={t(
                     "Saytdan gələn hər müraciət bu ünvana göndərilir. Boş qalsa, server tənzimləməsindəki ünvan istifadə olunur.",

@@ -3,10 +3,10 @@ import "server-only";
 import { count, desc, eq, gte } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
-import { pages, posts, products, projects, quoteRequests } from "@/lib/db/schema";
+import { brands, consultationRequests, pages, posts, products } from "@/lib/db/schema";
 import { countVisitors, type VisitorCounts } from "@/lib/visits";
 
-import { requestProductCount } from "./quote-requests";
+import { requestProductCount } from "./consultation-requests";
 
 const week = 7 * 24 * 60 * 60 * 1000;
 
@@ -15,14 +15,14 @@ export type DashboardSummary = {
   newRequestsThisWeek: number;
   unreadRequests: number;
   products: { total: number; published: number; draft: number };
-  projects: number;
+  brands: number;
   drafts: number;
   latestRequests: {
     id: string;
     name: string;
     phone: string;
     company: string | null;
-    status: (typeof quoteRequests.$inferSelect)["status"];
+    status: (typeof consultationRequests.$inferSelect)["status"];
     productCount: number;
     createdAt: Date;
   }[];
@@ -36,32 +36,36 @@ export async function getDashboardSummary(now = new Date()): Promise<DashboardSu
     [thisWeek],
     [unread],
     productRows,
-    [projectTotal],
-    [projectDrafts],
+    [brandTotal],
     [pageDrafts],
     [postDrafts],
     latestRequests,
     visitors,
   ] = await Promise.all([
-    db.select({ value: count() }).from(quoteRequests).where(gte(quoteRequests.createdAt, since)),
-    db.select({ value: count() }).from(quoteRequests).where(eq(quoteRequests.status, "new")),
+    db
+      .select({ value: count() })
+      .from(consultationRequests)
+      .where(gte(consultationRequests.createdAt, since)),
+    db
+      .select({ value: count() })
+      .from(consultationRequests)
+      .where(eq(consultationRequests.status, "new")),
     db.select({ status: products.status, value: count() }).from(products).groupBy(products.status),
-    db.select({ value: count() }).from(projects),
-    db.select({ value: count() }).from(projects).where(eq(projects.status, "draft")),
+    db.select({ value: count() }).from(brands),
     db.select({ value: count() }).from(pages).where(eq(pages.status, "draft")),
     db.select({ value: count() }).from(posts).where(eq(posts.status, "draft")),
     db
       .select({
-        id: quoteRequests.id,
-        name: quoteRequests.name,
-        phone: quoteRequests.phone,
-        company: quoteRequests.company,
-        status: quoteRequests.status,
-        createdAt: quoteRequests.createdAt,
+        id: consultationRequests.id,
+        name: consultationRequests.name,
+        phone: consultationRequests.phone,
+        company: consultationRequests.company,
+        status: consultationRequests.status,
+        createdAt: consultationRequests.createdAt,
         productCount: requestProductCount,
       })
-      .from(quoteRequests)
-      .orderBy(desc(quoteRequests.createdAt))
+      .from(consultationRequests)
+      .orderBy(desc(consultationRequests.createdAt))
       .limit(5),
     countVisitors(now),
   ]);
@@ -74,12 +78,8 @@ export async function getDashboardSummary(now = new Date()): Promise<DashboardSu
     newRequestsThisWeek: thisWeek?.value ?? 0,
     unreadRequests: unread?.value ?? 0,
     products: { total: published + productDrafts, published, draft: productDrafts },
-    projects: projectTotal?.value ?? 0,
-    drafts:
-      productDrafts +
-      (projectDrafts?.value ?? 0) +
-      (pageDrafts?.value ?? 0) +
-      (postDrafts?.value ?? 0),
+    brands: brandTotal?.value ?? 0,
+    drafts: productDrafts + (pageDrafts?.value ?? 0) + (postDrafts?.value ?? 0),
     latestRequests,
   };
 }
@@ -87,7 +87,7 @@ export async function getDashboardSummary(now = new Date()): Promise<DashboardSu
 export async function countUnreadRequests(): Promise<number> {
   const [row] = await getDb()
     .select({ value: count() })
-    .from(quoteRequests)
-    .where(eq(quoteRequests.status, "new"));
+    .from(consultationRequests)
+    .where(eq(consultationRequests.status, "new"));
   return row?.value ?? 0;
 }

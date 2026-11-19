@@ -29,7 +29,6 @@ export type UploadItem = {
 const kindLabels: Record<MediaKind, string> = {
   image: "JPG, PNG, WebP, AVIF, GIF",
   video: "MP4, WebM",
-  model: "GLB (3D model)",
   document: "PDF",
 };
 

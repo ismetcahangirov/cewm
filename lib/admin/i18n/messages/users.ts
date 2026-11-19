@@ -109,3 +109,58 @@ export const en: Record<keyof typeof ru, string> = {
   Göndərilir: "Sending",
   "Dəvət göndər": "Send invite",
 };
+
+export const de: Record<keyof typeof ru, string> = {
+  İstifadəçilər: "Benutzer",
+  Deaktiv: "Deaktiviert",
+  "Dəvət gözləyir": "Einladung ausstehend",
+  Aktiv: "Aktiv",
+  "«{name}» üçün rol sahib olsun?": "„{name}“ zum Inhaber machen?",
+  "«{name}» üçün rol redaktor olsun?": "„{name}“ zum Redakteur machen?",
+  "Sahib bütün bölmələri və istifadəçiləri idarə edə bilir.":
+    "Ein Inhaber kann alle Bereiche und Benutzer verwalten.",
+  "Redaktor istifadəçiləri görmür və onları idarə edə bilmir.":
+    "Ein Redakteur sieht keine Benutzer und kann sie nicht verwalten.",
+  "Rolu dəyiş": "Rolle ändern",
+  "«{name}» yenidən aktiv edilsin?": "„{name}“ wieder aktivieren?",
+  "İstifadəçi öz şifrəsi ilə yenidən daxil ola biləcək.":
+    "Der Benutzer kann sich wieder mit dem eigenen Passwort anmelden.",
+  "Aktiv et": "Aktivieren",
+  "«{name}» deaktiv edilsin?": "„{name}“ deaktivieren?",
+  "Bütün açıq sessiyaları bağlanacaq və daxil ola bilməyəcək.":
+    "Alle offenen Sitzungen werden beendet, und eine Anmeldung ist nicht mehr möglich.",
+  "Deaktiv et": "Deaktivieren",
+  Ad: "Name",
+  "(siz)": "(Sie)",
+  "E-poçt": "E-Mail",
+  Rol: "Rolle",
+  Status: "Status",
+  "Son giriş": "Letzte Anmeldung",
+  "Əlavə olunub": "Hinzugefügt",
+  "{name}: rol dəyişdi.": "{name}: Rolle geändert.",
+  "{name} aktiv edildi.": "{name} wurde aktiviert.",
+  "{name} deaktiv edildi.": "{name} wurde deaktiviert.",
+  "Dəvət yenidən göndərildi: {email}": "Einladung erneut gesendet: {email}",
+  "{name}: əməliyyatlar": "{name}: Aktionen",
+  "Sahib et": "Zum Inhaber machen",
+  "Redaktor et": "Zum Redakteur machen",
+  "Dəvəti yenidən göndər": "Einladung erneut senden",
+  "İdarə panelinə kimin daxil ola biləcəyini burada idarə edin.":
+    "Legen Sie hier fest, wer sich im Dashboard anmelden kann.",
+  "Yenidən yüklə": "Neu laden",
+  "İstifadəçilər yüklənmədi.": "Die Benutzer konnten nicht geladen werden.",
+  "Ad və ya e-poçt ilə axtar": "Nach Name oder E-Mail suchen",
+  "Axtarışa uyğun istifadəçi tapılmadı.": "Keine Benutzer entsprechen der Suche.",
+  "Hələ istifadəçi yoxdur.": "Noch keine Benutzer.",
+  "Bütün bölmələr və istifadəçilərin idarəsi.": "Verwaltet alle Bereiche und Benutzer.",
+  "Kataloq, məzmun və müraciətlər. İstifadəçiləri görmür.":
+    "Katalog, Inhalte und Anfragen. Sieht keine Benutzer.",
+  "Dəvət göndərildi: {email}": "Einladung gesendet: {email}",
+  "İstifadəçi dəvət et": "Benutzer einladen",
+  "Göstərilən ünvana şifrə təyin etmək üçün link göndəriləcək. Link 24 saat etibarlıdır.":
+    "An die angegebene Adresse wird ein Link zum Festlegen des Passworts gesendet. Der Link ist 24 Stunden gültig.",
+  "Ad və soyad": "Vor- und Nachname",
+  "Ləğv et": "Abbrechen",
+  Göndərilir: "Wird gesendet",
+  "Dəvət göndər": "Einladung senden",
+};

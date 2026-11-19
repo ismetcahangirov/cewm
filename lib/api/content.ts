@@ -10,20 +10,6 @@ import type {
   PostListArgs,
   PostListItemDto,
 } from "@/lib/validation/posts";
-import type {
-  ProjectDetailDto,
-  ProjectInput,
-  ProjectListArgs,
-  ProjectListItemDto,
-  ReorderProjectsInput,
-} from "@/lib/validation/projects";
-import type {
-  VacancyDetailDto,
-  VacancyInput,
-  VacancyListArgs,
-  VacancyListItemDto,
-} from "@/lib/validation/vacancies";
-
 import { baseApi } from "./base-api";
 import type { Page } from "./types";
 
@@ -93,88 +79,6 @@ export const contentApi = baseApi.injectEndpoints({
         { type: "Media", id: "LIST" },
       ],
     }),
-
-    getVacancies: build.query<Page<VacancyListItemDto>, VacancyListArgs>({
-      query: (params) => ({ url: "admin/vacancies", params }),
-      providesTags: [{ type: "Vacancy", id: "LIST" }],
-    }),
-    getVacancy: build.query<VacancyDetailDto, string>({
-      query: (id) => `admin/vacancies/${id}`,
-      providesTags: (_result, _error, id) => [{ type: "Vacancy", id }],
-    }),
-    createVacancy: build.mutation<{ id: string }, VacancyInput>({
-      query: (body) => ({ url: "admin/vacancies", method: "POST", body }),
-      invalidatesTags: [{ type: "Vacancy", id: "LIST" }],
-    }),
-    updateVacancy: build.mutation<{ id: string }, VacancyInput & { id: string }>({
-      query: ({ id, ...body }) => ({ url: `admin/vacancies/${id}`, method: "PUT", body }),
-      invalidatesTags: (_result, _error, { id }) => [
-        { type: "Vacancy", id },
-        { type: "Vacancy", id: "LIST" },
-      ],
-    }),
-    deleteVacancy: build.mutation<void, string>({
-      query: (id) => ({ url: `admin/vacancies/${id}`, method: "DELETE" }),
-      invalidatesTags: (_result, _error, id) => [
-        { type: "Vacancy", id },
-        { type: "Vacancy", id: "LIST" },
-      ],
-    }),
-
-    getProjects: build.query<Page<ProjectListItemDto>, ProjectListArgs>({
-      query: (params) => ({ url: "admin/projects", params }),
-      providesTags: [{ type: "Project", id: "LIST" }],
-    }),
-    getProjectOrder: build.query<ProjectListItemDto[], void>({
-      query: () => "admin/projects/reorder",
-      providesTags: [{ type: "Project", id: "LIST" }],
-    }),
-    getProject: build.query<ProjectDetailDto, string>({
-      query: (id) => `admin/projects/${id}`,
-      providesTags: (_result, _error, id) => [{ type: "Project", id }],
-    }),
-    createProject: build.mutation<{ id: string }, ProjectInput>({
-      query: (body) => ({ url: "admin/projects", method: "POST", body }),
-      invalidatesTags: [
-        { type: "Project", id: "LIST" },
-        { type: "Media", id: "LIST" },
-      ],
-    }),
-    updateProject: build.mutation<{ id: string }, ProjectInput & { id: string }>({
-      query: ({ id, ...body }) => ({ url: `admin/projects/${id}`, method: "PUT", body }),
-      invalidatesTags: (_result, _error, { id }) => [
-        { type: "Project", id },
-        { type: "Project", id: "LIST" },
-        { type: "Media", id: "LIST" },
-      ],
-    }),
-    reorderProjects: build.mutation<void, ReorderProjectsInput>({
-      query: (body) => ({ url: "admin/projects/reorder", method: "POST", body }),
-      async onQueryStarted({ orderedIds }, { dispatch, queryFulfilled }) {
-        const patch = dispatch(
-          contentApi.util.updateQueryData("getProjectOrder", undefined, (draft) => {
-            const position = new Map(orderedIds.map((id, index) => [id, index]));
-            for (const item of draft) item.sortOrder = position.get(item.id) ?? item.sortOrder;
-            draft.sort((a, b) => a.sortOrder - b.sortOrder);
-          }),
-        );
-        try {
-          await queryFulfilled;
-        } catch {
-          patch.undo();
-        }
-      },
-      invalidatesTags: [{ type: "Project", id: "LIST" }],
-    }),
-    deleteProject: build.mutation<void, string>({
-      query: (id) => ({ url: `admin/projects/${id}`, method: "DELETE" }),
-      invalidatesTags: (_result, _error, id) => [
-        { type: "Project", id },
-        { type: "Project", id: "LIST" },
-        { type: "Menu", id: "LIST" },
-        { type: "Media", id: "LIST" },
-      ],
-    }),
   }),
 });
 
@@ -189,16 +93,4 @@ export const {
   useCreatePostMutation,
   useUpdatePostMutation,
   useDeletePostMutation,
-  useGetVacanciesQuery,
-  useGetVacancyQuery,
-  useCreateVacancyMutation,
-  useUpdateVacancyMutation,
-  useDeleteVacancyMutation,
-  useGetProjectsQuery,
-  useGetProjectOrderQuery,
-  useGetProjectQuery,
-  useCreateProjectMutation,
-  useUpdateProjectMutation,
-  useReorderProjectsMutation,
-  useDeleteProjectMutation,
 } = contentApi;

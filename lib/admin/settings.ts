@@ -51,7 +51,7 @@ export async function getAdminSettings(): Promise<SettingsDto> {
     seoTitle: row?.seoTitle ?? null,
     seoDescription: row?.seoDescription ?? null,
     legalName: row?.legalName ?? null,
-    quoteNotifyEmail: row?.quoteNotifyEmail ?? null,
+    consultationNotifyEmail: row?.consultationNotifyEmail ?? null,
     updatedAt: row?.updatedAt.toISOString() ?? null,
   };
 }
@@ -108,7 +108,7 @@ export async function saveSettings(
     socials: values.socials,
     whatsappNumber: values.whatsappNumber,
     legalName: values.legalName,
-    quoteNotifyEmail: values.quoteNotifyEmail,
+    consultationNotifyEmail: values.consultationNotifyEmail,
     seoTitle: values.seoTitle,
     seoDescription: values.seoDescription,
     ogImageId: values.ogImageId,

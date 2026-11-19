@@ -35,13 +35,13 @@ import type { UserRole } from "@/lib/auth/roles";
 import { mailtoHref, telHref, whatsappHref } from "@/lib/contact-links";
 import { formatAzerbaijaniPhone } from "@/lib/phone";
 import {
-  quoteRequestLocaleLabels,
-  quoteRequestStatuses,
-  quoteRequestStatusLabels,
-  type QuoteRequestDetailDto,
-  type QuoteRequestProductDto,
-  type QuoteRequestStatus,
-} from "@/lib/validation/quote-requests";
+  consultationRequestLocaleLabels,
+  consultationRequestStatuses,
+  consultationRequestStatusLabels,
+  type ConsultationRequestDetailDto,
+  type ConsultationRequestProductDto,
+  type ConsultationRequestStatus,
+} from "@/lib/validation/consultation-requests";
 
 const noteLimit = 5000;
 
@@ -88,7 +88,7 @@ function ContactRow({ label, children }: { label: string; children: ReactNode })
   );
 }
 
-function ProductRow({ product }: { product: QuoteRequestProductDto }) {
+function ProductRow({ product }: { product: ConsultationRequestProductDto }) {
   const t = useT();
   return (
     <li className="flex items-center gap-3 py-2">
@@ -118,7 +118,7 @@ function ProductRow({ product }: { product: QuoteRequestProductDto }) {
   );
 }
 
-function RequestView({ request, role }: { request: QuoteRequestDetailDto; role: UserRole }) {
+function RequestView({ request, role }: { request: ConsultationRequestDetailDto; role: UserRole }) {
   const t = useT();
   const router = useRouter();
   const noteId = useId();
@@ -130,11 +130,11 @@ function RequestView({ request, role }: { request: QuoteRequestDetailDto; role: 
   const guard = useUnsavedChangesGuard(noteDirty);
   const [noteError, setNoteError] = useState<string | null>(null);
 
-  async function changeStatus(status: QuoteRequestStatus) {
+  async function changeStatus(status: ConsultationRequestStatus) {
     try {
       await updateRequest({ id: request.id, status }).unwrap();
       toast.success(
-        t("Status: {status}.", { status: t.message(quoteRequestStatusLabels[status]) }),
+        t("Status: {status}.", { status: t.message(consultationRequestStatusLabels[status]) }),
       );
     } catch (error) {
       toast.error(apiErrorMessage(error));
@@ -228,7 +228,7 @@ function RequestView({ request, role }: { request: QuoteRequestDetailDto; role: 
                 <ContactRow label={t("E-poçt")}>
                   {request.email ? (
                     <a
-                      href={mailtoHref(request.email, "Mebline: təklif sorğunuz")}
+                      href={mailtoHref(request.email, "CEWM: konsultasiya sorğunuz")}
                       className="inline-flex min-h-11 items-center gap-2 break-all hover:underline md:min-h-0"
                     >
                       <Mail className="size-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
@@ -280,16 +280,16 @@ function RequestView({ request, role }: { request: QuoteRequestDetailDto; role: 
                 </label>
                 <Select
                   value={request.status}
-                  onValueChange={(value) => changeStatus(value as QuoteRequestStatus)}
+                  onValueChange={(value) => changeStatus(value as ConsultationRequestStatus)}
                   disabled={updating}
                 >
                   <SelectTrigger id={`${noteId}-status`} className="w-full">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {quoteRequestStatuses.map((status) => (
+                    {consultationRequestStatuses.map((status) => (
                       <SelectItem key={status} value={status}>
-                        {t.message(quoteRequestStatusLabels[status])}
+                        {t.message(consultationRequestStatusLabels[status])}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -334,7 +334,7 @@ function RequestView({ request, role }: { request: QuoteRequestDetailDto; role: 
             <FormSection title={t("Məlumat")}>
               <dl className="grid grid-cols-[auto_1fr] gap-x-4 gap-y-1 text-meta">
                 <dt className="text-muted-foreground">{t("Sayt dili")}</dt>
-                <dd>{t.message(quoteRequestLocaleLabels[request.locale])}</dd>
+                <dd>{t.message(consultationRequestLocaleLabels[request.locale])}</dd>
                 <dt className="text-muted-foreground">{t("Göndərilib")}</dt>
                 <dd>{t("{date} (Bakı)", { date: formatDateTime(request.createdAt, t.locale) })}</dd>
                 <dt className="text-muted-foreground">{t("Dəyişib")}</dt>

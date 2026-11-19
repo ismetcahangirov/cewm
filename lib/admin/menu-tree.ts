@@ -32,7 +32,6 @@ export function fromDto(items: MenuItemDto[]): EditorItem[] {
     target: item.target,
     categoryId: item.categoryId,
     pageId: item.pageId,
-    projectId: item.projectId,
     url: item.url,
     children: fromDto(item.children),
   }));
@@ -41,11 +40,15 @@ export function fromDto(items: MenuItemDto[]): EditorItem[] {
 export function toInput(items: EditorItem[]): MenuItemInput[] {
   return items.map((item) => ({
     id: item.id,
-    label: { az: item.label.az, ru: item.label.ru ?? null, en: item.label.en ?? null },
+    label: {
+      az: item.label.az,
+      ru: item.label.ru ?? null,
+      en: item.label.en ?? null,
+      de: item.label.de ?? null,
+    },
     target: item.target,
     categoryId: item.categoryId,
     pageId: item.pageId,
-    projectId: item.projectId,
     url: item.url,
     children: toInput(item.children),
   }));
@@ -251,26 +254,14 @@ export function describeTarget(
         warning: hidden ? t("Kateqoriya gizlidir, saytda göstərilməyəcək.") : null,
       };
     }
-    case "page":
-    case "project": {
-      const isPage = item.target === "page";
-      const noun = isPage ? t("Səhifə") : t("Layihə");
-      const id = isPage ? item.pageId : item.projectId;
-      const option = (isPage ? targets?.pages : targets?.projects)?.find(
-        (entry) => entry.id === id,
-      );
+    case "page": {
+      const noun = t("Səhifə");
+      const option = targets?.pages.find((entry) => entry.id === item.pageId);
       if (!targets) return { text: noun, warning: null };
-      if (!option) {
-        return { text: noun, warning: isPage ? t("Səhifə tapılmadı.") : t("Layihə tapılmadı.") };
-      }
-      const name = text(option.title);
+      if (!option) return { text: noun, warning: t("Səhifə tapılmadı.") };
       return {
-        text: isPage ? t("Səhifə: {name}", { name }) : t("Layihə: {name}", { name }),
-        warning: option.isPublished
-          ? null
-          : isPage
-            ? t("Səhifə dərc olunmayıb, saytda göstərilməyəcək.")
-            : t("Layihə dərc olunmayıb, saytda göstərilməyəcək."),
+        text: t("Səhifə: {name}", { name: text(option.title) }),
+        warning: option.isPublished ? null : t("Səhifə dərc olunmayıb, saytda göstərilməyəcək."),
       };
     }
   }

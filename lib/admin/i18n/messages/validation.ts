@@ -10,7 +10,6 @@ export const ru = {
   "Dəyər seçin.": "Выберите значение.",
   "Sıra boşdur.": "Порядок не задан.",
   "Dəyişiklik yoxdur.": "Нет изменений.",
-
   "E-poçt ünvanı düzgün deyil.": "Неверный адрес эл. почты.",
   "Şifrəni daxil edin.": "Введите пароль.",
   "Şifrə ən azı {min} simvol olmalıdır.":
@@ -24,7 +23,6 @@ export const ru = {
     "Ссылка недействительна или устарела. Запросите новую ссылку.",
   "Çox cəhd edildi. Bir dəqiqə sonra yenidən yoxlayın.":
     "Слишком много попыток. Попробуйте снова через минуту.",
-
   "Daxil olmaq lazımdır.": "Нужно войти.",
   "Bu əməliyyat üçün icazəniz yoxdur.": "У вас нет прав на это действие.",
   "Sorğunun gövdəsi JSON deyil.": "Тело запроса не является JSON.",
@@ -33,7 +31,6 @@ export const ru = {
   "Siyahı köhnədir. Səhifəni yeniləyib yenidən cəhd edin.":
     "Список устарел. Обновите страницу и попробуйте снова.",
   "Bu ünvan artıq istifadə olunur.": "Этот адрес уже используется.",
-
   "Kateqoriyanın adını yazın.": "Введите название категории.",
   "Kateqoriyanı seçin.": "Выберите категорию.",
   "Kateqoriya tapılmadı.": "Категория не найдена.",
@@ -52,7 +49,6 @@ export const ru = {
   "Kateqoriyalardan biri tapılmadı.": "Одна из категорий не найдена.",
   "Məhsulları başqa kateqoriyaya köçürün.": "Перенесите товары в другую категорию.",
   "Hədəf kateqoriya tapılmadı.": "Целевая категория не найдена.",
-
   "Məhsulun adını yazın.": "Введите название товара.",
   "Məhsul seçin.": "Выберите товар.",
   "Məhsul düzgün deyil.": "Неверный товар.",
@@ -78,24 +74,12 @@ export const ru = {
   "Şəkil seçin.": "Выберите изображение.",
   "Şəkil üçün alt mətn yazın.": "Введите alt-текст для изображения.",
   "Eyni şəkil iki dəfə əlavə olunub.": "Одно и то же изображение добавлено дважды.",
-  "3D model üçün poster şəkli seçin.": "Выберите постер для 3D-модели.",
-  "3D model GLB faylı olmalıdır.": "3D-модель должна быть файлом GLB.",
   "Poster şəkil olmalıdır.": "Постер должен быть изображением.",
   "Dərc etmək üçün ən azı bir şəkil əlavə edin.":
     "Чтобы опубликовать, добавьте хотя бы одно изображение.",
   "Əməliyyat seçin.": "Выберите действие.",
   "Məhsullardan biri tapılmadı və ya zibil qutusundadır.":
     "Один из товаров не найден или находится в корзине.",
-
-  "Layihənin adını yazın.": "Введите название проекта.",
-  "Layihənin növünü seçin.": "Выберите тип проекта.",
-  "Layihəni seçin.": "Выберите проект.",
-  "Layihə tapılmadı.": "Проект не найден.",
-  "Layihələrdən biri tapılmadı.": "Один из проектов не найден.",
-  "Sıra təkrarlanan layihə ehtiva edir.": "В порядке повторяется проект.",
-  "Bu ünvan (slug) artıq başqa layihədə istifadə olunur.":
-    "Этот адрес (slug) уже используется в другом проекте.",
-
   "Səhifənin adını yazın.": "Введите название страницы.",
   "Səhifəni seçin.": "Выберите страницу.",
   "Səhifə tapılmadı.": "Страница не найдена.",
@@ -105,13 +89,11 @@ export const ru = {
     "Этот адрес (slug) уже используется на другой странице.",
   "Sistem səhifəsini silmək olmaz: sayt bu səhifəyə bağlıdır. Onu qaralamaya çevirə bilərsiniz.":
     "Системную страницу нельзя удалить: сайт зависит от неё. Её можно перевести в черновик.",
-
   "Yazının başlığını yazın.": "Введите заголовок записи.",
   "Tarix və saatı düzgün yazın.": "Введите корректные дату и время.",
   "Yazı tapılmadı.": "Запись не найдена.",
   "Bu ünvan (slug) artıq başqa yazıda istifadə olunur.":
     "Этот адрес (slug) уже используется в другой записи.",
-
   "Fayl adı yoxdur.": "Нет имени файла.",
   "Fayl adı çox uzundur.": "Имя файла слишком длинное.",
   "Bu fayl növü dəstəklənmir.": "Этот тип файла не поддерживается.",
@@ -133,7 +115,6 @@ export const ru = {
     "Фавикон должен быть квадратным, например 512 × 512.",
   "Şəklin ölçüləri bilinmir. Şəkli yenidən yükləyin.":
     "Размеры изображения неизвестны. Загрузите изображение заново.",
-
   "Qrupu seçin.": "Выберите группу.",
   "Adı yazın.": "Введите название.",
   "Loqo şəklini seçin.": "Выберите изображение логотипа.",
@@ -141,7 +122,6 @@ export const ru = {
   "Sıra təkrarlanan loqo ehtiva edir.": "В порядке повторяется логотип.",
   "Tam ünvan yazın: http:// və ya https:// ilə başlamalıdır.":
     "Введите полный адрес: он должен начинаться с http:// или https://.",
-
   "Elementin adını yazın.": "Введите название пункта.",
   "Keçid növünü seçin.": "Выберите тип ссылки.",
   "Ünvanı yazın.": "Введите адрес.",
@@ -161,7 +141,6 @@ export const ru = {
   "Əsas menyu silinə bilməz.": "Главное меню нельзя удалить.",
   "Yalnız altbilgi sütunları silinə bilər.": "Удалять можно только колонки футера.",
   "Sıra təkrarlanan sütun ehtiva edir.": "В порядке повторяется колонка.",
-
   "Bölmə düzgün deyil.": "Неверный раздел.",
   "Bütün bölmələr göndərilməlidir.": "Нужно отправить все разделы.",
   "Bölmə təkrarlanır.": "Раздел повторяется.",
@@ -177,9 +156,6 @@ export const ru = {
     "Ширина мобильного изображения должна быть не меньше {min} px. Ширина этого изображения {width} px.",
   "Saytdakı ünvanı «/» ilə (məsələn /mehsullar) və ya tam linki https:// ilə yazın.":
     "Введите адрес на сайте с «/» (например /mehsullar) или полную ссылку с https://.",
-
-  "Şirkətin adı «MMC» olmadan yazılır, məsələn «Mebline».":
-    "Название компании пишется без «MMC», например «Mebline».",
   "Link çox uzundur.": "Ссылка слишком длинная.",
   "Nömrə düzgün deyil.": "Неверный номер.",
   "Nömrəni ölkə kodu ilə yalnız rəqəmlərlə yazın, məsələn 994552555423.":
@@ -195,7 +171,6 @@ export const ru = {
   "Bu ünvan artıq əlavə olunub.": "Этот адрес уже добавлен.",
   "Ən çox {max} şəbəkə ola bilər.": "Не более {max} {max|соцсети|соцсетей|соцсетей}.",
   "Bu şəbəkə artıq əlavə olunub.": "Эта соцсеть уже добавлена.",
-
   "Köhnə ünvanı yazın.": "Введите старый адрес.",
   "Yeni ünvanı yazın.": "Введите новый адрес.",
   "Ünvan «/» ilə başlamalıdır.": "Адрес должен начинаться с «/».",
@@ -211,7 +186,6 @@ export const ru = {
   "Bu köhnə ünvan üçün yönləndirmə artıq var.": "Для этого старого адреса редирект уже есть.",
   "Bu ünvan özü də {target} ünvanına yönləndirilir. Son ünvanı yazın.":
     "Этот адрес сам перенаправляется на {target}. Укажите конечный адрес.",
-
   "Telefon nömrəsini yazın.": "Введите номер телефона.",
   "Telefon nömrəsi düzgün deyil.": "Неверный номер телефона.",
   "Nömrəni +994 XX XXX XX XX və ya 0XX XXX XX XX şəklində yazın.":
@@ -224,14 +198,12 @@ export const ru = {
   "Ad çox uzundur.": "Имя слишком длинное.",
   "Dil düzgün deyil.": "Неверный язык.",
   "Müraciət tapılmadı.": "Заявка не найдена.",
-
   "Rol seçin.": "Выберите роль.",
   "İstifadəçi tapılmadı.": "Пользователь не найден.",
   "Bu e-poçt ilə istifadəçi artıq var.": "Пользователь с этой эл. почтой уже есть.",
   "Deaktiv istifadəçiyə dəvət göndərilmir.":
     "Деактивированному пользователю приглашение не отправляется.",
   "Öz rolunuzu və statusunuzu dəyişə bilməzsiniz.": "Нельзя изменить собственную роль и статус.",
-
   "Yanlış dəyər": "Неверное значение",
   "Yanlış dəyər: gözlənilən {expected}, daxil olan {received}":
     "Неверное значение: ожидалось {expected}, получено {received}",
@@ -299,6 +271,8 @@ export const ru = {
   "Bütün bölmələr bir dəfə göndərilməlidir.": "Каждый раздел нужно отправить один раз.",
   "Ən çox {max} əlavə bölmə ola bilər.":
     "Не более {max} {max|дополнительного раздела|дополнительных разделов|дополнительных разделов}.",
+  "Şirkətin adı «MMC» olmadan yazılır, məsələn «CEWM».":
+    "Название компании пишется без «MMC», например «CEWM».",
 } satisfies Messages;
 
 export const en: Record<keyof typeof ru, string> = {
@@ -311,7 +285,6 @@ export const en: Record<keyof typeof ru, string> = {
   "Dəyər seçin.": "Choose a value.",
   "Sıra boşdur.": "The order is empty.",
   "Dəyişiklik yoxdur.": "There are no changes.",
-
   "E-poçt ünvanı düzgün deyil.": "The email address is not valid.",
   "Şifrəni daxil edin.": "Enter the password.",
   "Şifrə ən azı {min} simvol olmalıdır.":
@@ -325,7 +298,6 @@ export const en: Record<keyof typeof ru, string> = {
     "The link is invalid or has expired. Request a new link.",
   "Çox cəhd edildi. Bir dəqiqə sonra yenidən yoxlayın.":
     "Too many attempts. Try again in a minute.",
-
   "Daxil olmaq lazımdır.": "You need to sign in.",
   "Bu əməliyyat üçün icazəniz yoxdur.": "You don't have permission for this action.",
   "Sorğunun gövdəsi JSON deyil.": "The request body is not JSON.",
@@ -334,7 +306,6 @@ export const en: Record<keyof typeof ru, string> = {
   "Siyahı köhnədir. Səhifəni yeniləyib yenidən cəhd edin.":
     "The list is out of date. Refresh the page and try again.",
   "Bu ünvan artıq istifadə olunur.": "This URL is already in use.",
-
   "Kateqoriyanın adını yazın.": "Enter the category name.",
   "Kateqoriyanı seçin.": "Choose a category.",
   "Kateqoriya tapılmadı.": "Category not found.",
@@ -352,7 +323,6 @@ export const en: Record<keyof typeof ru, string> = {
   "Kateqoriyalardan biri tapılmadı.": "One of the categories was not found.",
   "Məhsulları başqa kateqoriyaya köçürün.": "Move the products to another category.",
   "Hədəf kateqoriya tapılmadı.": "Target category not found.",
-
   "Məhsulun adını yazın.": "Enter the product name.",
   "Məhsul seçin.": "Choose a product.",
   "Məhsul düzgün deyil.": "Invalid product.",
@@ -376,23 +346,11 @@ export const en: Record<keyof typeof ru, string> = {
   "Şəkil seçin.": "Choose an image.",
   "Şəkil üçün alt mətn yazın.": "Enter alt text for the image.",
   "Eyni şəkil iki dəfə əlavə olunub.": "The same image was added twice.",
-  "3D model üçün poster şəkli seçin.": "Choose a poster image for the 3D model.",
-  "3D model GLB faylı olmalıdır.": "The 3D model must be a GLB file.",
   "Poster şəkil olmalıdır.": "The poster must be an image.",
   "Dərc etmək üçün ən azı bir şəkil əlavə edin.": "Add at least one image to publish.",
   "Əməliyyat seçin.": "Choose an action.",
   "Məhsullardan biri tapılmadı və ya zibil qutusundadır.":
     "One of the products was not found or is in the trash.",
-
-  "Layihənin adını yazın.": "Enter the project name.",
-  "Layihənin növünü seçin.": "Choose the project type.",
-  "Layihəni seçin.": "Choose a project.",
-  "Layihə tapılmadı.": "Project not found.",
-  "Layihələrdən biri tapılmadı.": "One of the projects was not found.",
-  "Sıra təkrarlanan layihə ehtiva edir.": "The order contains a repeated project.",
-  "Bu ünvan (slug) artıq başqa layihədə istifadə olunur.":
-    "This URL (slug) is already used by another project.",
-
   "Səhifənin adını yazın.": "Enter the page name.",
   "Səhifəni seçin.": "Choose a page.",
   "Səhifə tapılmadı.": "Page not found.",
@@ -402,13 +360,11 @@ export const en: Record<keyof typeof ru, string> = {
     "This URL (slug) is already used by another page.",
   "Sistem səhifəsini silmək olmaz: sayt bu səhifəyə bağlıdır. Onu qaralamaya çevirə bilərsiniz.":
     "A system page can't be deleted: the site depends on it. You can turn it into a draft.",
-
   "Yazının başlığını yazın.": "Enter the post title.",
   "Tarix və saatı düzgün yazın.": "Enter a valid date and time.",
   "Yazı tapılmadı.": "Post not found.",
   "Bu ünvan (slug) artıq başqa yazıda istifadə olunur.":
     "This URL (slug) is already used by another post.",
-
   "Fayl adı yoxdur.": "The file has no name.",
   "Fayl adı çox uzundur.": "The file name is too long.",
   "Bu fayl növü dəstəklənmir.": "This file type is not supported.",
@@ -430,7 +386,6 @@ export const en: Record<keyof typeof ru, string> = {
     "The favicon must be square, for example 512 × 512.",
   "Şəklin ölçüləri bilinmir. Şəkli yenidən yükləyin.":
     "The image size is unknown. Upload the image again.",
-
   "Qrupu seçin.": "Choose a group.",
   "Adı yazın.": "Enter the name.",
   "Loqo şəklini seçin.": "Choose the logo image.",
@@ -438,7 +393,6 @@ export const en: Record<keyof typeof ru, string> = {
   "Sıra təkrarlanan loqo ehtiva edir.": "The order contains a repeated logo.",
   "Tam ünvan yazın: http:// və ya https:// ilə başlamalıdır.":
     "Enter the full URL: it must start with http:// or https://.",
-
   "Elementin adını yazın.": "Enter the item name.",
   "Keçid növünü seçin.": "Choose the link type.",
   "Ünvanı yazın.": "Enter the URL.",
@@ -457,7 +411,6 @@ export const en: Record<keyof typeof ru, string> = {
   "Əsas menyu silinə bilməz.": "The main menu can't be deleted.",
   "Yalnız altbilgi sütunları silinə bilər.": "Only footer columns can be deleted.",
   "Sıra təkrarlanan sütun ehtiva edir.": "The order contains a repeated column.",
-
   "Bölmə düzgün deyil.": "Invalid section.",
   "Bütün bölmələr göndərilməlidir.": "All sections must be sent.",
   "Bölmə təkrarlanır.": "The section is repeated.",
@@ -473,9 +426,6 @@ export const en: Record<keyof typeof ru, string> = {
     "The mobile image must be at least {min} px wide. This image is {width} px wide.",
   "Saytdakı ünvanı «/» ilə (məsələn /mehsullar) və ya tam linki https:// ilə yazın.":
     "Enter a site URL with “/” (for example /mehsullar) or a full link with https://.",
-
-  "Şirkətin adı «MMC» olmadan yazılır, məsələn «Mebline».":
-    "Write the company name without “MMC”, for example “Mebline”.",
   "Link çox uzundur.": "The link is too long.",
   "Nömrə düzgün deyil.": "The number is not valid.",
   "Nömrəni ölkə kodu ilə yalnız rəqəmlərlə yazın, məsələn 994552555423.":
@@ -491,7 +441,6 @@ export const en: Record<keyof typeof ru, string> = {
   "Bu ünvan artıq əlavə olunub.": "This address has already been added.",
   "Ən çox {max} şəbəkə ola bilər.": "At most {max} social {max|network|networks}.",
   "Bu şəbəkə artıq əlavə olunub.": "This social network has already been added.",
-
   "Köhnə ünvanı yazın.": "Enter the old URL.",
   "Yeni ünvanı yazın.": "Enter the new URL.",
   "Ünvan «/» ilə başlamalıdır.": "The URL must start with “/”.",
@@ -507,7 +456,6 @@ export const en: Record<keyof typeof ru, string> = {
   "Bu köhnə ünvan üçün yönləndirmə artıq var.": "A redirect for this old URL already exists.",
   "Bu ünvan özü də {target} ünvanına yönləndirilir. Son ünvanı yazın.":
     "This URL itself redirects to {target}. Enter the final URL.",
-
   "Telefon nömrəsini yazın.": "Enter the phone number.",
   "Telefon nömrəsi düzgün deyil.": "The phone number is not valid.",
   "Nömrəni +994 XX XXX XX XX və ya 0XX XXX XX XX şəklində yazın.":
@@ -519,13 +467,11 @@ export const en: Record<keyof typeof ru, string> = {
   "Ad çox uzundur.": "The name is too long.",
   "Dil düzgün deyil.": "Invalid language.",
   "Müraciət tapılmadı.": "Request not found.",
-
   "Rol seçin.": "Choose a role.",
   "İstifadəçi tapılmadı.": "User not found.",
   "Bu e-poçt ilə istifadəçi artıq var.": "A user with this email already exists.",
   "Deaktiv istifadəçiyə dəvət göndərilmir.": "Invitations aren't sent to deactivated users.",
   "Öz rolunuzu və statusunuzu dəyişə bilməzsiniz.": "You can't change your own role and status.",
-
   "Yanlış dəyər": "Invalid value",
   "Yanlış dəyər: gözlənilən {expected}, daxil olan {received}":
     "Invalid value: expected {expected}, received {received}",
@@ -584,4 +530,282 @@ export const en: Record<keyof typeof ru, string> = {
   "Başlıq, mətn və ya media əlavə edin.": "Add a heading, text or media.",
   "Bütün bölmələr bir dəfə göndərilməlidir.": "Every section must be sent exactly once.",
   "Ən çox {max} əlavə bölmə ola bilər.": "At most {max} extra {max|section|sections}.",
+  "Şirkətin adı «MMC» olmadan yazılır, məsələn «CEWM».":
+    "Write the company name without “MMC”, for example “CEWM”.",
+};
+
+export const de: Record<keyof typeof ru, string> = {
+  "Bu sahəni doldurun.": "Füllen Sie dieses Feld aus.",
+  "Seçim düzgün deyil.": "Ungültige Auswahl.",
+  "Ən çox {max} simvol ola bilər.": "Höchstens {max} {max|Zeichen|Zeichen}.",
+  "Yalnız kiçik latın hərfləri, rəqəmlər və tire.":
+    "Nur lateinische Kleinbuchstaben, Ziffern und Bindestriche.",
+  "Status seçin.": "Wählen Sie einen Status aus.",
+  "Dəyər seçin.": "Wählen Sie einen Wert aus.",
+  "Sıra boşdur.": "Die Reihenfolge ist leer.",
+  "Dəyişiklik yoxdur.": "Keine Änderungen vorhanden.",
+  "E-poçt ünvanı düzgün deyil.": "Die E-Mail-Adresse ist ungültig.",
+  "Şifrəni daxil edin.": "Geben Sie das Passwort ein.",
+  "Şifrə ən azı {min} simvol olmalıdır.":
+    "Das Passwort muss mindestens {min} {min|Zeichen|Zeichen} lang sein.",
+  "Şifrə çox uzundur.": "Das Passwort ist zu lang.",
+  "Şifrə çox qısadır.": "Das Passwort ist zu kurz.",
+  "Şifrələr eyni deyil.": "Die Passwörter stimmen nicht überein.",
+  "E-poçt və ya şifrə yanlışdır.": "E-Mail-Adresse oder Passwort ist falsch.",
+  "Hesabınız deaktiv edilib.": "Ihr Konto wurde deaktiviert.",
+  "Link etibarsızdır və ya vaxtı keçib. Yeni link istəyin.":
+    "Der Link ist ungültig oder abgelaufen. Fordern Sie einen neuen Link an.",
+  "Çox cəhd edildi. Bir dəqiqə sonra yenidən yoxlayın.":
+    "Zu viele Versuche. Versuchen Sie es in einer Minute erneut.",
+  "Daxil olmaq lazımdır.": "Sie müssen sich anmelden.",
+  "Bu əməliyyat üçün icazəniz yoxdur.": "Sie haben keine Berechtigung für diese Aktion.",
+  "Sorğunun gövdəsi JSON deyil.": "Der Inhalt der Anfrage ist kein JSON.",
+  "Xəta baş verdi. Yenidən cəhd edin.": "Ein Fehler ist aufgetreten. Versuchen Sie es erneut.",
+  "Məlumatlar düzgün deyil.": "Die Daten sind ungültig.",
+  "Siyahı köhnədir. Səhifəni yeniləyib yenidən cəhd edin.":
+    "Die Liste ist veraltet. Laden Sie die Seite neu und versuchen Sie es erneut.",
+  "Bu ünvan artıq istifadə olunur.": "Diese Adresse wird bereits verwendet.",
+  "Kateqoriyanın adını yazın.": "Geben Sie den Namen der Kategorie ein.",
+  "Kateqoriyanı seçin.": "Wählen Sie eine Kategorie aus.",
+  "Kateqoriya tapılmadı.": "Kategorie nicht gefunden.",
+  "Kateqoriya təkrarlanır.": "Die Kategorie kommt mehrfach vor.",
+  "Bu ünvan (slug) artıq başqa kateqoriyada istifadə olunur.":
+    "Diese Adresse (Slug) wird bereits von einer anderen Kategorie verwendet.",
+  "Kateqoriya öz-özünün alt kateqoriyası ola bilməz.":
+    "Eine Kategorie kann nicht ihre eigene Unterkategorie sein.",
+  "Kateqoriya öz-özünün altına keçə bilməz.":
+    "Eine Kategorie kann nicht unter sich selbst verschoben werden.",
+  "Üst kateqoriya tapılmadı.": "Übergeordnete Kategorie nicht gefunden.",
+  "Yalnız iki səviyyə olar: alt kateqoriyanın altına kateqoriya qoymaq olmaz.":
+    "Es sind nur zwei Ebenen erlaubt: Eine Kategorie kann nicht unter eine Unterkategorie verschoben werden.",
+  "Alt kateqoriyaları olan kateqoriya başqasının altına keçə bilməz.":
+    "Eine Kategorie mit Unterkategorien kann nicht unter eine andere verschoben werden.",
+  "Sıra təkrarlanan kateqoriya ehtiva edir.": "Die Reihenfolge enthält eine Kategorie mehrfach.",
+  "Kateqoriyalardan biri tapılmadı.": "Eine der Kategorien wurde nicht gefunden.",
+  "Məhsulları başqa kateqoriyaya köçürün.":
+    "Verschieben Sie die Produkte in eine andere Kategorie.",
+  "Hədəf kateqoriya tapılmadı.": "Zielkategorie nicht gefunden.",
+  "Məhsulun adını yazın.": "Geben Sie den Namen des Produkts ein.",
+  "Məhsul seçin.": "Wählen Sie ein Produkt aus.",
+  "Məhsul düzgün deyil.": "Ungültiges Produkt.",
+  "Məhsul təkrarlanır.": "Das Produkt kommt mehrfach vor.",
+  "Məhsul tapılmadı.": "Produkt nicht gefunden.",
+  "Məhsul özü ilə əlaqələndirilə bilməz.":
+    "Ein Produkt kann nicht mit sich selbst verknüpft werden.",
+  "Bu ünvan (slug) artıq başqa məhsulda istifadə olunur.":
+    "Diese Adresse (Slug) wird bereits von einem anderen Produkt verwendet.",
+  "Ən çox {max} məhsul ola bilər.": "Höchstens {max} {max|Produkt|Produkte}.",
+  "Ən çox {max} məhsul seçmək olar.":
+    "Sie können höchstens {max} {max|Produkt|Produkte} auswählen.",
+  "Ən çox {max} əlaqəli məhsul seçmək olar.":
+    "Sie können höchstens {max} {max|verwandtes Produkt|verwandte Produkte} auswählen.",
+  "Ən çox {max} kateqoriya seçmək olar.":
+    "Sie können höchstens {max} {max|Kategorie|Kategorien} auswählen.",
+  "Ən çox {max} göstərici ola bilər.": "Höchstens {max} {max|Merkmal|Merkmale}.",
+  "Ən çox {max} şəkil ola bilər.": "Höchstens {max} {max|Bild|Bilder}.",
+  "Bir dəfəyə ən çox {max} məhsul.": "Höchstens {max} {max|Produkt|Produkte} auf einmal.",
+  "{count} məhsul dərc olunmadı: şəkli yoxdur və ya silinib.":
+    "{count} {count|Produkt wurde|Produkte wurden} nicht veröffentlicht: kein Bild vorhanden oder das Bild wurde gelöscht.",
+  "Göstəricinin adını yazın.": "Geben Sie die Bezeichnung des Merkmals ein.",
+  "Dəyəri yazın.": "Geben Sie den Wert ein.",
+  "Şəkil seçin.": "Wählen Sie ein Bild aus.",
+  "Şəkil üçün alt mətn yazın.": "Geben Sie einen Alternativtext für das Bild ein.",
+  "Eyni şəkil iki dəfə əlavə olunub.": "Dasselbe Bild wurde zweimal hinzugefügt.",
+  "Poster şəkil olmalıdır.": "Das Poster muss ein Bild sein.",
+  "Dərc etmək üçün ən azı bir şəkil əlavə edin.":
+    "Fügen Sie mindestens ein Bild hinzu, um zu veröffentlichen.",
+  "Əməliyyat seçin.": "Wählen Sie eine Aktion aus.",
+  "Məhsullardan biri tapılmadı və ya zibil qutusundadır.":
+    "Eines der Produkte wurde nicht gefunden oder befindet sich im Papierkorb.",
+  "Səhifənin adını yazın.": "Geben Sie den Namen der Seite ein.",
+  "Səhifəni seçin.": "Wählen Sie eine Seite aus.",
+  "Səhifə tapılmadı.": "Seite nicht gefunden.",
+  "Bu ünvan saytın bölməsinə aiddir. Başqa ünvan seçin.":
+    "Diese Adresse gehört zu einem Bereich der Website. Wählen Sie eine andere Adresse.",
+  "Bu ünvan (slug) artıq başqa səhifədə istifadə olunur.":
+    "Diese Adresse (Slug) wird bereits von einer anderen Seite verwendet.",
+  "Sistem səhifəsini silmək olmaz: sayt bu səhifəyə bağlıdır. Onu qaralamaya çevirə bilərsiniz.":
+    "Eine Systemseite kann nicht gelöscht werden, da die Website von ihr abhängt. Sie können sie auf Entwurf setzen.",
+  "Yazının başlığını yazın.": "Geben Sie den Titel des Beitrags ein.",
+  "Tarix və saatı düzgün yazın.": "Geben Sie ein gültiges Datum und eine gültige Uhrzeit ein.",
+  "Yazı tapılmadı.": "Beitrag nicht gefunden.",
+  "Bu ünvan (slug) artıq başqa yazıda istifadə olunur.":
+    "Diese Adresse (Slug) wird bereits von einem anderen Beitrag verwendet.",
+  "Fayl adı yoxdur.": "Die Datei hat keinen Namen.",
+  "Fayl adı çox uzundur.": "Der Dateiname ist zu lang.",
+  "Bu fayl növü dəstəklənmir.": "Dieser Dateityp wird nicht unterstützt.",
+  "Fayl boşdur.": "Die Datei ist leer.",
+  "Fayl {size}-dan böyük ola bilməz.": "Die Datei darf nicht größer als {size} sein.",
+  "Fayl açarı düzgün deyil.": "Ungültiger Dateischlüssel.",
+  "Fayl yüklənməyib. Yenidən cəhd edin.":
+    "Die Datei wurde nicht hochgeladen. Versuchen Sie es erneut.",
+  "Fayl icazə verilən ölçüdən böyükdür.": "Die Datei ist größer als zulässig.",
+  "Faylın məzmunu növünə uyğun deyil.": "Der Inhalt der Datei entspricht nicht ihrem Typ.",
+  "Fayl tapılmadı.": "Datei nicht gefunden.",
+  "Fayl istifadə olunur. Əvvəlcə onu istifadə edən yerlərdən çıxarın.":
+    "Die Datei wird verwendet. Entfernen Sie sie zuerst an allen Stellen, an denen sie verwendet wird.",
+  "Həmişəlik silmək yalnız sahibə icazəlidir.": "Nur der Inhaber kann endgültig löschen.",
+  "PDF faylı seçin.": "Wählen Sie eine PDF-Datei aus.",
+  "Şəkil tapılmadı.": "Bild nicht gefunden.",
+  "JPG, PNG və ya WebP şəkil seçin.": "Wählen Sie ein JPG-, PNG- oder WebP-Bild aus.",
+  "Şəkil (PNG, WebP, SVG) seçin.": "Wählen Sie ein Bild (PNG, WebP, SVG) aus.",
+  "Favikon kvadrat olmalıdır, məsələn 512 × 512.":
+    "Das Favicon muss quadratisch sein, zum Beispiel 512 × 512.",
+  "Şəklin ölçüləri bilinmir. Şəkli yenidən yükləyin.":
+    "Die Abmessungen des Bildes sind unbekannt. Laden Sie das Bild erneut hoch.",
+  "Qrupu seçin.": "Wählen Sie eine Gruppe aus.",
+  "Adı yazın.": "Geben Sie den Namen ein.",
+  "Loqo şəklini seçin.": "Wählen Sie das Logobild aus.",
+  "Loqo tapılmadı.": "Logo nicht gefunden.",
+  "Sıra təkrarlanan loqo ehtiva edir.": "Die Reihenfolge enthält ein Logo mehrfach.",
+  "Tam ünvan yazın: http:// və ya https:// ilə başlamalıdır.":
+    "Geben Sie die vollständige Adresse ein: Sie muss mit http:// oder https:// beginnen.",
+  "Elementin adını yazın.": "Geben Sie die Bezeichnung des Menüpunkts ein.",
+  "Keçid növünü seçin.": "Wählen Sie den Linktyp aus.",
+  "Ünvanı yazın.": "Geben Sie die Adresse ein.",
+  "https:// ilə tam ünvan, /yol, tel: və ya mailto: yazın.":
+    "Geben Sie eine vollständige Adresse mit https://, einen /Pfad, tel: oder mailto: ein.",
+  "Başlığı yazın.": "Geben Sie den Titel ein.",
+  "Sütunun başlığını yazın.": "Geben Sie den Titel der Spalte ein.",
+  "Ən çox {max} element ola bilər.": "Höchstens {max} {max|Menüpunkt|Menüpunkte}.",
+  "Menyu tapılmadı.": "Menü nicht gefunden.",
+  "Menyu başqa yerdə dəyişdirilib. Səhifəni yeniləyib yenidən cəhd edin.":
+    "Das Menü wurde an anderer Stelle geändert. Laden Sie die Seite neu und versuchen Sie es erneut.",
+  "Bəzi elementlərin hədəfi tapılmadı.": "Für einige Menüpunkte wurde das Ziel nicht gefunden.",
+  "Altbilgi sütununda alt element ola bilməz.":
+    "Eine Spalte der Fußzeile kann keine Unterpunkte enthalten.",
+  "Menyu ən çox {max} səviyyəli ola bilər.":
+    "Das Menü kann höchstens {max} {max|Ebene|Ebenen} haben.",
+  "Menyuda təkrarlanan element var.": "Das Menü enthält einen Menüpunkt mehrfach.",
+  "Əsas menyu silinə bilməz.": "Das Hauptmenü kann nicht gelöscht werden.",
+  "Yalnız altbilgi sütunları silinə bilər.": "Nur Spalten der Fußzeile können gelöscht werden.",
+  "Sıra təkrarlanan sütun ehtiva edir.": "Die Reihenfolge enthält eine Spalte mehrfach.",
+  "Bölmə düzgün deyil.": "Ungültiger Bereich.",
+  "Bütün bölmələr göndərilməlidir.": "Alle Bereiche müssen übermittelt werden.",
+  "Bölmə təkrarlanır.": "Der Bereich kommt mehrfach vor.",
+  "Ən çox {max} slayd ola bilər.": "Höchstens {max} {max|Slide|Slides}.",
+  "Slaydın başlığını yazın.": "Geben Sie den Titel des Slides ein.",
+  "Slayd şəkli üfüqi olmalıdır: eni hündürlüyündən böyük. Bu şəkil {width} × {height} px-dir.":
+    "Das Slide-Bild muss im Querformat sein: breiter als hoch. Dieses Bild ist {width} × {height} px groß.",
+  "Slayd şəklinin eni ən azı {min} px olmalıdır. Bu şəklin eni {width} px-dir.":
+    "Das Slide-Bild muss mindestens {min} px breit sein. Dieses Bild ist {width} px breit.",
+  "Mobil şəkil şaquli olmalıdır: hündürlüyü enindən böyük. Bu şəkil {width} × {height} px-dir.":
+    "Das mobile Bild muss im Hochformat sein: höher als breit. Dieses Bild ist {width} × {height} px groß.",
+  "Mobil şəklin eni ən azı {min} px olmalıdır. Bu şəklin eni {width} px-dir.":
+    "Das mobile Bild muss mindestens {min} px breit sein. Dieses Bild ist {width} px breit.",
+  "Saytdakı ünvanı «/» ilə (məsələn /mehsullar) və ya tam linki https:// ilə yazın.":
+    "Geben Sie eine Adresse auf der Website mit „/“ (zum Beispiel /mehsullar) oder einen vollständigen Link mit https:// ein.",
+  "Link çox uzundur.": "Der Link ist zu lang.",
+  "Nömrə düzgün deyil.": "Die Nummer ist ungültig.",
+  "Nömrəni ölkə kodu ilə yalnız rəqəmlərlə yazın, məsələn 994552555423.":
+    "Geben Sie die Nummer mit Ländervorwahl und nur mit Ziffern ein, zum Beispiel 994552555423.",
+  "Nömrənin adını yazın, məsələn «Ofis».":
+    "Geben Sie eine Bezeichnung für die Nummer ein, zum Beispiel „Büro“.",
+  "Şəbəkəni seçin.": "Wählen Sie ein soziales Netzwerk aus.",
+  "Linki https:// ilə tam yazın.": "Geben Sie den vollständigen Link mit https:// ein.",
+  "Xəritə linkini https:// ilə tam yazın.":
+    "Geben Sie den vollständigen Kartenlink mit https:// ein.",
+  "Ən azı bir telefon nömrəsi əlavə edin.": "Fügen Sie mindestens eine Telefonnummer hinzu.",
+  "Ən çox {max} nömrə ola bilər.": "Höchstens {max} {max|Nummer|Nummern}.",
+  "Bu nömrə artıq əlavə olunub.": "Diese Nummer wurde bereits hinzugefügt.",
+  "Ən çox {max} ünvan ola bilər.": "Höchstens {max} {max|Adresse|Adressen}.",
+  "Bu ünvan artıq əlavə olunub.": "Diese Adresse wurde bereits hinzugefügt.",
+  "Ən çox {max} şəbəkə ola bilər.": "Höchstens {max} {max|soziales Netzwerk|soziale Netzwerke}.",
+  "Bu şəbəkə artıq əlavə olunub.": "Dieses soziale Netzwerk wurde bereits hinzugefügt.",
+  "Köhnə ünvanı yazın.": "Geben Sie die alte Adresse ein.",
+  "Yeni ünvanı yazın.": "Geben Sie die neue Adresse ein.",
+  "Ünvan «/» ilə başlamalıdır.": "Die Adresse muss mit „/“ beginnen.",
+  "Ünvan düzgün deyil.": "Die Adresse ist ungültig.",
+  "Ünvanda boşluq olmamalıdır.": "Die Adresse darf keine Leerzeichen enthalten.",
+  "Ana səhifəni yönləndirmək olmaz.": "Die Startseite kann nicht weitergeleitet werden.",
+  "Bu ünvan yönləndirilə bilməz.": "Diese Adresse kann nicht weitergeleitet werden.",
+  "Saytdakı ünvanı «/» ilə başlayaraq yazın, məsələn /mehsullar.":
+    "Geben Sie eine Adresse auf der Website ein, die mit „/“ beginnt, zum Beispiel /mehsullar.",
+  "Kodu seçin.": "Wählen Sie einen Code aus.",
+  "Köhnə və yeni ünvan eyni ola bilməz.": "Alte und neue Adresse dürfen nicht identisch sein.",
+  "Yönləndirmə tapılmadı.": "Weiterleitung nicht gefunden.",
+  "Bu köhnə ünvan üçün yönləndirmə artıq var.":
+    "Für diese alte Adresse existiert bereits eine Weiterleitung.",
+  "Bu ünvan özü də {target} ünvanına yönləndirilir. Son ünvanı yazın.":
+    "Diese Adresse wird selbst auf {target} weitergeleitet. Geben Sie die endgültige Adresse ein.",
+  "Telefon nömrəsini yazın.": "Geben Sie die Telefonnummer ein.",
+  "Telefon nömrəsi düzgün deyil.": "Die Telefonnummer ist ungültig.",
+  "Nömrəni +994 XX XXX XX XX və ya 0XX XXX XX XX şəklində yazın.":
+    "Geben Sie die Nummer im Format +994 XX XXX XX XX oder 0XX XXX XX XX ein.",
+  "Adınızı yazın.": "Geben Sie Ihren Namen ein.",
+  "Ad ən azı {min} simvol olmalıdır.":
+    "Der Name muss mindestens {min} {min|Zeichen|Zeichen} lang sein.",
+  "Ad ən çox {max} simvol ola bilər.":
+    "Der Name darf höchstens {max} {max|Zeichen|Zeichen} lang sein.",
+  "Ad çox uzundur.": "Der Name ist zu lang.",
+  "Dil düzgün deyil.": "Ungültige Sprache.",
+  "Müraciət tapılmadı.": "Anfrage nicht gefunden.",
+  "Rol seçin.": "Wählen Sie eine Rolle aus.",
+  "İstifadəçi tapılmadı.": "Benutzer nicht gefunden.",
+  "Bu e-poçt ilə istifadəçi artıq var.":
+    "Ein Benutzer mit dieser E-Mail-Adresse existiert bereits.",
+  "Deaktiv istifadəçiyə dəvət göndərilmir.":
+    "An deaktivierte Benutzer werden keine Einladungen gesendet.",
+  "Öz rolunuzu və statusunuzu dəyişə bilməzsiniz.":
+    "Sie können Ihre eigene Rolle und Ihren eigenen Status nicht ändern.",
+  "Yanlış dəyər": "Ungültiger Wert",
+  "Yanlış dəyər: gözlənilən {expected}, daxil olan {received}":
+    "Ungültiger Wert: erwartet {expected}, erhalten {received}",
+  "Yanlış dəyər: gözlənilən {value}": "Ungültiger Wert: erwartet {value}",
+  "Yanlış seçim: aşağıdakılardan biri olmalıdır: {values}":
+    "Ungültige Option: muss einer der folgenden Werte sein: {values}",
+  "Çox böyük: gözlənilən string <={max} simvol": "Höchstens {max} {max|Zeichen|Zeichen}",
+  "Çox böyük: gözlənilən array <={max} element": "Höchstens {max} {max|Element|Elemente}",
+  "Çox böyük: gözlənilən file <={max} bayt": "Datei mit höchstens {max} {max|Byte|Byte}",
+  "Çox böyük: gözlənilən number <={max}": "Höchstens {max}",
+  "Çox böyük: gözlənilən number <{max}": "Muss kleiner als {max} sein",
+  "Çox böyük: gözlənilən {origin} {limit} simvol": "Zu groß: erwartet {origin} {limit} Zeichen",
+  "Çox böyük: gözlənilən {origin} {limit} element": "Zu groß: erwartet {origin} {limit} Elemente",
+  "Çox böyük: gözlənilən {origin} {limit} bayt": "Zu groß: erwartet {origin} {limit} Byte",
+  "Çox böyük: gözlənilən {origin} {limit}": "Zu groß: erwartet {origin} {limit}",
+  "Çox kiçik: gözlənilən string >={min} simvol": "Mindestens {min} {min|Zeichen|Zeichen}",
+  "Çox kiçik: gözlənilən array >={min} element": "Mindestens {min} {min|Element|Elemente}",
+  "Çox kiçik: gözlənilən number >={min}": "Mindestens {min}",
+  "Çox kiçik: gözlənilən number >{min}": "Muss größer als {min} sein",
+  "Çox kiçik: gözlənilən {origin} {limit} simvol": "Zu klein: erwartet {origin} {limit} Zeichen",
+  "Çox kiçik: gözlənilən {origin} {limit} element": "Zu klein: erwartet {origin} {limit} Elemente",
+  "Çox kiçik: gözlənilən {origin} {limit} bayt": "Zu klein: erwartet {origin} {limit} Byte",
+  "Çox kiçik: gözlənilən {origin} {limit}": "Zu klein: erwartet {origin} {limit}",
+  'Yanlış mətn: "{prefix}" ilə başlamalıdır': "Ungültiger Text: muss mit „{prefix}“ beginnen",
+  'Yanlış mətn: "{suffix}" ilə bitməlidir': "Ungültiger Text: muss mit „{suffix}“ enden",
+  'Yanlış mətn: "{includes}" daxil olmalıdır': "Ungültiger Text: muss „{includes}“ enthalten",
+  "Yanlış mətn: {pattern} şablonuna uyğun olmalıdır":
+    "Ungültiger Text: muss dem Muster {pattern} entsprechen",
+  "Yanlış email address": "Ungültige E-Mail-Adresse",
+  "Yanlış URL": "Ungültige URL",
+  "Yanlış UUID": "Ungültige UUID",
+  "Yanlış ISO datetime": "Ungültige ISO-Datums- und Zeitangabe",
+  "Yanlış ISO date": "Ungültiges ISO-Datum",
+  "Yanlış input": "Ungültige Eingabe",
+  "Yanlış ədəd: {divisor} ilə bölünə bilən olmalıdır":
+    "Ungültige Zahl: muss ein Vielfaches von {divisor} sein",
+  "Tanınmayan açar: {keys}": "Unbekannter Schlüssel: {keys}",
+  "Tanınmayan açarlar: {keys}": "Unbekannte Schlüssel: {keys}",
+  "{origin} daxilində yanlış açar": "Ungültiger Schlüssel in {origin}",
+  "{origin} daxilində yanlış dəyər": "Ungültiger Wert in {origin}",
+  "Fayl düzgün deyil.": "Ungültige Datei.",
+  "Media növünü seçin.": "Wählen Sie den Medientyp aus.",
+  "Düzülüşü seçin.": "Wählen Sie das Layout aus.",
+  "Fonu seçin.": "Wählen Sie den Hintergrund aus.",
+  "Medianın enini seçin.": "Wählen Sie die Breite des Mediums aus.",
+  "Ən azı {min}% ola bilər.": "Mindestens {min} %.",
+  "Ən çox {max}% ola bilər.": "Höchstens {max} %.",
+  "{step}%-lik addımlarla seçin.": "Wählen Sie in Schritten von {step} %.",
+  "Video seçin.": "Wählen Sie ein Video aus.",
+  "Video tapılmadı.": "Video nicht gefunden.",
+  "Fon düzülüşü üçün şəkil və ya video seçin.":
+    "Wählen Sie für das Hintergrund-Layout ein Bild oder ein Video aus.",
+  "Düymə üçün link yazın.": "Geben Sie einen Link für die Schaltfläche ein.",
+  "Düymənin mətnini yazın.": "Geben Sie den Text der Schaltfläche ein.",
+  "Başlıq, mətn və ya media əlavə edin.": "Fügen Sie eine Überschrift, Text oder Medien hinzu.",
+  "Bütün bölmələr bir dəfə göndərilməlidir.": "Jeder Bereich muss genau einmal übermittelt werden.",
+  "Ən çox {max} əlavə bölmə ola bilər.":
+    "Höchstens {max} {max|zusätzlicher Bereich|zusätzliche Bereiche}.",
+  "Şirkətin adı «MMC» olmadan yazılır, məsələn «CEWM».":
+    "Geben Sie den Firmennamen ohne „MMC“ ein, zum Beispiel „CEWM“.",
 };

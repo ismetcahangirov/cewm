@@ -42,10 +42,42 @@ export type ProductListArgs = ListArgs<ProductSortField> & {
   excludeId?: string;
 };
 
+export const productLimits = {
+  benefits: 12,
+  specs: 80,
+  images: 40,
+  documents: 20,
+  related: 12,
+} as const;
+
 export const specSchema = z.object({
-  key: localizedText(120, "Göstəricinin adını yazın."),
+  label: localizedText(120, "Göstəricinin adını yazın."),
   value: localizedText(250, "Dəyəri yazın."),
+  unit: localizedOptional(30),
 });
+
+export const benefitSchema = z.object({ text: localizedText(200, "Üstünlüyü yazın.") });
+
+export const documentSchema = z.object({
+  mediaId: uuid("Sənəd seçin."),
+  title: localizedText(160, "Sənədin adını yazın."),
+});
+
+const optionalId = z
+  .union([z.literal(""), uuid("Seçim düzgün deyil.")])
+  .nullish()
+  .transform((value) => value || null);
+
+const videoUrlSchema = z
+  .string()
+  .trim()
+  .max(500, "Link çox uzundur.")
+  .refine(
+    (value) => !value || z.url({ protocol: /^https$/ }).safeParse(value).success,
+    "Video linkini https:// ilə tam yazın, məsələn YouTube linki.",
+  )
+  .nullish()
+  .transform((value) => value || null);
 
 export const galleryImageSchema = z.object({
   mediaId: uuid("Şəkil seçin."),
@@ -63,19 +95,33 @@ export const productInputSchema = z
       .array(uuid())
       .max(20, "Ən çox 20 kateqoriya seçmək olar.")
       .refine((ids) => new Set(ids).size === ids.length, "Kateqoriya təkrarlanır."),
-    specs: z.array(specSchema).max(60, "Ən çox 60 göstərici ola bilər."),
+    brandId: optionalId,
+    benefits: z
+      .array(benefitSchema)
+      .max(productLimits.benefits, `Ən çox ${productLimits.benefits} üstünlük ola bilər.`),
+    specs: z
+      .array(specSchema)
+      .max(productLimits.specs, `Ən çox ${productLimits.specs} göstərici ola bilər.`),
     images: z
       .array(galleryImageSchema)
-      .max(40, "Ən çox 40 şəkil ola bilər.")
+      .max(productLimits.images, `Ən çox ${productLimits.images} şəkil ola bilər.`)
       .refine(
         (images) => new Set(images.map((image) => image.mediaId)).size === images.length,
         "Eyni şəkil iki dəfə əlavə olunub.",
       ),
-    modelId: uuid().nullable(),
-    modelPosterId: uuid().nullable(),
+    documents: z
+      .array(documentSchema)
+      .max(productLimits.documents, `Ən çox ${productLimits.documents} sənəd ola bilər.`)
+      .refine(
+        (documents) => new Set(documents.map((item) => item.mediaId)).size === documents.length,
+        "Eyni sənəd iki dəfə əlavə olunub.",
+      ),
+    videoId: optionalId,
+    videoUrl: videoUrlSchema,
+    videoPosterId: optionalId,
     relatedIds: z
       .array(uuid())
-      .max(12, "Ən çox 12 əlaqəli məhsul seçmək olar.")
+      .max(productLimits.related, `Ən çox ${productLimits.related} əlaqəli məhsul seçmək olar.`)
       .refine((ids) => new Set(ids).size === ids.length, "Məhsul təkrarlanır."),
     seoTitle: localizedOptional(120),
     seoDescription: localizedOptional(320),
@@ -83,11 +129,11 @@ export const productInputSchema = z
     isFeatured: z.boolean().default(false),
   })
   .superRefine((value, context) => {
-    if (value.modelId && !value.modelPosterId) {
+    if (value.videoId && value.videoUrl) {
       context.addIssue({
         code: "custom",
-        path: ["modelPosterId"],
-        message: "3D model üçün poster şəkli seçin.",
+        path: ["videoUrl"],
+        message: "Ya video faylı, ya da link seçin, ikisini birlikdə yox.",
       });
     }
     if (value.status === "published" && value.images.length === 0) {
@@ -129,6 +175,7 @@ export type ProductListItemDto = {
   name: Localized;
   slug: Localized;
   sku: string | null;
+  brand: string | null;
   status: "draft" | "published";
   isFeatured: boolean;
   thumbnail: Pick<MediaDto, "src" | "alt"> | null;
@@ -147,11 +194,15 @@ export type ProductDetailDto = {
   shortDescription: Localized<RichTextDoc> | null;
   description: Localized<RichTextDoc> | null;
   categoryIds: string[];
-  specs: { key: Localized; value: Localized }[];
+  brandId: string | null;
+  benefits: Localized[];
+  specs: { label: Localized; value: Localized; unit: Localized | null }[];
   images: { mediaId: string; alt: Localized }[];
+  documents: { mediaId: string; title: Localized }[];
   media: MediaDto[];
-  modelId: string | null;
-  modelPosterId: string | null;
+  videoId: string | null;
+  videoUrl: string | null;
+  videoPosterId: string | null;
   related: ProductOptionDto[];
   seoTitle: Localized | null;
   seoDescription: Localized | null;

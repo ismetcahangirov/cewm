@@ -1,6 +1,6 @@
 import { defaultLocale, type Locale } from "@/lib/i18n/config";
 
-const intlLocales: Record<Locale, string> = { az: "az", ru: "ru", en: "en-GB" };
+const intlLocales: Record<Locale, string> = { az: "az", ru: "ru", en: "en-GB", de: "de-DE" };
 
 const dateTimes = new Map<Locale, Intl.DateTimeFormat>();
 const numbers = new Map<Locale, Intl.NumberFormat>();

@@ -74,7 +74,7 @@ export function AppSidebar({
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton asChild size="lg" tooltip={t("İdarə paneli")}>
-              <Link href="/admin" aria-label={t("Mebline idarə paneli")}>
+              <Link href="/admin" aria-label={t("CEWM idarə paneli")}>
                 <AdminBrand />
               </Link>
             </SidebarMenuButton>

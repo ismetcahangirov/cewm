@@ -22,7 +22,7 @@ function createAuth() {
   const db = getDb();
 
   return betterAuth({
-    appName: "Mebline",
+    appName: "CEWM",
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
     database: drizzleAdapter(db, {

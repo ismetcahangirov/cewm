@@ -127,3 +127,69 @@ export const en: Record<keyof typeof ru, string> = {
   "Yazı saytdan və admin paneldən həmişəlik silinəcək. Bu əməliyyat geri qaytarılmır. Örtük şəkli media kitabxanasında qalır.":
     "The post will be permanently removed from the site and the admin panel. This cannot be undone. The cover image stays in the media library.",
 };
+
+export const de: Record<keyof typeof ru, string> = {
+  Bloq: "Blog",
+  "Bloqa qayıt": "Zurück zum Blog",
+  "Yazı tapılmadı.": "Beitrag nicht gefunden.",
+  "Yazı yüklənmədi. Səhifəni yeniləyin.":
+    "Der Beitrag konnte nicht geladen werden. Bitte laden Sie die Seite neu.",
+  "Saxlanıldı. Yazı {date} tarixində dərc olunacaq.":
+    "Gespeichert. Der Beitrag wird am {date} veröffentlicht.",
+  "Saxlanıldı, saytda yeniləndi.": "Gespeichert und auf der Website aktualisiert.",
+  "Saxlanıldı.": "Gespeichert.",
+  "Yazı yaradıldı.": "Beitrag erstellt.",
+  "Formada səhvlər var. Qırmızı sahələri düzəldin.":
+    "Das Formular enthält Fehler. Bitte korrigieren Sie die rot markierten Felder.",
+  "«{name}» silindi.": "„{name}“ wurde gelöscht.",
+  "Yeni yazı": "Neuer Beitrag",
+  Saxlanılır: "Wird gespeichert…",
+  Saxla: "Speichern",
+  Yarat: "Erstellen",
+  "Son dəyişiklik: {date}": "Letzte Änderung: {date}",
+  "Yazını qaralama kimi yaradın, hazır olanda dərc edin və ya tarix seçib planlaşdırın.":
+    "Erstellen Sie den Beitrag als Entwurf und veröffentlichen Sie ihn, sobald er fertig ist, oder planen Sie ihn mit einem Datum ein.",
+  "Saytda bax": "Auf der Website ansehen",
+  Məzmun: "Inhalt",
+  "Başlıq ({locale})": "Titel ({locale})",
+  "Ünvan ({locale})": "Adresse (Slug, {locale})",
+  "Qısa məzmun ({locale})": "Zusammenfassung ({locale})",
+  "Bloq siyahısında başlığın altında göstərilir.":
+    "Wird in der Blogübersicht unter dem Titel angezeigt.",
+  "Mətn ({locale})": "Text ({locale})",
+  Dərc: "Veröffentlichung",
+  Status: "Status",
+  "Dərc tarixi çatanda yazı saytda görünür.":
+    "Der Beitrag erscheint auf der Website, sobald das Veröffentlichungsdatum erreicht ist.",
+  "Qaralama saytda görünmür.": "Entwürfe werden auf der Website nicht angezeigt.",
+  Qaralama: "Entwurf",
+  "Dərc olunub": "Veröffentlicht",
+  "Dərc tarixi": "Veröffentlichungsdatum",
+  "Bakı vaxtı (Asia/Baku, UTC+4). Boş qalsa, dərc edəndə indiki vaxt yazılır. Gələcək tarix yazını planlaşdırır.":
+    "Bakuer Zeit (Asia/Baku, UTC+4). Bleibt das Feld leer, wird beim Veröffentlichen die aktuelle Uhrzeit eingetragen. Mit einem zukünftigen Datum wird der Beitrag eingeplant.",
+  "Yazı {date} tarixində saytda görünəcək.": "Der Beitrag erscheint am {date} auf der Website.",
+  Yaradılıb: "Erstellt",
+  Sil: "Löschen",
+  "Örtük şəkli": "Titelbild",
+  Şəkil: "Bild",
+  "Bloq siyahısında, yazının yuxarısında və paylaşanda göstərilir.":
+    "Wird in der Blogübersicht, oben im Beitrag und beim Teilen angezeigt.",
+  Örtük: "Titelbild",
+  "«{name}» silinsin?": "„{name}“ löschen?",
+  Planlaşdırılıb: "Geplant",
+  Yazı: "Beitrag",
+  Dəyişib: "Geändert",
+  "{name}: əməliyyatlar": "{name}: Aktionen",
+  "Redaktə et": "Bearbeiten",
+  "Yazılar dərc tarixindən etibarən saytda görünür. Gələcək tarix seçilən yazı həmin vaxt özü dərc olunur.":
+    "Beiträge erscheinen ab ihrem Veröffentlichungsdatum auf der Website. Ein Beitrag mit zukünftigem Datum wird zu diesem Zeitpunkt automatisch veröffentlicht.",
+  "Yenidən yüklə": "Neu laden",
+  "Yazılar yüklənmədi.": "Die Beiträge konnten nicht geladen werden.",
+  "Başlıq və ya ünvan ilə axtar": "Nach Titel oder Adresse suchen",
+  "Seçimə uyğun yazı tapılmadı.": "Keine Beiträge entsprechen der Auswahl.",
+  "Hələ yazı yoxdur.": "Noch keine Beiträge.",
+  "Tarixi təmizlə": "Datum entfernen",
+  "Bütün statuslar": "Alle Status",
+  "Yazı saytdan və admin paneldən həmişəlik silinəcək. Bu əməliyyat geri qaytarılmır. Örtük şəkli media kitabxanasında qalır.":
+    "Der Beitrag wird endgültig von der Website und aus dem Dashboard entfernt. Dieser Vorgang kann nicht rückgängig gemacht werden. Das Titelbild bleibt in der Mediathek.",
+};

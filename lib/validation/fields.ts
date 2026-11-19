@@ -35,15 +35,23 @@ export function localizedText(max: number, message = required) {
     az: requiredText(max, message),
     ru: optionalText(max),
     en: optionalText(max),
+    de: optionalText(max),
   });
 }
 
 export function localizedOptional(max: number) {
   return z
-    .object({ az: optionalText(max), ru: optionalText(max), en: optionalText(max) })
+    .object({
+      az: optionalText(max),
+      ru: optionalText(max),
+      en: optionalText(max),
+      de: optionalText(max),
+    })
     .nullish()
     .transform((value): Localized | null =>
-      value?.az ? { az: value.az, ru: value.ru ?? null, en: value.en ?? null } : null,
+      value?.az
+        ? { az: value.az, ru: value.ru ?? null, en: value.en ?? null, de: value.de ?? null }
+        : null,
     );
 }
 
@@ -56,6 +64,7 @@ export const localizedSlug = z.object({
   az: z.string(required).trim().min(1, required).pipe(slugText),
   ru: optionalSlug,
   en: optionalSlug,
+  de: optionalSlug,
 });
 
 const nodeTypes = [
@@ -113,12 +122,18 @@ export const localizedRichText = z
     az: richTextDoc.nullish(),
     ru: richTextDoc.nullish(),
     en: richTextDoc.nullish(),
+    de: richTextDoc.nullish(),
   })
   .nullish()
   .transform((value): Localized<RichTextDoc> | null => {
     if (!value || !hasText(value.az)) return null;
     const pick = (doc: RichTextDoc | null | undefined) => (hasText(doc) ? doc : null);
-    return { az: value.az as RichTextDoc, ru: pick(value.ru), en: pick(value.en) };
+    return {
+      az: value.az as RichTextDoc,
+      ru: pick(value.ru),
+      en: pick(value.en),
+      de: pick(value.de),
+    };
   });
 
 export const publishStatusSchema = z.enum(["draft", "published"], "Status seçin.");

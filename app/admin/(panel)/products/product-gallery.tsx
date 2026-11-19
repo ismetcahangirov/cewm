@@ -50,6 +50,7 @@ export function ProductGallery({
           az: item.alts?.az ?? "",
           ru: item.alts?.ru ?? "",
           en: item.alts?.en ?? "",
+          de: item.alts?.de ?? "",
         },
       });
     }
@@ -65,6 +66,7 @@ export function ProductGallery({
   const filled = {
     ru: images.every((image) => image.alt.ru),
     en: images.every((image) => image.alt.en),
+    de: images.every((image) => image.alt.de),
   };
 
   return (

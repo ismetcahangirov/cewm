@@ -23,17 +23,12 @@ export const ru = {
   "Saytda bu sıra ilə ilk {count} dərc olunmuş məhsul göstərilir. Siyahı boşdursa, kataloqun ilk {count} məhsulu çıxır. Məhsul formasındakı «Ana səhifədə göstər» işarəsi də bu siyahını dəyişir.":
     "На сайте в этом порядке показываются первые {count} {count|опубликованный товар|опубликованных товара|опубликованных товаров}. Если список пуст, выводятся первые {count} {count|товар|товара|товаров} каталога. Отметка «Показывать на главной» в форме товара тоже меняет этот список.",
   Kateqoriyalar: "Категории",
-  "Layihələr və təklif bloku": "Проекты и блок предложения",
   "Aktiv üst kateqoriyalar, kateqoriyalar səhifəsindəki sıra ilə.":
     "Активные категории верхнего уровня, в порядке со страницы категорий.",
   "Aşağıdakı «Seçilmiş məhsullar» siyahısı.": "Список «Избранные товары» ниже.",
   "Siyahıya keç": "Перейти к списку",
-  "Dərc olunmuş ilk 8 layihə, layihələr səhifəsindəki sıra ilə. Bölmə gizlədiləndə «Təklif al» bloku qalır.":
-    "Первые 8 опубликованных проектов, в порядке со страницы проектов. Если раздел скрыт, блок «Запросить предложение» остаётся.",
-  Layihələr: "Проекты",
   "Aktiv referans və partnyor loqoları, hərəkət edən lent kimi.":
     "Активные логотипы референсов и партнёров в виде бегущей ленты.",
-  Partnyorlar: "Партнёры",
   "{name}: yerini dəyiş": "{name}: переместить",
   "{name}: yuxarı": "{name}: вверх",
   "{name}: aşağı": "{name}: вниз",
@@ -111,6 +106,29 @@ export const ru = {
   "Brauzerlər səsli videonu özü başlatmağa icazə vermir: video səssiz başlayır, küncdəki düymə ilə ziyarətçi səsi açır.":
     "Браузеры не разрешают автоматически запускать видео со звуком: видео начинается без звука, посетитель включает звук кнопкой в углу.",
   "Söndürülübsə video səssiz oynayır.": "Если выключено, видео воспроизводится без звука.",
+  Hero: "Hero",
+  "Hero filmi": "Hero-фильм",
+  Filmsiz: "Без фильма",
+  "{name} · {count} kadr": "{name} · {count} {count|кадр|кадра|кадров}",
+  "Alt mətn ({locale})": "Подзаголовок ({locale})",
+  "Açıq mavi": "Светло-голубой",
+  "Tünd göy": "Тёмно-синий",
+  Brendlər: "Бренды",
+  Müştərilər: "Клиенты",
+  Bloq: "Блог",
+  "Saytdakı ünvan, məsələn /mehsullar, və ya https:// ilə tam link. Bütün dillərdə eynidir.":
+    "Адрес на сайте, например /mehsullar, или полная ссылка с https://. Одинаков для всех языков.",
+  "Bütün dillərdə eyni film göstərilir.": "На всех языках показывается один и тот же фильм.",
+  "Filmləri idarə et": "Управлять фильмами",
+  "Hero, bölmələrin sırası və seçilmiş məhsullar. Son dəyişiklik: {date}":
+    "Hero, порядок разделов и избранные товары. Последнее изменение: {date}",
+  "Hero, bölmələrin sırası və seçilmiş məhsullar.": "Hero, порядок разделов и избранные товары.",
+  "Ana səhifənin ən yuxarısı: başlıq, alt mətn, düymə və scroll ilə oynadılan film.":
+    "Верх главной страницы: заголовок, подзаголовок, кнопка и фильм, который прокручивается скроллом.",
+  "Hero-dan sonra bu sıra ilə göstərilir. Gizlədilən bölmə saytda görünmür, amma ayarları saxlanılır. «Bölmə əlavə et» ilə başlıq, mətn, düymə, şəkil və ya video olan öz bölmənizi qurun.":
+    "Показываются после hero в этом порядке. Скрытый раздел не виден на сайте, но его настройки сохраняются. Через «Добавить раздел» соберите свой раздел с заголовком, текстом, кнопкой, изображением или видео.",
+  "Ən son dərc olunmuş 3 bloq yazısı.": "3 последние опубликованные записи блога.",
+  "Hero başlığını yazın.": "Введите заголовок hero.",
 } satisfies Messages;
 
 export const en: Record<keyof typeof ru, string> = {
@@ -136,17 +154,12 @@ export const en: Record<keyof typeof ru, string> = {
   "Saytda bu sıra ilə ilk {count} dərc olunmuş məhsul göstərilir. Siyahı boşdursa, kataloqun ilk {count} məhsulu çıxır. Məhsul formasındakı «Ana səhifədə göstər» işarəsi də bu siyahını dəyişir.":
     "The site shows the first {count} published {count|product|products} in this order. If the list is empty, the first {count} {count|product|products} of the catalogue appear. The “Show on home page” checkbox in the product form also changes this list.",
   Kateqoriyalar: "Categories",
-  "Layihələr və təklif bloku": "Projects and quote block",
   "Aktiv üst kateqoriyalar, kateqoriyalar səhifəsindəki sıra ilə.":
     "Active top-level categories, in the order from the categories page.",
   "Aşağıdakı «Seçilmiş məhsullar» siyahısı.": "The “Featured products” list below.",
   "Siyahıya keç": "Go to the list",
-  "Dərc olunmuş ilk 8 layihə, layihələr səhifəsindəki sıra ilə. Bölmə gizlədiləndə «Təklif al» bloku qalır.":
-    "The first 8 published projects, in the order from the projects page. When the section is hidden, the “Request a quote” block stays.",
-  Layihələr: "Projects",
   "Aktiv referans və partnyor loqoları, hərəkət edən lent kimi.":
     "Active reference and partner logos, as a scrolling strip.",
-  Partnyorlar: "Partners",
   "{name}: yerini dəyiş": "{name}: move",
   "{name}: yuxarı": "{name}: up",
   "{name}: aşağı": "{name}: down",
@@ -223,4 +236,162 @@ export const en: Record<keyof typeof ru, string> = {
   "Brauzerlər səsli videonu özü başlatmağa icazə vermir: video səssiz başlayır, küncdəki düymə ilə ziyarətçi səsi açır.":
     "Browsers do not let a video with sound start by itself: it starts muted and the visitor turns the sound on with the button in the corner.",
   "Söndürülübsə video səssiz oynayır.": "When off, the video plays muted.",
+  Hero: "Hero",
+  "Hero filmi": "Hero film",
+  Filmsiz: "No film",
+  "{name} · {count} kadr": "{name} · {count} {count|frame|frames}",
+  "Alt mətn ({locale})": "Subline ({locale})",
+  "Açıq mavi": "Light blue",
+  "Tünd göy": "Navy",
+  Brendlər: "Brands",
+  Müştərilər: "Clients",
+  Bloq: "Blog",
+  "Saytdakı ünvan, məsələn /mehsullar, və ya https:// ilə tam link. Bütün dillərdə eynidir.":
+    "An address on the site, for example /mehsullar, or a full https:// link. The same for every language.",
+  "Bütün dillərdə eyni film göstərilir.": "The same film is shown in every language.",
+  "Filmləri idarə et": "Manage films",
+  "Hero, bölmələrin sırası və seçilmiş məhsullar. Son dəyişiklik: {date}":
+    "Hero, section order and featured products. Last change: {date}",
+  "Hero, bölmələrin sırası və seçilmiş məhsullar.": "Hero, section order and featured products.",
+  "Ana səhifənin ən yuxarısı: başlıq, alt mətn, düymə və scroll ilə oynadılan film.":
+    "The top of the home page: headline, subline, button and a film played by scrolling.",
+  "Hero-dan sonra bu sıra ilə göstərilir. Gizlədilən bölmə saytda görünmür, amma ayarları saxlanılır. «Bölmə əlavə et» ilə başlıq, mətn, düymə, şəkil və ya video olan öz bölmənizi qurun.":
+    "Shown after the hero in this order. A hidden section does not appear on the site, but its settings are kept. Use “Add section” to build your own section with a heading, text, button, image or video.",
+  "Ən son dərc olunmuş 3 bloq yazısı.": "The 3 latest published blog posts.",
+  "Hero başlığını yazın.": "Enter the hero headline.",
+};
+
+export const de: Record<keyof typeof ru, string> = {
+  "Ana səhifə bölmələri": "Startseitenbereiche",
+  "Ana səhifə bölmələri yüklənmədi.": "Die Startseitenbereiche konnten nicht geladen werden.",
+  "Yenidən yüklə": "Neu laden",
+  "Saxlanıldı, saytda yeniləndi.": "Gespeichert und auf der Website aktualisiert.",
+  "Formada səhvlər var. Qırmızı sahələri düzəldin.":
+    "Das Formular enthält Fehler. Bitte korrigieren Sie die rot markierten Felder.",
+  Saxlanılır: "Wird gespeichert…",
+  Saxla: "Speichern",
+  "Slaydlar, bölmələrin sırası və seçilmiş məhsullar. Son dəyişiklik: {date}":
+    "Slides, Reihenfolge der Bereiche und ausgewählte Produkte. Letzte Änderung: {date}",
+  "Slaydlar, bölmələrin sırası və seçilmiş məhsullar.":
+    "Slides, Reihenfolge der Bereiche und ausgewählte Produkte.",
+  Slaydlar: "Slides",
+  "Ana səhifənin ən yuxarısında növbə ilə göstərilir, ən çox {max} slayd. Sıranı sürüşdürərək və ya oxlarla dəyişin.":
+    "Werden nacheinander ganz oben auf der Startseite angezeigt, höchstens {max} {max|Slide|Slides}. Ändern Sie die Reihenfolge per Ziehen oder mit den Pfeilen.",
+  Bölmələr: "Bereiche",
+  "Slaydlardan sonra bu sıra ilə göstərilir. Gizlədilən bölmə saytda görünmür, amma ayarları saxlanılır.":
+    "Werden nach den Slides in dieser Reihenfolge angezeigt. Ein ausgeblendeter Bereich ist auf der Website nicht sichtbar, seine Einstellungen bleiben aber erhalten.",
+  "Seçilmiş məhsullar": "Ausgewählte Produkte",
+  "Saytda bu sıra ilə ilk {count} dərc olunmuş məhsul göstərilir. Siyahı boşdursa, kataloqun ilk {count} məhsulu çıxır. Məhsul formasındakı «Ana səhifədə göstər» işarəsi də bu siyahını dəyişir.":
+    "Die Website zeigt in dieser Reihenfolge die ersten {count} veröffentlichten {count|Produkt|Produkte}. Ist die Liste leer, erscheinen die ersten {count} {count|Produkt|Produkte} des Katalogs. Auch das Häkchen „Auf der Startseite anzeigen“ im Produktformular ändert diese Liste.",
+  Kateqoriyalar: "Kategorien",
+  "Aktiv üst kateqoriyalar, kateqoriyalar səhifəsindəki sıra ilə.":
+    "Aktive Hauptkategorien in der Reihenfolge der Kategorienseite.",
+  "Aşağıdakı «Seçilmiş məhsullar» siyahısı.": "Die Liste „Ausgewählte Produkte“ weiter unten.",
+  "Siyahıya keç": "Zur Liste",
+  "Aktiv referans və partnyor loqoları, hərəkət edən lent kimi.":
+    "Aktive Referenz- und Partnerlogos als Laufband.",
+  "{name}: yerini dəyiş": "{name}: verschieben",
+  "{name}: yuxarı": "{name}: nach oben",
+  "{name}: aşağı": "{name}: nach unten",
+  "{name}: sil": "{name}: löschen",
+  "Saytda göstər": "Auf der Website anzeigen",
+  Görünür: "Sichtbar",
+  Gizlədilib: "Ausgeblendet",
+  "Boş qalsa, saytda standart başlıq göstərilir.":
+    "Bleibt das Feld leer, zeigt die Website den Standardtitel an.",
+  "Başlıq ({locale})": "Titel ({locale})",
+  "Boş qalsa: «{title}».": "Wenn leer: „{title}“.",
+  Slayd: "Slide",
+  Şəkil: "Bild",
+  "Üfüqi şəkil, eni ən azı {width} px. Tövsiyə: 2400 × 1200 px, JPG və ya WebP.":
+    "Bild im Querformat, mindestens {width} px breit. Empfohlen: 2400 × 1200 px, JPG oder WebP.",
+  "Mobil şəkil": "Mobiles Bild",
+  "İstəyə bağlıdır. Telefonda bu şaquli şəkil göstərilir, eni ən azı {width} px. Tövsiyə: 1200 × 1600 px. Boş qalsa, üfüqi şəkil kəsilərək göstərilir.":
+    "Optional. Auf Smartphones wird dieses Bild im Hochformat angezeigt, mindestens {width} px breit. Empfohlen: 1200 × 1600 px. Bleibt das Feld leer, wird das Querformatbild zugeschnitten angezeigt.",
+  "Qısa mətn ({locale})": "Kurztext ({locale})",
+  "İstəyə bağlıdır, bir-iki cümlə.": "Optional, ein bis zwei Sätze.",
+  Link: "Link",
+  "İstəyə bağlıdır. Saytdakı ünvan, məsələn /mehsullar, və ya https:// ilə tam link.":
+    "Optional. Ein Pfad auf der Website, zum Beispiel /mehsullar, oder ein vollständiger Link mit https://.",
+  "Slayd yoxdur. Bu halda sayt ana səhifənin yuxarısında geniş məhsul fotolarından ən çox {max} slaydı özü seçir.":
+    "Keine Slides vorhanden. In diesem Fall wählt die Website für den oberen Bereich der Startseite selbst bis zu {max} breite {max|Produktfoto|Produktfotos} aus.",
+  "Slayd əlavə et": "Slide hinzufügen",
+  "{name}: bağla": "{name}: einklappen",
+  "{name}: redaktə et": "{name}: bearbeiten",
+  Ağ: "Weiß",
+  Krem: "Creme",
+  "Qrafit (tünd)": "Graphit (dunkel)",
+  "Bölmə əlavə et": "Bereich hinzufügen",
+  "Düymənin linki": "Button-Link",
+  "Düymənin mətni ({locale})": "Button-Text ({locale})",
+  Düzülüş: "Anordnung",
+  "Əlavə bölmə {number}": "Zusätzlicher Bereich {number}",
+  əlavə: "zusätzlich",
+  Fon: "Hintergrund",
+  "Fon düzülüşündə media fonu əvəz edir.":
+    "In der Hintergrund-Anordnung ersetzen die Medien den Hintergrund.",
+  "Görünüş sxemi": "Anordnungsskizze",
+  "İstəyə bağlıdır, məsələn «Kataloqa bax».": "Optional, zum Beispiel „Katalog ansehen“.",
+  "İstəyə bağlıdır. Başlığın üstündə nöqtə ilə.":
+    "Optional. Über der Überschrift, mit einem Punkt.",
+  "JPG və ya WebP. Yan-yana düzülüşdə eni ən azı 1200 px olsun.":
+    "JPG oder WebP. Bei der Anordnung nebeneinander mindestens 1200 px breit.",
+  "Kiçik başlıq ({locale})": "Dachzeile ({locale})",
+  "Kompüterdə sətrin neçə faizini media tutur. Telefonda media tam endədir.":
+    "Welchen Anteil der Zeile die Medien auf dem Computer einnehmen. Auf Smartphones nehmen sie die volle Breite ein.",
+  Media: "Medien",
+  "Media yoxdur": "Ohne Medien",
+  "Media solda, mətn sağda": "Medien links, Text rechts",
+  "Media sağda, mətn solda": "Medien rechts, Text links",
+  "Media yuxarıda, mətn altda": "Medien oben, Text darunter",
+  "Media fon kimi, mətn üstündə": "Medien als Hintergrund, Text darüber",
+  "Medianın eni: {value}%": "Medienbreite: {value}%",
+  "MP4 və ya WebM. Tövsiyə: 1920 px, 20 MB-dan az.":
+    "MP4 oder WebM. Empfohlen: 1920 px, unter 20 MB.",
+  "Slaydlardan sonra bu sıra ilə göstərilir. Gizlədilən bölmə saytda görünmür, amma ayarları saxlanılır. «Bölmə əlavə et» ilə başlıq, mətn, düymə, şəkil və ya video olan öz bölmənizi qurun.":
+    "Werden nach den Slides in dieser Reihenfolge angezeigt. Ein ausgeblendeter Bereich erscheint nicht auf der Website, seine Einstellungen bleiben aber erhalten. Mit „Bereich hinzufügen“ erstellen Sie einen eigenen Bereich mit Überschrift, Text, Button, Bild oder Video.",
+  Video: "Video",
+  "Poster şəkli": "Posterbild",
+  "Video yüklənənə qədər göstərilir. İstəyə bağlıdır.":
+    "Wird angezeigt, bis das Video geladen ist. Optional.",
+  "Yalnız yan-yana düzülüşdə istifadə olunur.":
+    "Wird nur bei der Anordnung nebeneinander verwendet.",
+  "Avtomatik başlasın": "Automatisch starten",
+  "Fon düzülüşündə video həmişə özü başlayır.":
+    "In der Hintergrund-Anordnung startet das Video immer automatisch.",
+  "Bölmə ekranda görünəndə özü başlayır və təkrar oynayır.":
+    "Startet automatisch, sobald der Bereich sichtbar wird, und läuft in Schleife.",
+  "Ziyarətçi oynatma düyməsinə basanda başlayır.":
+    "Startet, wenn der Besucher auf Wiedergabe klickt.",
+  Bəli: "Ja",
+  Xeyr: "Nein",
+  Səsli: "Mit Ton",
+  Səssiz: "Ohne Ton",
+  "Brauzerlər səsli videonu özü başlatmağa icazə vermir: video səssiz başlayır, küncdəki düymə ilə ziyarətçi səsi açır.":
+    "Browser erlauben keinen automatischen Start von Videos mit Ton: Das Video startet stumm, und der Besucher schaltet den Ton über die Schaltfläche in der Ecke ein.",
+  "Söndürülübsə video səssiz oynayır.": "Wenn deaktiviert, wird das Video ohne Ton abgespielt.",
+  Hero: "Hero",
+  "Hero filmi": "Hero-Film",
+  Filmsiz: "Ohne Film",
+  "{name} · {count} kadr": "{name} · {count} {count|Einzelbild|Einzelbilder}",
+  "Alt mətn ({locale})": "Unterzeile ({locale})",
+  "Açıq mavi": "Hellblau",
+  "Tünd göy": "Marineblau",
+  Brendlər: "Marken",
+  Müştərilər: "Kunden",
+  Bloq: "Blog",
+  "Saytdakı ünvan, məsələn /mehsullar, və ya https:// ilə tam link. Bütün dillərdə eynidir.":
+    "Ein Pfad auf der Website, zum Beispiel /mehsullar, oder ein vollständiger Link mit https://. Für alle Sprachen gleich.",
+  "Bütün dillərdə eyni film göstərilir.": "In allen Sprachen wird derselbe Film angezeigt.",
+  "Filmləri idarə et": "Filme verwalten",
+  "Hero, bölmələrin sırası və seçilmiş məhsullar. Son dəyişiklik: {date}":
+    "Hero, Reihenfolge der Bereiche und ausgewählte Produkte. Letzte Änderung: {date}",
+  "Hero, bölmələrin sırası və seçilmiş məhsullar.":
+    "Hero, Reihenfolge der Bereiche und ausgewählte Produkte.",
+  "Ana səhifənin ən yuxarısı: başlıq, alt mətn, düymə və scroll ilə oynadılan film.":
+    "Der oberste Bereich der Startseite: Überschrift, Unterzeile, Button und ein Film, der beim Scrollen abgespielt wird.",
+  "Hero-dan sonra bu sıra ilə göstərilir. Gizlədilən bölmə saytda görünmür, amma ayarları saxlanılır. «Bölmə əlavə et» ilə başlıq, mətn, düymə, şəkil və ya video olan öz bölmənizi qurun.":
+    "Werden nach dem Hero in dieser Reihenfolge angezeigt. Ein ausgeblendeter Bereich erscheint nicht auf der Website, seine Einstellungen bleiben aber erhalten. Mit „Bereich hinzufügen“ erstellen Sie einen eigenen Bereich mit Überschrift, Text, Button, Bild oder Video.",
+  "Ən son dərc olunmuş 3 bloq yazısı.": "Die 3 zuletzt veröffentlichten Blogbeiträge.",
+  "Hero başlığını yazın.": "Geben Sie die Hero-Überschrift ein.",
 };

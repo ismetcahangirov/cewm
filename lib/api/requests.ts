@@ -1,37 +1,47 @@
 import type {
-  QuoteRequestDetailDto,
-  QuoteRequestListArgs,
-  QuoteRequestListItemDto,
-  UpdateQuoteRequestInput,
-} from "@/lib/validation/quote-requests";
+  ConsultationRequestDetailDto,
+  ConsultationRequestListArgs,
+  ConsultationRequestListItemDto,
+  UpdateConsultationRequestInput,
+} from "@/lib/validation/consultation-requests";
 
 import { baseApi } from "./base-api";
 import type { Page } from "./types";
 
 const listAndUnread = [
-  { type: "QuoteRequest" as const, id: "LIST" },
-  { type: "QuoteRequest" as const, id: "UNREAD" },
+  { type: "ConsultationRequest" as const, id: "LIST" },
+  { type: "ConsultationRequest" as const, id: "UNREAD" },
 ];
 
 export const requestsApi = baseApi.injectEndpoints({
   endpoints: (build) => ({
-    getRequests: build.query<Page<QuoteRequestListItemDto>, QuoteRequestListArgs>({
-      query: (params) => ({ url: "admin/quote-requests", params }),
+    getRequests: build.query<Page<ConsultationRequestListItemDto>, ConsultationRequestListArgs>({
+      query: (params) => ({ url: "admin/consultation-requests", params }),
       providesTags: (result) => [
-        { type: "QuoteRequest", id: "LIST" },
-        ...(result?.rows ?? []).map((row) => ({ type: "QuoteRequest" as const, id: row.id })),
+        { type: "ConsultationRequest", id: "LIST" },
+        ...(result?.rows ?? []).map((row) => ({
+          type: "ConsultationRequest" as const,
+          id: row.id,
+        })),
       ],
     }),
-    getRequest: build.query<QuoteRequestDetailDto, string>({
-      query: (id) => `admin/quote-requests/${id}`,
-      providesTags: (_result, _error, id) => [{ type: "QuoteRequest", id }],
+    getRequest: build.query<ConsultationRequestDetailDto, string>({
+      query: (id) => `admin/consultation-requests/${id}`,
+      providesTags: (_result, _error, id) => [{ type: "ConsultationRequest", id }],
       async onQueryStarted(_id, { dispatch, queryFulfilled }) {
         const result = await queryFulfilled.catch(() => null);
         if (result?.data.markedSeen) dispatch(baseApi.util.invalidateTags(listAndUnread));
       },
     }),
-    updateRequest: build.mutation<QuoteRequestDetailDto, UpdateQuoteRequestInput & { id: string }>({
-      query: ({ id, ...body }) => ({ url: `admin/quote-requests/${id}`, method: "PATCH", body }),
+    updateRequest: build.mutation<
+      ConsultationRequestDetailDto,
+      UpdateConsultationRequestInput & { id: string }
+    >({
+      query: ({ id, ...body }) => ({
+        url: `admin/consultation-requests/${id}`,
+        method: "PATCH",
+        body,
+      }),
       async onQueryStarted({ id }, { dispatch, queryFulfilled }) {
         const result = await queryFulfilled.catch(() => null);
         if (result) dispatch(requestsApi.util.upsertQueryData("getRequest", id, result.data));
@@ -39,7 +49,7 @@ export const requestsApi = baseApi.injectEndpoints({
       invalidatesTags: (result) => (result ? listAndUnread : []),
     }),
     deleteRequest: build.mutation<void, string>({
-      query: (id) => ({ url: `admin/quote-requests/${id}`, method: "DELETE" }),
+      query: (id) => ({ url: `admin/consultation-requests/${id}`, method: "DELETE" }),
       invalidatesTags: (_result, error) => (error ? [] : listAndUnread),
     }),
   }),
@@ -57,5 +67,5 @@ export function requestsExportHref(filters: { status: string; search: string }):
   if (filters.status !== "all") params.set("status", filters.status);
   if (filters.search) params.set("search", filters.search);
   const query = params.toString();
-  return `/api/admin/quote-requests/export${query ? `?${query}` : ""}`;
+  return `/api/admin/consultation-requests/export${query ? `?${query}` : ""}`;
 }

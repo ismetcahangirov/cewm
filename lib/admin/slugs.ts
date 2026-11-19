@@ -3,7 +3,7 @@ import "server-only";
 import { and, ne, sql, type SQL } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
-import { categories, pages, posts, products, projects, vacancies } from "@/lib/db/schema";
+import { categories, pages, posts, products } from "@/lib/db/schema";
 import { localeKey } from "@/lib/db/schema/columns";
 import type { Locale } from "@/lib/i18n/config";
 import { slugify } from "@/lib/slug";
@@ -15,8 +15,6 @@ const tables = {
   category: categories,
   page: pages,
   post: posts,
-  project: projects,
-  vacancy: vacancies,
 } as const;
 
 export async function takenSlugs(

@@ -1,7 +1,8 @@
 import {
-  Armchair,
-  BriefcaseBusiness,
-  Building2,
+  BadgeCheck,
+  Clapperboard,
+  Cog,
+  Contact,
   FileText,
   FolderTree,
   Handshake,
@@ -14,7 +15,6 @@ import {
   Route,
   Settings,
   Users,
-  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 
@@ -41,24 +41,18 @@ export const adminNavigation: AdminNavGroup[] = [
   {
     label: "Kataloq",
     items: [
-      { title: "Məhsullar", href: "/admin/products", icon: Armchair, ready: true },
+      { title: "Məhsullar", href: "/admin/products", icon: Cog, ready: true },
       { title: "Kateqoriyalar", href: "/admin/categories", icon: FolderTree, ready: true },
+      { title: "Brendlər", href: "/admin/brands", icon: BadgeCheck, ready: true },
     ],
   },
   {
     label: "Məzmun#nav",
     items: [
-      { title: "Layihələr", href: "/admin/projects", icon: Building2, ready: true },
       { title: "Səhifələr", href: "/admin/pages", icon: FileText, ready: true },
       { title: "Bloq", href: "/admin/blog", icon: Newspaper, ready: true },
-      {
-        title: "Vakansiyalar",
-        href: "/admin/vacancies",
-        icon: BriefcaseBusiness,
-        ready: true,
-      },
-      { title: "Partnyorlar", href: "/admin/logos", icon: Handshake, ready: true },
-      { title: "Komanda", href: "/admin/team", icon: UsersRound, ready: true },
+      { title: "Müştərilər", href: "/admin/clients", icon: Handshake, ready: true },
+      { title: "Əlaqə şəxsləri", href: "/admin/contacts", icon: Contact, ready: true },
       { title: "Media", href: "/admin/media", icon: Images, ready: true },
     ],
   },
@@ -83,6 +77,7 @@ export const adminNavigation: AdminNavGroup[] = [
         icon: PanelsTopLeft,
         ready: true,
       },
+      { title: "Hero filmləri", href: "/admin/hero-films", icon: Clapperboard, ready: true },
       { title: "Menyular", href: "/admin/menus", icon: Menu, ready: true },
       { title: "Yönləndirmələr", href: "/admin/redirects", icon: Route, ready: true },
       { title: "SEO və tənzimləmələr", href: "/admin/settings", icon: Settings, ready: true },

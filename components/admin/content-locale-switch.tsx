@@ -19,12 +19,14 @@ export const localeLabels: Record<Locale, MessageKey> = {
   az: "Azərbaycanca",
   ru: "Rusca",
   en: "İngiliscə",
+  de: "Almanca",
 };
 
 const nativeLocaleNames: Record<Locale, string> = {
   az: "Azərbaycanca",
   ru: "Русский",
   en: "English",
+  de: "Deutsch",
 };
 
 export function ContentLocaleSwitch() {

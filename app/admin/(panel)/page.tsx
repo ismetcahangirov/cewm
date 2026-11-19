@@ -124,16 +124,16 @@ export default async function DashboardPage() {
           locale={t.locale}
         />
         <CountCard
-          label={t("Layihələr")}
-          value={summary.projects}
-          href="/admin/projects"
-          linkLabel={t("Layihələr")}
+          label={t("Brendlər")}
+          value={summary.brands}
+          href="/admin/brands"
+          linkLabel={t("Brendlər")}
           locale={t.locale}
         />
         <CountCard
           label={t("Qaralamalar")}
           value={summary.drafts}
-          detail={t("Məhsul, layihə, səhifə və bloq")}
+          detail={t("Məhsul, səhifə və bloq")}
           href="/admin/products"
           linkLabel={t("Qaralamalar")}
           locale={t.locale}
@@ -148,7 +148,7 @@ export default async function DashboardPage() {
           </div>
           {summary.latestRequests.length === 0 ? (
             <EmptyState>
-              {t("Hələ müraciət yoxdur. Saytdan gələn təklif sorğuları burada görünəcək.")}
+              {t("Hələ müraciət yoxdur. Saytdan gələn konsultasiya sorğuları burada görünəcək.")}
             </EmptyState>
           ) : (
             <div className="border border-border bg-white">
@@ -234,7 +234,7 @@ export default async function DashboardPage() {
               <ArrowLink href="/admin/products/new">{t("Yeni məhsul əlavə et")}</ArrowLink>
             </li>
             <li>
-              <ArrowLink href="/admin/projects/new">{t("Yeni layihə əlavə et")}</ArrowLink>
+              <ArrowLink href="/admin/home-sections">{t("Ana səhifə bölmələri")}</ArrowLink>
             </li>
             <li>
               <ArrowLink href="/admin/media">{t("Media kitabxanası")}</ArrowLink>

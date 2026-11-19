@@ -4,7 +4,7 @@ export type Messages = Record<string, string>;
 
 export type MessageParams = Record<string, string | number>;
 
-export type Dictionaries = { ru: Messages; en: Messages };
+export type Dictionaries = { ru: Messages; en: Messages; de: Messages };
 
 const pluralOrder: Record<Intl.LDMLPluralRule, number> = {
   one: 0,

@@ -59,10 +59,6 @@ export const ru = {
   "Ətraflı təsvir ({locale})": "Подробное описание ({locale})",
   Şəkillər: "Изображения",
   "Texniki göstəricilər": "Технические характеристики",
-  "3D model": "3D-модель",
-  "İstəyə bağlıdır. GLB faylı və model yüklənənədək göstəriləcək poster şəkli.":
-    "Необязательно. Файл GLB и изображение-постер, которое видно, пока модель загружается.",
-  "Model (GLB)": "Модель (GLB)",
   Model: "Модель",
   "Poster şəkli": "Изображение-постер",
   Poster: "Постер",
@@ -81,7 +77,6 @@ export const ru = {
   Sil: "Удалить",
   Kataloq: "Каталог",
   Kateqoriyalar: "Категории",
-  Artikul: "Артикул",
   "Məsələn, MLIK-020. Axtarışda istifadə olunur.": "Например, MLIK-020. Используется в поиске.",
   "Axtarış sistemləri": "Поисковые системы",
   "«{name}» silinsin?": "Удалить «{name}»?",
@@ -165,6 +160,55 @@ export const ru = {
     "Корзина пуста. Удалённые товары хранятся здесь 30 дней.",
   "Seçimə uyğun məhsul tapılmadı.": "Подходящих товаров не найдено.",
   "Hələ məhsul yoxdur.": "Товаров пока нет.",
+  Üstünlüklər: "Преимущества",
+  "Üstünlük {number}": "Преимущество {number}",
+  "Üstünlük {number} ({locale})": "Преимущество {number} ({locale})",
+  "Üstünlük {number}: sil": "Преимущество {number}: удалить",
+  "Maşının əsas üstünlüklərini qısa cümlələrlə əlavə edin, hər sətirdə bir üstünlük.":
+    "Добавьте главные преимущества машины короткими фразами, по одному в строке.",
+  "Üstünlük əlavə et": "Добавить преимущество",
+  Sənədlər: "Документы",
+  "PDF broşürlər və kataloqlar. Fayl bir dəfə yüklənir, adı hər dil üçün ayrıca yazılır.":
+    "PDF-брошюры и каталоги. Файл загружается один раз, название пишется для каждого языка отдельно.",
+  "Sənəd {number}": "Документ {number}",
+  "Sənədin adı ({locale})": "Название документа ({locale})",
+  "Sənəd {number}: çıxar": "Документ {number}: убрать",
+  "Sənəd əlavə edin": "Добавьте документ",
+  Video: "Видео",
+  "İstəyə bağlıdır. Video faylı yükləyin və ya YouTube kimi xarici link yazın, ikisindən biri. Video bütün dillərdə eynidir.":
+    "Необязательно. Загрузите видеофайл или укажите внешнюю ссылку, например YouTube, одно из двух. Видео одно для всех языков.",
+  "Video faylı": "Видеофайл",
+  "Video linki": "Ссылка на видео",
+  "https:// ilə tam link, məsələn YouTube və ya Vimeo.":
+    "Полная ссылка с https://, например YouTube или Vimeo.",
+  "Model kodu": "Код модели",
+  "İstehsalçının model kodu. Axtarışda istifadə olunur.":
+    "Код модели производителя. Используется в поиске.",
+  "Göstərici, məs. Kəsmə uzunluğu": "Параметр, напр. Длина реза",
+  "Dəyər, məs. 3200": "Значение, напр. 3200",
+  "Vahid, məs. mm": "Единица, напр. мм",
+  "Vahid {number} ({locale})": "Единица {number} ({locale})",
+  "Kəsmə uzunluğu, güc, çəki kimi texniki göstəriciləri sətir-sətir əlavə edin: ad, dəyər və vahid.":
+    "Добавляйте технические характеристики, такие как длина реза, мощность, вес, построчно: название, значение и единица.",
+  "PDF sənədi tapılmadı.": "PDF-документ не найден.",
+  "Video faylı tapılmadı.": "Видеофайл не найден.",
+  "Üstünlüyü yazın.": "Введите преимущество.",
+  "Sənəd seçin.": "Выберите документ.",
+  "Sənədin adını yazın.": "Введите название документа.",
+  "Video linkini https:// ilə tam yazın, məsələn YouTube linki.":
+    "Укажите полную ссылку на видео с https://, например ссылку YouTube.",
+  "Eyni sənəd iki dəfə əlavə olunub.": "Один и тот же документ добавлен дважды.",
+  "Ya video faylı, ya da link seçin, ikisini birlikdə yox.":
+    "Выберите либо видеофайл, либо ссылку, но не оба сразу.",
+  "Ən çox {count} üstünlük ola bilər.":
+    "Не более {count} {count|преимущества|преимуществ|преимуществ}.",
+  "Ən çox {count} sənəd ola bilər.": "Не более {count} {count|документа|документов|документов}.",
+  "Ən çox {count} göstərici ola bilər.":
+    "Не более {count} {count|параметра|параметров|параметров}.",
+  "Ən çox {count} şəkil ola bilər.":
+    "Не более {count} {count|изображения|изображений|изображений}.",
+  "Ən çox {count} əlaqəli məhsul seçmək olar.":
+    "Можно выбрать не более {count} {count|связанного товара|связанных товаров|связанных товаров}.",
 } satisfies Messages;
 
 export const en: Record<keyof typeof ru, string> = {
@@ -227,10 +271,6 @@ export const en: Record<keyof typeof ru, string> = {
   "Ətraflı təsvir ({locale})": "Full description ({locale})",
   Şəkillər: "Images",
   "Texniki göstəricilər": "Specifications",
-  "3D model": "3D model",
-  "İstəyə bağlıdır. GLB faylı və model yüklənənədək göstəriləcək poster şəkli.":
-    "Optional. A GLB file and a poster image shown while the model loads.",
-  "Model (GLB)": "Model (GLB)",
   Model: "Model",
   "Poster şəkli": "Poster image",
   Poster: "Poster",
@@ -249,7 +289,6 @@ export const en: Record<keyof typeof ru, string> = {
   Sil: "Delete",
   Kataloq: "Catalogue",
   Kateqoriyalar: "Categories",
-  Artikul: "SKU",
   "Məsələn, MLIK-020. Axtarışda istifadə olunur.": "For example, MLIK-020. Used in search.",
   "Axtarış sistemləri": "Search engines",
   "«{name}» silinsin?": "Delete “{name}”?",
@@ -327,4 +366,257 @@ export const en: Record<keyof typeof ru, string> = {
     "The trash is empty. Deleted products are kept here for 30 days.",
   "Seçimə uyğun məhsul tapılmadı.": "No products match the filters.",
   "Hələ məhsul yoxdur.": "No products yet.",
+  Üstünlüklər: "Key benefits",
+  "Üstünlük {number}": "Benefit {number}",
+  "Üstünlük {number} ({locale})": "Benefit {number} ({locale})",
+  "Üstünlük {number}: sil": "Benefit {number}: delete",
+  "Maşının əsas üstünlüklərini qısa cümlələrlə əlavə edin, hər sətirdə bir üstünlük.":
+    "Add the machine's main benefits as short sentences, one per line.",
+  "Üstünlük əlavə et": "Add benefit",
+  Sənədlər: "Documents",
+  "PDF broşürlər və kataloqlar. Fayl bir dəfə yüklənir, adı hər dil üçün ayrıca yazılır.":
+    "PDF brochures and catalogues. The file is uploaded once; its title is written separately for each language.",
+  "Sənəd {number}": "Document {number}",
+  "Sənədin adı ({locale})": "Document title ({locale})",
+  "Sənəd {number}: çıxar": "Document {number}: remove",
+  "Sənəd əlavə edin": "Add a document",
+  Video: "Video",
+  "İstəyə bağlıdır. Video faylı yükləyin və ya YouTube kimi xarici link yazın, ikisindən biri. Video bütün dillərdə eynidir.":
+    "Optional. Upload a video file or enter an external link such as YouTube, one of the two. The video is the same in every language.",
+  "Video faylı": "Video file",
+  "Video linki": "Video link",
+  "https:// ilə tam link, məsələn YouTube və ya Vimeo.":
+    "A full https:// link, for example YouTube or Vimeo.",
+  "Model kodu": "Model code",
+  "İstehsalçının model kodu. Axtarışda istifadə olunur.":
+    "The manufacturer's model code. Used in search.",
+  "Göstərici, məs. Kəsmə uzunluğu": "Parameter, e.g. Cutting length",
+  "Dəyər, məs. 3200": "Value, e.g. 3200",
+  "Vahid, məs. mm": "Unit, e.g. mm",
+  "Vahid {number} ({locale})": "Unit {number} ({locale})",
+  "Kəsmə uzunluğu, güc, çəki kimi texniki göstəriciləri sətir-sətir əlavə edin: ad, dəyər və vahid.":
+    "Add technical specifications such as cutting length, power and weight row by row: name, value and unit.",
+  "PDF sənədi tapılmadı.": "PDF document not found.",
+  "Video faylı tapılmadı.": "Video file not found.",
+  "Üstünlüyü yazın.": "Enter the benefit.",
+  "Sənəd seçin.": "Choose a document.",
+  "Sənədin adını yazın.": "Enter the document title.",
+  "Video linkini https:// ilə tam yazın, məsələn YouTube linki.":
+    "Enter the full video link with https://, for example a YouTube link.",
+  "Eyni sənəd iki dəfə əlavə olunub.": "The same document was added twice.",
+  "Ya video faylı, ya da link seçin, ikisini birlikdə yox.":
+    "Choose either a video file or a link, not both.",
+  "Ən çox {count} üstünlük ola bilər.": "At most {count} {count|benefit|benefits}.",
+  "Ən çox {count} sənəd ola bilər.": "At most {count} {count|document|documents}.",
+  "Ən çox {count} göstərici ola bilər.": "At most {count} {count|specification|specifications}.",
+  "Ən çox {count} şəkil ola bilər.": "At most {count} {count|image|images}.",
+  "Ən çox {count} əlaqəli məhsul seçmək olar.":
+    "You can choose at most {count} related {count|product|products}.",
+};
+
+export const de: Record<keyof typeof ru, string> = {
+  "Seçilmiş məhsullar#selection": "Ausgewählte Produkte",
+  "Yeni məhsul": "Neues Produkt",
+  Məhsullar: "Produkte",
+  Məhsul: "Produkt",
+  məhsul: "Produkt",
+  "Məhsullara qayıt": "Zurück zu den Produkten",
+  "Məhsul tapılmadı.": "Produkt nicht gefunden.",
+  "Məhsul yüklənmədi. Səhifəni yeniləyin.":
+    "Das Produkt konnte nicht geladen werden. Laden Sie die Seite neu.",
+  "Göstərici {number}": "Merkmal {number}",
+  "{label}: yerini dəyiş": "{label}: verschieben",
+  "Göstərici {number} ({locale})": "Merkmal {number} ({locale})",
+  "Göstərici, məs. Hündürlük": "Merkmal, z. B. Höhe",
+  "Dəyər {number} ({locale})": "Wert {number} ({locale})",
+  "Dəyər, məs. 75 sm": "Wert, z. B. 75 cm",
+  "Göstərici {number}: sil": "Merkmal {number}: löschen",
+  "Ölçü, material, rəng kimi texniki göstəriciləri sətir-sətir əlavə edin.":
+    "Fügen Sie technische Merkmale wie Maße, Material und Farbe zeilenweise hinzu.",
+  "Göstərici əlavə et": "Merkmal hinzufügen",
+  "Əsas şəkil": "Hauptbild",
+  "Hover şəkli": "Hover-Bild",
+  "Birinci şəkil kataloqda və məhsul səhifəsində əsas şəkildir, ikincisi kartın üzərinə gələndə görünür. Sırasını sürüşdürərək dəyişin.":
+    "Das erste Bild ist das Hauptbild im Katalog und auf der Produktseite, das zweite erscheint, wenn man mit der Maus über die Karte fährt. Ändern Sie die Reihenfolge per Drag-and-drop.",
+  "Şəkil {number}": "Bild {number}",
+  "Şəkil {number}: əsas et": "Bild {number}: als Hauptbild festlegen",
+  "Əsas şəkil et": "Als Hauptbild festlegen",
+  "Şəkil {number}: çıxar": "Bild {number}: entfernen",
+  "Qalereyadan çıxar": "Aus der Galerie entfernen",
+  "Alt mətn ({locale})": "Alternativtext ({locale})",
+  "Kitabxanadan seç": "Aus der Mediathek wählen",
+  "Qalereyaya şəkil əlavə edin": "Fügen Sie der Galerie Bilder hinzu",
+  "Saxlanıldı, saytda yeniləndi.": "Gespeichert und auf der Website aktualisiert.",
+  "Saxlanıldı.": "Gespeichert.",
+  "Məhsul yaradıldı.": "Produkt erstellt.",
+  "Formada səhvlər var. Qırmızı sahələri düzəldin.":
+    "Das Formular enthält Fehler. Korrigieren Sie die rot markierten Felder.",
+  "Kopya qaralama kimi yaradıldı.": "Kopie als Entwurf erstellt.",
+  "Məhsul silinənlərə köçürüldü. 30 gün ərzində bərpa etmək olar.":
+    "Das Produkt wurde in den Papierkorb verschoben. Es kann innerhalb von 30 Tagen wiederhergestellt werden.",
+  "Məhsul bərpa olundu və qaralamadadır.": "Das Produkt wurde als Entwurf wiederhergestellt.",
+  Saxlanılır: "Wird gespeichert…",
+  Saxla: "Speichern",
+  Yarat: "Erstellen",
+  "Son dəyişiklik: {date}": "Zuletzt geändert: {date}",
+  "Məhsulu əvvəl qaralama kimi yaradın, hazır olanda dərc edin.":
+    "Erstellen Sie das Produkt zunächst als Entwurf und veröffentlichen Sie es, sobald es fertig ist.",
+  "Saytda bax": "Auf der Website ansehen",
+  "Kopyasını yarat": "Duplizieren",
+  "Bu məhsul silinənlərdədir və saytda görünmür.":
+    "Dieses Produkt befindet sich im Papierkorb und wird auf der Website nicht angezeigt.",
+  "Bərpa et": "Wiederherstellen",
+  "Əsas məlumat": "Grunddaten",
+  "Ad ({locale})": "Name ({locale})",
+  "Ünvan ({locale})": "Adresse (Slug) ({locale})",
+  "Qısa təsvir ({locale})": "Kurzbeschreibung ({locale})",
+  "Kataloq kartında və məhsulun yuxarısında göstərilir.":
+    "Wird auf der Katalogkarte und oben auf der Produktseite angezeigt.",
+  "Ətraflı təsvir ({locale})": "Ausführliche Beschreibung ({locale})",
+  Şəkillər: "Bilder",
+  "Texniki göstəricilər": "Technische Daten",
+  Model: "Modell",
+  "Poster şəkli": "Posterbild",
+  Poster: "Poster",
+  "Əlaqəli məhsullar": "Verwandte Produkte",
+  Dərc: "Veröffentlichung",
+  Status: "Status",
+  "Saxlayanda dəyişiklik saytda bir neçə saniyəyə görünür.":
+    "Nach dem Speichern erscheinen Änderungen innerhalb weniger Sekunden auf der Website.",
+  "Qaralama saytda görünmür.": "Entwürfe werden auf der Website nicht angezeigt.",
+  Qaralama: "Entwurf",
+  "Dərc olunub": "Veröffentlicht",
+  "Ana səhifədə göstər": "Auf der Startseite anzeigen",
+  "Seçilmiş məhsullar ana səhifədə görünür. Sıranı «Ana səhifə bölmələri»ndə dəyişin.":
+    "Hervorgehobene Produkte erscheinen auf der Startseite. Die Reihenfolge ändern Sie unter „Bereiche der Startseite“.",
+  Yaradılıb: "Erstellt",
+  Sil: "Löschen",
+  Kataloq: "Katalog",
+  Kateqoriyalar: "Kategorien",
+  "Məsələn, MLIK-020. Axtarışda istifadə olunur.":
+    "Zum Beispiel MLIK-020. Wird bei der Suche verwendet.",
+  "Axtarış sistemləri": "Suchmaschinen",
+  "«{name}» silinsin?": "„{name}“ löschen?",
+  "Məhsul saytdan götürüləcək və silinənlərə düşəcək. 30 gün ərzində bərpa etmək olar.":
+    "Das Produkt wird von der Website entfernt und in den Papierkorb verschoben. Es kann innerhalb von 30 Tagen wiederhergestellt werden.",
+  "Bütün statuslar": "Alle Status",
+  Silinənlər: "Papierkorb",
+  "Dərc et": "Veröffentlichen",
+  "{count} məhsul dərc olunsun?": "{count} {count|Produkt|Produkte} veröffentlichen?",
+  "«{name}» dərc olunsun?": "„{name}“ veröffentlichen?",
+  "Məhsullar saytda görünəcək. Şəkli olmayanlar dərc olunmayacaq.":
+    "Die Produkte werden auf der Website angezeigt. Produkte ohne Bild werden nicht veröffentlicht.",
+  "{count} məhsul dərc olundu.": "{count} {count|Produkt|Produkte} veröffentlicht.",
+  "«{name}» dərc olundu.": "„{name}“ veröffentlicht.",
+  "Qaralamaya çevir": "Auf Entwurf setzen",
+  "{count} məhsul qaralamaya çevrilsin?": "{count} {count|Produkt|Produkte} auf Entwurf setzen?",
+  "«{name}» qaralamaya çevrilsin?": "„{name}“ auf Entwurf setzen?",
+  "Məhsullar saytdan götürüləcək, amma silinməyəcək.":
+    "Die Produkte werden von der Website entfernt, aber nicht gelöscht.",
+  "{count} məhsul qaralamaya çevrildi.": "{count} {count|Produkt|Produkte} auf Entwurf gesetzt.",
+  "«{name}» qaralamaya çevrildi.": "„{name}“ auf Entwurf gesetzt.",
+  "Ana səhifəyə əlavə et": "Zur Startseite hinzufügen",
+  "{count} məhsul ana səhifəyə əlavə olunsun?":
+    "{count} {count|Produkt|Produkte} zur Startseite hinzufügen?",
+  "«{name}» ana səhifəyə əlavə olunsun?": "„{name}“ zur Startseite hinzufügen?",
+  "Məhsullar ana səhifənin seçilmiş məhsullar bölməsində görünəcək. Qaralamalar dərc olunana qədər görünmür.":
+    "Die Produkte erscheinen im Bereich „Hervorgehobene Produkte“ der Startseite. Entwürfe bleiben bis zur Veröffentlichung ausgeblendet.",
+  "{count} məhsul ana səhifəyə əlavə olundu.":
+    "{count} {count|Produkt|Produkte} zur Startseite hinzugefügt.",
+  "«{name}» ana səhifəyə əlavə olundu.": "„{name}“ zur Startseite hinzugefügt.",
+  "Ana səhifədən çıxar": "Von der Startseite entfernen",
+  "{count} məhsul ana səhifədən çıxarılsın?":
+    "{count} {count|Produkt|Produkte} von der Startseite entfernen?",
+  "«{name}» ana səhifədən çıxarılsın?": "„{name}“ von der Startseite entfernen?",
+  "Məhsullar kataloqda qalacaq, amma ana səhifədə görünməyəcək.":
+    "Die Produkte bleiben im Katalog, werden aber nicht mehr auf der Startseite angezeigt.",
+  "{count} məhsul ana səhifədən çıxarıldı.":
+    "{count} {count|Produkt|Produkte} von der Startseite entfernt.",
+  "«{name}» ana səhifədən çıxarıldı.": "„{name}“ von der Startseite entfernt.",
+  "{count} məhsul silinsin?": "{count} {count|Produkt|Produkte} löschen?",
+  "Məhsullar saytdan götürüləcək və silinənlərə düşəcək. 30 gün ərzində bərpa etmək olar.":
+    "Die Produkte werden von der Website entfernt und in den Papierkorb verschoben. Sie können innerhalb von 30 Tagen wiederhergestellt werden.",
+  "{count} məhsul silinənlərə köçürüldü.":
+    "{count} {count|Produkt|Produkte} in den Papierkorb verschoben.",
+  "«{name}» silinənlərə köçürüldü.": "„{name}“ in den Papierkorb verschoben.",
+  "{count} məhsul bərpa olunsun?": "{count} {count|Produkt|Produkte} wiederherstellen?",
+  "«{name}» bərpa olunsun?": "„{name}“ wiederherstellen?",
+  "Bərpa olunan məhsullar qaralama kimi qayıdır.":
+    "Wiederhergestellte Produkte werden als Entwürfe gespeichert.",
+  "{count} məhsul bərpa olundu.": "{count} {count|Produkt|Produkte} wiederhergestellt.",
+  "«{name}» bərpa olundu.": "„{name}“ wiederhergestellt.",
+  "Həmişəlik sil": "Endgültig löschen",
+  "{count} məhsul həmişəlik silinsin?": "{count} {count|Produkt|Produkte} endgültig löschen?",
+  "«{name}» həmişəlik silinsin?": "„{name}“ endgültig löschen?",
+  "Bu əməliyyat geri qaytarılmır. Şəkillər media kitabxanasında qalır.":
+    "Dieser Vorgang kann nicht rückgängig gemacht werden. Die Bilder bleiben in der Mediathek.",
+  "{count} məhsul həmişəlik silindi.": "{count} {count|Produkt|Produkte} endgültig gelöscht.",
+  "«{name}» həmişəlik silindi.": "„{name}“ endgültig gelöscht.",
+  "Ana səhifədə": "Auf der Startseite",
+  Kateqoriya: "Kategorie",
+  Kateqoriyasız: "Ohne Kategorie",
+  Silinib: "Im Papierkorb",
+  Dəyişib: "Geändert",
+  "Heç bir məhsul dəyişmədi.": "Es wurden keine Produkte geändert.",
+  "«{name}» üçün kopya yaradıldı.": "Kopie von „{name}“ erstellt.",
+  "{name}: əməliyyatlar": "{name}: Aktionen",
+  "Redaktə et": "Bearbeiten",
+  "{count} məhsul seçilib": "{count} {count|Produkt|Produkte} ausgewählt",
+  "Seçimi ləğv et": "Auswahl aufheben",
+  "Kataloqdakı bütün məhsullar. Dərc olunanlar saytda dərhal görünür.":
+    "Alle Produkte im Katalog. Veröffentlichte Produkte erscheinen sofort auf der Website.",
+  "Yenidən yüklə": "Neu laden",
+  "Məhsullar yüklənmədi.": "Die Produkte konnten nicht geladen werden.",
+  "Ad, artikul və ya ünvan ilə axtar": "Nach Name, Artikelnummer oder Adresse suchen",
+  "Bütün kateqoriyalar": "Alle Kategorien",
+  "Silinənlər boşdur. Silinən məhsullar burada 30 gün saxlanılır.":
+    "Der Papierkorb ist leer. Gelöschte Produkte werden hier 30 Tage lang aufbewahrt.",
+  "Seçimə uyğun məhsul tapılmadı.": "Keine passenden Produkte gefunden.",
+  "Hələ məhsul yoxdur.": "Noch keine Produkte vorhanden.",
+  Üstünlüklər: "Vorteile",
+  "Üstünlük {number}": "Vorteil {number}",
+  "Üstünlük {number} ({locale})": "Vorteil {number} ({locale})",
+  "Üstünlük {number}: sil": "Vorteil {number}: löschen",
+  "Maşının əsas üstünlüklərini qısa cümlələrlə əlavə edin, hər sətirdə bir üstünlük.":
+    "Fügen Sie die wichtigsten Vorteile der Maschine in kurzen Sätzen hinzu, einen Vorteil pro Zeile.",
+  "Üstünlük əlavə et": "Vorteil hinzufügen",
+  Sənədlər: "Dokumente",
+  "PDF broşürlər və kataloqlar. Fayl bir dəfə yüklənir, adı hər dil üçün ayrıca yazılır.":
+    "PDF-Broschüren und -Kataloge. Die Datei wird einmal hochgeladen, der Titel wird für jede Sprache separat eingegeben.",
+  "Sənəd {number}": "Dokument {number}",
+  "Sənədin adı ({locale})": "Dokumenttitel ({locale})",
+  "Sənəd {number}: çıxar": "Dokument {number}: entfernen",
+  "Sənəd əlavə edin": "Fügen Sie ein Dokument hinzu",
+  Video: "Video",
+  "İstəyə bağlıdır. Video faylı yükləyin və ya YouTube kimi xarici link yazın, ikisindən biri. Video bütün dillərdə eynidir.":
+    "Optional. Laden Sie eine Videodatei hoch oder geben Sie einen externen Link ein, etwa zu YouTube – nur eines von beiden. Das Video ist in allen Sprachen gleich.",
+  "Video faylı": "Videodatei",
+  "Video linki": "Videolink",
+  "https:// ilə tam link, məsələn YouTube və ya Vimeo.":
+    "Vollständiger Link mit https://, zum Beispiel YouTube oder Vimeo.",
+  "Model kodu": "Modellcode",
+  "İstehsalçının model kodu. Axtarışda istifadə olunur.":
+    "Der Modellcode des Herstellers. Wird bei der Suche verwendet.",
+  "Göstərici, məs. Kəsmə uzunluğu": "Merkmal, z. B. Schnittlänge",
+  "Dəyər, məs. 3200": "Wert, z. B. 3200",
+  "Vahid, məs. mm": "Einheit, z. B. mm",
+  "Vahid {number} ({locale})": "Einheit {number} ({locale})",
+  "Kəsmə uzunluğu, güc, çəki kimi texniki göstəriciləri sətir-sətir əlavə edin: ad, dəyər və vahid.":
+    "Fügen Sie technische Merkmale wie Schnittlänge, Leistung und Gewicht zeilenweise hinzu: Bezeichnung, Wert und Einheit.",
+  "PDF sənədi tapılmadı.": "PDF-Dokument nicht gefunden.",
+  "Video faylı tapılmadı.": "Videodatei nicht gefunden.",
+  "Üstünlüyü yazın.": "Geben Sie den Vorteil ein.",
+  "Sənəd seçin.": "Wählen Sie ein Dokument aus.",
+  "Sənədin adını yazın.": "Geben Sie den Titel des Dokuments ein.",
+  "Video linkini https:// ilə tam yazın, məsələn YouTube linki.":
+    "Geben Sie den vollständigen Videolink mit https:// ein, zum Beispiel einen YouTube-Link.",
+  "Eyni sənəd iki dəfə əlavə olunub.": "Dasselbe Dokument wurde zweimal hinzugefügt.",
+  "Ya video faylı, ya da link seçin, ikisini birlikdə yox.":
+    "Wählen Sie entweder eine Videodatei oder einen Link, nicht beides.",
+  "Ən çox {count} üstünlük ola bilər.": "Höchstens {count} {count|Vorteil|Vorteile}.",
+  "Ən çox {count} sənəd ola bilər.": "Höchstens {count} {count|Dokument|Dokumente}.",
+  "Ən çox {count} göstərici ola bilər.": "Höchstens {count} {count|Merkmal|Merkmale}.",
+  "Ən çox {count} şəkil ola bilər.": "Höchstens {count} {count|Bild|Bilder}.",
+  "Ən çox {count} əlaqəli məhsul seçmək olar.":
+    "Sie können höchstens {count} {count|verwandtes Produkt|verwandte Produkte} auswählen.",
 };

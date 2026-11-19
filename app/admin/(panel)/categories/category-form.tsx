@@ -33,6 +33,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { formatDateTime } from "@/lib/admin/format";
+import { filledLocales } from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import { useCreateCategoryMutation, useUpdateCategoryMutation } from "@/lib/api/admin";
 import { richTextToPlain, type RichTextDoc } from "@/lib/content/rich-text";
@@ -96,6 +97,7 @@ export function CategoryForm({
     az: Boolean(category),
     ru: Boolean(category?.slug.ru),
     en: Boolean(category?.slug.en),
+    de: Boolean(category?.slug.de),
   });
   const [deleting, setDeleting] = useState(false);
   const [createCategory] = useCreateCategoryMutation();
@@ -165,10 +167,7 @@ export function CategoryForm({
         <FormLayout
           main={
             <FormSection title={t("Əsas məlumat")}>
-              <LocaleTabs
-                invalid={textInvalid}
-                filled={{ ru: Boolean(name?.ru), en: Boolean(name?.en) }}
-              >
+              <LocaleTabs invalid={textInvalid} filled={filledLocales(name)}>
                 {(locale) => (
                   <>
                     <FormField
@@ -327,6 +326,7 @@ export function CategoryForm({
                   filled={{
                     ru: Boolean(values.seoTitle?.ru || values.seoDescription?.ru),
                     en: Boolean(values.seoTitle?.en || values.seoDescription?.en),
+                    de: Boolean(values.seoTitle?.de || values.seoDescription?.de),
                   }}
                 >
                   {(locale) => (
@@ -340,7 +340,7 @@ export function CategoryForm({
                       onDescriptionChange={(next) =>
                         form.setValue(`seoDescription.${locale}`, next, { shouldDirty: true })
                       }
-                      fallbackTitle={`${name?.[locale] || name?.az || ""} | Mebline`}
+                      fallbackTitle={`${name?.[locale] || name?.az || ""} | CEWM`}
                       fallbackDescription={richTextToPlain(
                         (values.description?.[locale] ??
                           values.description?.az ??

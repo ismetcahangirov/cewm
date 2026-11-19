@@ -19,6 +19,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { filledLocales } from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import { useCreateMenuMutation, useReorderMenusMutation } from "@/lib/api/menus";
 import { apiErrorMessage } from "@/lib/api/types";
@@ -32,7 +33,7 @@ export function NewFooterColumnDialog({ onClose }: { onClose: () => void }) {
   const [error, setError] = useState<string | null>(null);
   const [createMenu] = useCreateMenuMutation();
   const form = useZodForm(createMenuSchema, {
-    defaultValues: { title: { az: "", ru: "", en: "" } },
+    defaultValues: { title: { az: "", ru: "", en: "", de: "" } },
   });
   const title = useWatch({ control: form.control, name: "title" });
   const { isSubmitting } = form.formState;
@@ -70,7 +71,7 @@ export function NewFooterColumnDialog({ onClose }: { onClose: () => void }) {
           className="flex flex-col gap-5"
         >
           <FormAlert message={error} />
-          <LocaleTabs filled={{ ru: Boolean(title?.ru), en: Boolean(title?.en) }}>
+          <LocaleTabs filled={filledLocales(title)}>
             {(locale) => (
               <FormField
                 control={form.control}

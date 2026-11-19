@@ -5,7 +5,7 @@ import { and, asc, desc, eq, inArray, isNull, notInArray } from "drizzle-orm";
 import type { DomainError } from "@/lib/api/server";
 import { getDb } from "@/lib/db";
 import { products, settings } from "@/lib/db/schema";
-import type { SettingsHeroSlide, SettingsHomeSection } from "@/lib/db/schema/settings";
+import type { SettingsHomeSection } from "@/lib/db/schema/settings";
 import {
   isCustomSection,
   normalizeHomeSections,
@@ -13,8 +13,8 @@ import {
   type HomeSectionsValues,
 } from "@/lib/validation/home-sections";
 import { mediaKindOf } from "@/lib/validation/media";
-import { heroSlideImageError, heroSlideMobileImageError } from "@/lib/validation/settings";
 
+import { heroFilmOptions } from "./hero-films";
 import { findMediaByIds, toMediaDto } from "./media";
 import { productOptions } from "./products";
 import { readSettingsRow } from "./settings";
@@ -35,31 +35,32 @@ async function featuredIds(): Promise<string[]> {
   return rows.map((row) => row.id);
 }
 
-function referencedMedia(heroSlides: SettingsHeroSlide[], sections: SettingsHomeSection[]) {
+function referencedMedia(sections: SettingsHomeSection[]) {
   return [
-    ...new Set([
-      ...heroSlides.flatMap((slide) =>
-        slide.mobileImageId ? [slide.imageId, slide.mobileImageId] : [slide.imageId],
-      ),
-      ...sections.flatMap((section) =>
+    ...new Set(
+      sections.flatMap((section) =>
         isCustomSection(section)
           ? [section.block.mediaId, section.block.posterId].filter((id) => id !== null)
           : [],
       ),
-    ]),
+    ),
   ];
 }
 
 export async function getAdminHomeSections(): Promise<HomeSectionsDto> {
-  const [row, ids] = await Promise.all([readSettingsRow(), featuredIds()]);
-  const heroSlides = row?.heroSlides ?? [];
+  const [row, ids, films] = await Promise.all([
+    readSettingsRow(),
+    featuredIds(),
+    heroFilmOptions(),
+  ]);
   const sections = normalizeHomeSections(row?.homeSections ?? []);
   const [media, featured] = await Promise.all([
-    findMediaByIds(referencedMedia(heroSlides, sections)),
+    findMediaByIds(referencedMedia(sections)),
     productOptions(ids),
   ]);
   return {
-    heroSlides,
+    hero: row?.hero ?? null,
+    films,
     sections,
     featured,
     media: media.map(toMediaDto),
@@ -69,16 +70,14 @@ export async function getAdminHomeSections(): Promise<HomeSectionsDto> {
 
 async function checkReferences(values: HomeSectionsValues): Promise<Record<string, string> | null> {
   const fields: Record<string, string> = {};
-  const files = await findMediaByIds(referencedMedia(values.heroSlides, values.sections));
+  const files = await findMediaByIds(referencedMedia(values.sections));
   const byId = new Map(files.map((file) => [file.id, file]));
-  values.heroSlides.forEach((slide, index) => {
-    const message = heroSlideImageError(byId.get(slide.imageId));
-    if (message) fields[`heroSlides.${index}.imageId`] = message;
-    const mobile = slide.mobileImageId
-      ? heroSlideMobileImageError(byId.get(slide.mobileImageId))
-      : null;
-    if (mobile) fields[`heroSlides.${index}.mobileImageId`] = mobile;
-  });
+  if (values.hero.filmId) {
+    const films = await heroFilmOptions();
+    if (!films.some((film) => film.id === values.hero.filmId)) {
+      fields["hero.filmId"] = "Film tapılmadı.";
+    }
+  }
   values.sections.forEach((section, index) => {
     if (!isCustomSection(section)) return;
     const { mediaKind, mediaId, posterId } = section.block;
@@ -111,7 +110,7 @@ export async function saveHomeSections(
   if (fields) return { error: { status: 400, message: "Məlumatlar düzgün deyil.", fields } };
 
   await getDb().transaction(async (tx) => {
-    const columns = { heroSlides: values.heroSlides, homeSections: values.sections };
+    const columns = { hero: values.hero, homeSections: values.sections };
     await tx
       .insert(settings)
       .values({ id: 1, ...columns })

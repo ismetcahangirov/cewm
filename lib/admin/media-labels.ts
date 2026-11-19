@@ -7,15 +7,14 @@ type Translate = (key: MessageKey, params?: MessageParams) => string;
 const usageLabels: Record<MediaUsageKind, MessageKey> = {
   products: "{count} məhsul",
   categories: "{count} kateqoriya",
-  projects: "{count} layihə",
+  brands: "{count} brend",
   posts: "{count} bloq yazısı",
-  vacancies: "{count} vakansiya",
   pages: "{count} səhifə",
-  logos: "{count} loqo",
-  team: "{count} işçi",
+  clients: "{count} müştəri loqosu",
+  contacts: "{count} əlaqə şəxsi",
+  films: "{count} hero filmi",
   settings: "sayt tənzimləmələri",
   content: "{count} mətn",
-  derived: "{count} emal olunmuş şəkil",
 };
 
 export function usageParts(usage: MediaUsage, t: Translate): string[] {

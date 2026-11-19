@@ -24,8 +24,9 @@ async function sectionDefaults(): Promise<SectionDefaults> {
   return {
     categories: titles((home) => home.categoriesTitle),
     products: titles((home) => home.productsTitle),
-    projects: titles((home) => home.projectsTitle),
-    logos: null,
+    brands: titles((home) => home.brandsTitle),
+    clients: titles((home) => home.clientsTitle),
+    posts: titles((home) => home.postsTitle),
   };
 }
 

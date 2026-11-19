@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import { cookies } from "next/headers";
 import { Suspense, type ReactNode } from "react";
 
-import { fontVariables } from "@/app/fonts";
 import { AdminLocaleSync } from "@/components/admin/admin-locale-sync";
 import { StoreProvider } from "@/components/providers/store-provider";
 import { Toaster } from "@/components/ui/sonner";
@@ -10,10 +9,10 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { defaultLocale, isLocale } from "@/lib/i18n/config";
 import { contentLocaleCookie } from "@/lib/store/editor-slice";
 
-import "../globals.css";
+import "../admin.css";
 
 export const metadata: Metadata = {
-  title: { default: "Mebline admin", template: "%s | Mebline admin" },
+  title: { default: "CEWM admin", template: "%s | CEWM admin" },
   robots: { index: false, follow: false },
 };
 
@@ -30,7 +29,7 @@ async function RequestStore({ children }: { children: ReactNode }) {
 
 export default function AdminLayout({ children }: LayoutProps<"/admin">) {
   return (
-    <html lang="az" className={fontVariables} data-scroll-behavior="smooth">
+    <html lang="az" data-scroll-behavior="smooth">
       <body className="bg-white">
         <TooltipProvider delayDuration={300}>
           <Suspense>

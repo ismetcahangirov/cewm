@@ -47,8 +47,8 @@ const layoutLabels: Record<CustomBlockLayout, MessageKey> = {
 
 const toneLabels: Record<CustomBlockTone, MessageKey> = {
   white: "Ağ",
-  cream: "Krem",
-  graphite: "Qrafit (tünd)",
+  light: "Açıq mavi",
+  navy: "Tünd göy",
 };
 
 type BlockErrors = {
@@ -162,6 +162,7 @@ export function CustomSectionFields({
         filled={{
           ru: Boolean(title?.ru || block?.eyebrow?.ru || block?.linkLabel?.ru),
           en: Boolean(title?.en || block?.eyebrow?.en || block?.linkLabel?.en),
+          de: Boolean(title?.de || block?.eyebrow?.de || block?.linkLabel?.de),
         }}
       >
         {(locale) => (

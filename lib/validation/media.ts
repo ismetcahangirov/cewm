@@ -11,7 +11,7 @@ export const mediaSortFields = ["createdAt", "key", "size"] as const;
 
 export type MediaSortField = (typeof mediaSortFields)[number];
 
-export const mediaKinds = ["image", "video", "model", "document"] as const;
+export const mediaKinds = ["image", "video", "document"] as const;
 
 export type MediaKind = (typeof mediaKinds)[number];
 
@@ -23,7 +23,6 @@ export const mediaTypes = {
   "image/gif": { kind: "image", extension: "gif", maxSize: 10 * 1024 * 1024 },
   "video/mp4": { kind: "video", extension: "mp4", maxSize: 100 * 1024 * 1024 },
   "video/webm": { kind: "video", extension: "webm", maxSize: 100 * 1024 * 1024 },
-  "model/gltf-binary": { kind: "model", extension: "glb", maxSize: 50 * 1024 * 1024 },
   "application/pdf": { kind: "document", extension: "pdf", maxSize: 30 * 1024 * 1024 },
 } as const satisfies Record<string, { kind: MediaKind; extension: string; maxSize: number }>;
 
@@ -33,7 +32,6 @@ export const mediaTypeNames = Object.keys(mediaTypes) as [MediaType, ...MediaTyp
 
 export function mediaTypeOf(file: { name: string; type: string }): MediaType | null {
   if (file.type in mediaTypes) return file.type as MediaType;
-  if (file.name.toLowerCase().endsWith(".glb")) return "model/gltf-binary";
   return null;
 }
 
@@ -44,7 +42,6 @@ export function mediaKindOf(mimeType: string): MediaKind | null {
 export const acceptByKind: Record<MediaKind, string> = {
   image: "image/jpeg,image/png,image/webp,image/avif,image/gif",
   video: "video/mp4,video/webm",
-  model: ".glb,model/gltf-binary",
   document: "application/pdf",
 };
 
@@ -112,15 +109,14 @@ export type UpdateMediaInput = z.input<typeof updateMediaSchema>;
 export const mediaUsageKinds = [
   "products",
   "categories",
-  "projects",
+  "brands",
   "posts",
-  "vacancies",
   "pages",
-  "logos",
-  "team",
+  "clients",
+  "contacts",
+  "films",
   "settings",
   "content",
-  "derived",
 ] as const;
 
 export type MediaUsageKind = (typeof mediaUsageKinds)[number];

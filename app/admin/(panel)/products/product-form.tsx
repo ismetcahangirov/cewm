@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { formatDateTime } from "@/lib/admin/format";
+import { filledLocales, formRichText, formText, hasLocaleError } from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import {
   useBulkProductsMutation,
@@ -50,6 +51,7 @@ import { localePath, locales, type Locale } from "@/lib/i18n/config";
 import type { Localized } from "@/lib/i18n/localized";
 import { routes } from "@/lib/routes";
 import { slugify } from "@/lib/slug";
+import type { BrandOptionDto } from "@/lib/validation/brands";
 import type { CategoryNodeDto } from "@/lib/validation/categories";
 import type { MediaDto } from "@/lib/validation/media";
 import { useContentText } from "@/lib/store/hooks";
@@ -60,13 +62,17 @@ import {
   type ProductOptionDto,
 } from "@/lib/validation/products";
 
+import { ProductBenefits } from "./product-benefits";
+import { ProductDocuments } from "./product-documents";
 import { ProductGallery } from "./product-gallery";
 import { ProductSpecs } from "./product-specs";
 
-const emptyLocalized = { az: "", ru: "", en: "" };
+const emptyLocalized = { az: "", ru: "", en: "", de: "" };
+
+const noBrand = "none";
 
 function richText(value: Localized<RichTextDoc> | null) {
-  return { az: value?.az ?? null, ru: value?.ru ?? null, en: value?.en ?? null };
+  return formRichText(value);
 }
 
 function toFormValues(product: ProductDetailDto | null): ProductInput {
@@ -78,10 +84,14 @@ function toFormValues(product: ProductDetailDto | null): ProductInput {
       shortDescription: richText(null),
       description: richText(null),
       categoryIds: [],
+      brandId: "",
+      benefits: [],
       specs: [],
       images: [],
-      modelId: null,
-      modelPosterId: null,
+      documents: [],
+      videoId: "",
+      videoUrl: "",
+      videoPosterId: "",
       relatedIds: [],
       seoTitle: { ...emptyLocalized },
       seoDescription: { ...emptyLocalized },
@@ -89,11 +99,7 @@ function toFormValues(product: ProductDetailDto | null): ProductInput {
       isFeatured: false,
     };
   }
-  const text = (value: { az: string; ru?: string | null; en?: string | null } | null) => ({
-    az: value?.az ?? "",
-    ru: value?.ru ?? "",
-    en: value?.en ?? "",
-  });
+  const text = formText;
   return {
     name: text(product.name),
     slug: text(product.slug),
@@ -101,10 +107,21 @@ function toFormValues(product: ProductDetailDto | null): ProductInput {
     shortDescription: richText(product.shortDescription),
     description: richText(product.description),
     categoryIds: product.categoryIds,
-    specs: product.specs.map((spec) => ({ key: text(spec.key), value: text(spec.value) })),
+    brandId: product.brandId ?? "",
+    benefits: product.benefits.map((benefit) => ({ text: text(benefit) })),
+    specs: product.specs.map((spec) => ({
+      label: text(spec.label),
+      value: text(spec.value),
+      unit: text(spec.unit),
+    })),
     images: product.images.map((image) => ({ mediaId: image.mediaId, alt: text(image.alt) })),
-    modelId: product.modelId,
-    modelPosterId: product.modelPosterId,
+    documents: product.documents.map((document) => ({
+      mediaId: document.mediaId,
+      title: text(document.title),
+    })),
+    videoId: product.videoId ?? "",
+    videoUrl: product.videoUrl ?? "",
+    videoPosterId: product.videoPosterId ?? "",
     relatedIds: product.related.map((related) => related.id),
     seoTitle: text(product.seoTitle),
     seoDescription: text(product.seoDescription),
@@ -113,16 +130,14 @@ function toFormValues(product: ProductDetailDto | null): ProductInput {
   };
 }
 
-function hasLocaleError(value: unknown, locale: Locale): boolean {
-  return Boolean(value && typeof value === "object" && locale in value);
-}
-
 export function ProductForm({
   product,
   categories,
+  brands,
 }: {
   product: ProductDetailDto | null;
   categories: CategoryNodeDto[];
+  brands: BrandOptionDto[];
 }) {
   const t = useT();
   const text = useContentText();
@@ -136,6 +151,7 @@ export function ProductForm({
     az: Boolean(product),
     ru: Boolean(product?.slug.ru),
     en: Boolean(product?.slug.en),
+    de: Boolean(product?.slug.de),
   });
   const [confirmTrash, setConfirmTrash] = useState(false);
   const [createProduct] = useCreateProductMutation();
@@ -159,8 +175,8 @@ export function ProductForm({
     });
   }
 
-  const modelMedia = values.modelId ? (mediaById.get(values.modelId) ?? null) : null;
-  const posterMedia = values.modelPosterId ? (mediaById.get(values.modelPosterId) ?? null) : null;
+  const videoMedia = values.videoId ? (mediaById.get(values.videoId) ?? null) : null;
+  const posterMedia = values.videoPosterId ? (mediaById.get(values.videoPosterId) ?? null) : null;
 
   const textInvalid = useMemo(() => {
     const result: Partial<Record<Locale, boolean>> = {};
@@ -299,10 +315,7 @@ export function ProductForm({
           main={
             <>
               <FormSection title={t("Əsas məlumat")}>
-                <LocaleTabs
-                  invalid={textInvalid}
-                  filled={{ ru: Boolean(name?.ru), en: Boolean(name?.en) }}
-                >
+                <LocaleTabs invalid={textInvalid} filled={filledLocales(name)}>
                   {(locale) => (
                     <>
                       <FormField
@@ -392,38 +405,67 @@ export function ProductForm({
                 <ProductGallery mediaById={mediaById} remember={remember} />
               </FormSection>
 
+              <FormSection title={t("Üstünlüklər")}>
+                <ProductBenefits />
+              </FormSection>
+
               <FormSection title={t("Texniki göstəricilər")}>
                 <ProductSpecs />
               </FormSection>
 
-              <FormSection title={t("3D model")}>
+              <FormSection title={t("Sənədlər")}>
+                <ProductDocuments mediaById={mediaById} remember={remember} />
+              </FormSection>
+
+              <FormSection title={t("Video")}>
                 <p className="text-meta text-muted-foreground">
-                  {t("İstəyə bağlıdır. GLB faylı və model yüklənənədək göstəriləcək poster şəkli.")}
+                  {t(
+                    "İstəyə bağlıdır. Video faylı yükləyin və ya YouTube kimi xarici link yazın, ikisindən biri. Video bütün dillərdə eynidir.",
+                  )}
                 </p>
                 <div className="grid gap-5 md:grid-cols-2">
                   <FormField
                     control={form.control}
-                    name="modelId"
-                    label={t("Model (GLB)")}
+                    name="videoId"
+                    label={t("Video faylı")}
                     render={({ field, id, invalid, describedBy }) => (
                       <ImagePicker
                         id={id}
-                        kind="model"
-                        label={t("Model")}
-                        value={modelMedia}
+                        kind="video"
+                        label={t("Video")}
+                        value={videoMedia}
                         invalid={invalid}
                         describedBy={describedBy}
                         onChange={(media) => {
                           if (media) remember([media]);
-                          field.onChange(media?.id ?? null);
-                          if (!media) form.setValue("modelPosterId", null, { shouldDirty: true });
+                          field.onChange(media?.id ?? "");
+                          if (media) form.setValue("videoUrl", "", { shouldDirty: true });
                         }}
                       />
                     )}
                   />
                   <FormField
                     control={form.control}
-                    name="modelPosterId"
+                    name="videoUrl"
+                    label={t("Video linki")}
+                    description={t("https:// ilə tam link, məsələn YouTube və ya Vimeo.")}
+                    render={({ field, id, invalid, describedBy }) => (
+                      <Input
+                        {...field}
+                        value={field.value ?? ""}
+                        id={id}
+                        type="url"
+                        inputMode="url"
+                        placeholder="https://"
+                        autoComplete="off"
+                        aria-invalid={invalid}
+                        aria-describedby={describedBy}
+                      />
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="videoPosterId"
                     label={t("Poster şəkli")}
                     render={({ field, id, invalid, describedBy }) => (
                       <ImagePicker
@@ -434,7 +476,7 @@ export function ProductForm({
                         describedBy={describedBy}
                         onChange={(media) => {
                           if (media) remember([media]);
-                          field.onChange(media?.id ?? null);
+                          field.onChange(media?.id ?? "");
                         }}
                       />
                     )}
@@ -555,9 +597,38 @@ export function ProductForm({
                 />
                 <FormField
                   control={form.control}
+                  name="brandId"
+                  label={t("Brend")}
+                  render={({ field, id, invalid, describedBy }) => (
+                    <Select
+                      value={field.value || noBrand}
+                      onValueChange={(value) => field.onChange(value === noBrand ? "" : value)}
+                    >
+                      <SelectTrigger
+                        id={id}
+                        className="w-full"
+                        aria-invalid={invalid}
+                        aria-describedby={describedBy}
+                        onBlur={field.onBlur}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value={noBrand}>{t("Brendsiz")}</SelectItem>
+                        {brands.map((brand) => (
+                          <SelectItem key={brand.id} value={brand.id}>
+                            {brand.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <FormField
+                  control={form.control}
                   name="sku"
-                  label={t("Artikul")}
-                  description={t("Məsələn, MLIK-020. Axtarışda istifadə olunur.")}
+                  label={t("Model kodu")}
+                  description={t("İstehsalçının model kodu. Axtarışda istifadə olunur.")}
                   render={({ field, id, invalid, describedBy }) => (
                     <Input
                       {...field}
@@ -576,6 +647,7 @@ export function ProductForm({
                   filled={{
                     ru: Boolean(values.seoTitle?.ru || values.seoDescription?.ru),
                     en: Boolean(values.seoTitle?.en || values.seoDescription?.en),
+                    de: Boolean(values.seoTitle?.de || values.seoDescription?.de),
                   }}
                 >
                   {(locale) => (
@@ -589,7 +661,7 @@ export function ProductForm({
                       onDescriptionChange={(next) =>
                         form.setValue(`seoDescription.${locale}`, next, { shouldDirty: true })
                       }
-                      fallbackTitle={`${name?.[locale] || name?.az || ""} | Mebline`}
+                      fallbackTitle={`${name?.[locale] || name?.az || ""} | CEWM`}
                       fallbackDescription={richTextToPlain(
                         (values.shortDescription?.[locale] ??
                           values.shortDescription?.az ??

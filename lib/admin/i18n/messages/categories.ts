@@ -163,3 +163,86 @@ export const en: Record<keyof typeof ru, string> = {
   "Kataloq menyusunda və kateqoriya kartında.": "In the catalogue menu and on the category card.",
   "Axtarış sistemləri": "Search engines",
 };
+
+export const de: Record<keyof typeof ru, string> = {
+  "Yeni kateqoriya": "Neue Kategorie",
+  Kateqoriyalar: "Kategorien",
+  Kateqoriya: "Kategorie",
+  "Kateqoriyalara qayıt": "Zurück zu den Kategorien",
+  "Kateqoriya tapılmadı.": "Kategorie nicht gefunden.",
+  "Kateqoriya yüklənmədi. Səhifəni yeniləyin.":
+    "Die Kategorie konnte nicht geladen werden. Bitte laden Sie die Seite neu.",
+  "«{name}» silindi, məhsullar «{target}» kateqoriyasına köçdü.":
+    "„{name}“ wurde gelöscht, die Produkte wurden in die Kategorie „{target}“ verschoben.",
+  "«{name}» silindi.": "„{name}“ wurde gelöscht.",
+  "«{name}» silinsin?": "„{name}“ löschen?",
+  "Bu əməliyyat geri qaytarılmır.": "Diese Aktion kann nicht rückgängig gemacht werden.",
+  "{count} məhsul hara köçsün?": "Wohin {count} {count|Produkt|Produkte} verschieben?",
+  "Köçürmə, bu kateqoriyadan çıxar": "Nicht verschieben, nur aus dieser Kategorie entfernen",
+  "Məhsulların başqa kateqoriyaları varsa, onlar dəyişmir.":
+    "Weitere Kategorien dieser Produkte bleiben unverändert.",
+  "Bu kateqoriyada məhsul yoxdur.": "Diese Kategorie enthält keine Produkte.",
+  "Alt kateqoriyalar silinmir: «{name}» altına keçəcək.":
+    "Unterkategorien werden nicht gelöscht: Sie werden unter „{name}“ verschoben.",
+  "Alt kateqoriyalar silinmir: əsas səviyyəyə keçəcək.":
+    "Unterkategorien werden nicht gelöscht: Sie werden auf die oberste Ebene verschoben.",
+  "Menyulardakı {count} keçid də silinəcək.":
+    "Zugehörige Menülinks werden ebenfalls gelöscht: {count}.",
+  "Ləğv et": "Abbrechen",
+  Sil: "Löschen",
+  "{label}: yerini dəyiş": "{label}: verschieben",
+  "{count} məhsul": "{count} {count|Produkt|Produkte}",
+  "alt kateqoriyaları var": "hat Unterkategorien",
+  Gizli: "Ausgeblendet",
+  "{name}: saytda göstər": "{name}: auf der Website anzeigen",
+  "Saytda görünür": "Auf der Website sichtbar",
+  "Saytda gizlədilib": "Auf der Website ausgeblendet",
+  "{name}: əməliyyatlar": "{name}: Aktionen",
+  "Redaktə et": "Bearbeiten",
+  Yuxarı: "Nach oben",
+  Aşağı: "Nach unten",
+  "Yuxarıdakının alt kateqoriyası et": "Zur Unterkategorie der Kategorie darüber machen",
+  "Əsas səviyyəyə çıxar": "Auf die oberste Ebene verschieben",
+  "«{name}» yerləşdirildi.": "„{name}“ wurde verschoben.",
+  "«{name}» yuxarı keçdi.": "„{name}“ wurde nach oben verschoben.",
+  "«{name}» aşağı keçdi.": "„{name}“ wurde nach unten verschoben.",
+  "«{name}» «{parent}» altına keçdi.": "„{name}“ wurde unter „{parent}“ verschoben.",
+  "«{name}» əsas səviyyəyə çıxdı.": "„{name}“ wurde auf die oberste Ebene verschoben.",
+  "«{name}» saytda göstərilir.": "„{name}“ wird jetzt auf der Website angezeigt.",
+  "«{name}» saytda gizlədildi.": "„{name}“ ist jetzt auf der Website ausgeblendet.",
+  "Sürüşdürərək sıranı dəyişin; sağa çəkərək alt kateqoriya edin. Klaviatura və telefonda sətir menyusundan istifadə edin.":
+    "Ziehen Sie Einträge, um die Reihenfolge zu ändern, und nach rechts, um eine Unterkategorie daraus zu machen. Mit der Tastatur und auf dem Smartphone verwenden Sie das Zeilenmenü.",
+  "Yenidən yüklə": "Neu laden",
+  "Kateqoriyalar yüklənmədi.": "Die Kategorien konnten nicht geladen werden.",
+  "Hələ kateqoriya yoxdur.": "Noch keine Kategorien vorhanden.",
+  "Kateqoriyalar ağacı": "Kategorienbaum",
+  "Saxlanıldı, saytda yeniləndi.": "Gespeichert und auf der Website aktualisiert.",
+  "Kateqoriya yaradıldı.": "Kategorie erstellt.",
+  "Formada səhvlər var. Qırmızı sahələri düzəldin.":
+    "Das Formular enthält Fehler. Bitte korrigieren Sie die rot markierten Felder.",
+  Saxlanılır: "Wird gespeichert…",
+  Saxla: "Speichern",
+  Yarat: "Erstellen",
+  "Son dəyişiklik: {date}": "Letzte Änderung: {date}",
+  "Kateqoriya saytın kataloq menyusunda və filtrlərində görünür.":
+    "Die Kategorie erscheint im Katalogmenü und in den Filtern der Website.",
+  "Əsas məlumat": "Grunddaten",
+  "Ad ({locale})": "Name ({locale})",
+  "Ünvan ({locale})": "Adresse ({locale})",
+  "Təsvir ({locale})": "Beschreibung ({locale})",
+  "Kateqoriya səhifəsində məhsulların altında göstərilir.":
+    "Wird auf der Kategorieseite unter den Produkten angezeigt.",
+  Yerləşmə: "Platzierung",
+  "Saytda göstər": "Auf der Website anzeigen",
+  "Gizli kateqoriya menyuda və kataloqda görünmür.":
+    "Eine ausgeblendete Kategorie erscheint weder im Menü noch im Katalog.",
+  "Üst kateqoriya": "Übergeordnete Kategorie",
+  "Alt kateqoriyaları olduğu üçün əsas səviyyədə qalır.":
+    "Bleibt auf der obersten Ebene, da sie Unterkategorien hat.",
+  "Sıranı kateqoriyalar siyahısında sürüşdürərək dəyişin.":
+    "Ändern Sie die Reihenfolge per Ziehen in der Kategorienliste.",
+  "Əsas səviyyə": "Oberste Ebene",
+  Şəkil: "Bild",
+  "Kataloq menyusunda və kateqoriya kartında.": "Im Katalogmenü und auf der Kategoriekarte.",
+  "Axtarış sistemləri": "Suchmaschinen",
+};

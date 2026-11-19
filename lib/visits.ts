@@ -4,7 +4,7 @@ import { sql } from "drizzle-orm";
 
 import { getDb } from "@/lib/db";
 import { siteVisits } from "@/lib/db/schema";
-import { clientIp, hashClientIp } from "@/lib/quote-requests/submit";
+import { clientIp, hashClientIp } from "@/lib/consultation-requests/submit";
 
 const siteTimeZone = "Asia/Baku";
 

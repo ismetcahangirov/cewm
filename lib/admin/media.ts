@@ -48,31 +48,27 @@ function contentUsage(key: SQL): SQL<number> {
   return sql<number>`(
     (select count(*) from products where products.description::text like ${needle} or products.short_description::text like ${needle})
     + (select count(*) from categories where categories.description::text like ${needle})
-    + (select count(*) from projects where projects.body::text like ${needle})
     + (select count(*) from pages where pages.content::text like ${needle})
     + (select count(*) from posts where posts.content::text like ${needle})
-    + (select count(*) from vacancies where vacancies.content::text like ${needle})
     + (select count(*) from settings where settings.home_sections::text like ${needle})
   )::int`;
 }
 
 function usageColumns(id: SQL, key: SQL) {
   return {
-    products: sql<number>`(select count(*) from products p where p.model_id = ${id} or p.model_poster_id = ${id}
-      or exists (select 1 from product_images pi where pi.product_id = p.id and pi.media_id = ${id}))::int`,
+    products: sql<number>`(select count(*) from products p where p.video_id = ${id} or p.video_poster_id = ${id}
+      or exists (select 1 from product_images pi where pi.product_id = p.id and pi.media_id = ${id})
+      or exists (select 1 from product_documents pd where pd.product_id = p.id and pd.media_id = ${id}))::int`,
     categories: sql<number>`(select count(*) from categories c where c.image_id = ${id})::int`,
-    projects: sql<number>`(select count(*) from projects pr where pr.cover_id = ${id}
-      or exists (select 1 from project_images pri where pri.project_id = pr.id and pri.media_id = ${id}))::int`,
+    brands: sql<number>`(select count(*) from brands b where b.logo_id = ${id})::int`,
     posts: sql<number>`(select count(*) from posts po where po.cover_id = ${id})::int`,
-    vacancies: sql<number>`(select count(*) from vacancies va where va.cover_id = ${id})::int`,
     pages: sql<number>`(select count(*) from pages pg where pg.cover_id = ${id})::int`,
-    logos: sql<number>`(select count(*) from logos l where l.image_id = ${id})::int`,
-    team: sql<number>`(select count(*) from team_members tm where tm.photo_id = ${id})::int`,
+    clients: sql<number>`(select count(*) from client_logos cl where cl.image_id = ${id})::int`,
+    contacts: sql<number>`(select count(*) from contact_persons cp where cp.photo_id = ${id})::int`,
+    films: sql<number>`(select count(*) from hero_films hf where hf.poster_id = ${id})::int`,
     settings: sql<number>`(select count(*) from settings s where ${id} in (s.logo_light_id, s.logo_dark_id, s.favicon_id, s.og_image_id, s.catalogue_file_id)
-      or exists (select 1 from jsonb_array_elements(s.hero_slides) hs where hs ->> 'imageId' = ${id}::text)
       or exists (select 1 from jsonb_array_elements(s.home_sections) hb where hb -> 'block' ->> 'mediaId' = ${id}::text or hb -> 'block' ->> 'posterId' = ${id}::text))::int`,
     content: contentUsage(key),
-    derived: sql<number>`(select count(*) from media d where d.original_id = ${id})::int`,
   } satisfies Record<keyof MediaUsage, SQL<number>>;
 }
 
@@ -203,11 +199,6 @@ const sharpFormats: Partial<Record<string, MediaType>> = {
 
 async function inspect(body: Buffer, declared: MediaType): Promise<Inspected | null> {
   const kind = mediaKindOf(declared);
-  if (kind === "model") {
-    return body.subarray(0, 4).toString("latin1") === "glTF" && body.readUInt32LE(4) === 2
-      ? { mimeType: "model/gltf-binary", width: null, height: null, lqip: null }
-      : null;
-  }
   if (kind === "video") {
     const isMp4 = body.subarray(4, 8).toString("latin1") === "ftyp";
     const isWebm = body.subarray(0, 4).toString("hex") === "1a45dfa3";

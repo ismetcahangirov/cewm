@@ -1,6 +1,6 @@
 "use client";
 
-import { Box, ChevronLeft, ChevronRight, FileText, Film, ImagePlus, Search, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, FileText, Film, ImagePlus, Search, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
@@ -35,7 +35,7 @@ export function MediaThumb({ media, sizes }: { media: MediaDto; sizes: string })
       <Image src={media.src} alt={media.alt ?? ""} fill sizes={sizes} className="object-contain" />
     );
   }
-  const Icon = kind === "model" ? Box : kind === "video" ? Film : FileText;
+  const Icon = kind === "video" ? Film : FileText;
   return (
     <span className="absolute inset-0 flex flex-col items-center justify-center gap-1 p-2 text-center text-meta text-muted-foreground">
       <Icon className="size-6" strokeWidth={1.5} aria-hidden="true" />

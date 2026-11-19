@@ -235,8 +235,8 @@ export function ProductsView({ role }: { role: UserRole }) {
           ),
         }),
         column.accessor("sku", {
-          header: t("Artikul"),
-          meta: { label: t("Artikul"), mobile: "hidden", className: "whitespace-nowrap" },
+          header: t("Model kodu"),
+          meta: { label: t("Model kodu"), mobile: "hidden", className: "whitespace-nowrap" },
           cell: ({ getValue }) => getValue<string | null>() ?? "—",
         }),
         column.display({

@@ -16,7 +16,7 @@ const serverSchema = z.object({
   SMTP_USER: z.string().min(1),
   SMTP_PASSWORD: z.string().min(1),
   SMTP_FROM: z.string().min(1),
-  QUOTE_NOTIFY_EMAIL: z.email(),
+  CONSULTATION_NOTIFY_EMAIL: z.email(),
 });
 
 export type ServerEnv = z.infer<typeof serverSchema>;
