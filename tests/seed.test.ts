@@ -74,4 +74,43 @@ describe("database seed", () => {
     expect(contact).toBeDefined();
     if (first.pages) expect(contact?.status).toBe("published");
   });
+
+  it("does not bring back starter categories the import or the admin renamed", async () => {
+    const db = getDb();
+    await seedDatabase(db);
+    const original = await db
+      .select({ id: categories.id, slug: categories.slug })
+      .from(categories)
+      .where(
+        inArray(
+          sql`${categories.slug} ->> 'az'`,
+          seedCategories.slice(0, 2).map((category) => category.slug.az),
+        ),
+      );
+    expect(original).toHaveLength(2);
+    const total = async () => {
+      const [row] = await db.select({ value: sql<number>`count(*)::int` }).from(categories);
+      return row?.value ?? 0;
+    };
+    try {
+      for (const row of original) {
+        const slug = { ...row.slug };
+        for (const locale of locales) slug[locale] = `renamed-${row.slug[locale] ?? locale}`;
+        await db
+          .update(categories)
+          .set({ slug: { ...slug, az: `renamed-${row.slug.az}` } })
+          .where(sql`${categories.id} = ${row.id}`);
+      }
+      const before = await total();
+      expect((await seedDatabase(db)).categories).toBe(0);
+      expect(await total()).toBe(before);
+    } finally {
+      for (const row of original) {
+        await db
+          .update(categories)
+          .set({ slug: row.slug })
+          .where(sql`${categories.id} = ${row.id}`);
+      }
+    }
+  });
 });

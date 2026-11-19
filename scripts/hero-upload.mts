@@ -14,6 +14,9 @@ import { z } from "zod";
 const load = createRequire(import.meta.url);
 const schema = load("../lib/db/schema") as typeof import("../lib/db/schema");
 const films = load("../lib/validation/hero-films") as typeof import("../lib/validation/hero-films");
+const remote = load(
+  "../lib/cache/remote-revalidate",
+) as typeof import("../lib/cache/remote-revalidate");
 
 const env = z
   .object({
@@ -257,7 +260,7 @@ try {
     [
       `Film ${prefix}: ${done} files uploaded (${(bytes / 1024 / 1024).toFixed(2)} MB) in ${seconds} s, ${uploads.length - done} already present`,
       `Registered hero film ${film?.id}${useFilm ? " and selected it for the home hero" : ""}`,
-      "Saving the home page in the admin (or a restart) refreshes the cached hero on the site.",
+      remote.describeRevalidation(await remote.requestPublicRevalidation()),
     ].join("\n"),
   );
 } finally {

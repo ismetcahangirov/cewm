@@ -14,7 +14,7 @@ export const PATCH = adminRoute<Context>(async (request, { params }) => {
   if ("response" in body) return body.response;
   const updated = await updateMediaText(target.id, body.data);
   if (!updated) return jsonError(404, "not-found", missing);
-  revalidatePublic("catalog");
+  revalidatePublic("catalog", "content", "settings");
   return Response.json(updated);
 });
 

@@ -271,6 +271,19 @@ describe("public quote submission", () => {
     expect(other.status).toBe(201);
   });
 
+  it("keeps the limit when one address sends many requests at once", async () => {
+    const ip = fakeIp();
+    const statuses = await Promise.all(
+      Array.from({ length: 12 }, (_, attempt) =>
+        submit(payload({ name: `Burst ${run} ${attempt}` }), ip).then(
+          (response) => response.status,
+        ),
+      ),
+    );
+    expect(statuses.filter((status) => status === 201)).toHaveLength(5);
+    expect(statuses.filter((status) => status === 429)).toHaveLength(7);
+  });
+
   it("keeps the request when the email fails", async () => {
     const error = vi.spyOn(console, "error").mockImplementation(() => undefined);
     mailState.fail = true;
