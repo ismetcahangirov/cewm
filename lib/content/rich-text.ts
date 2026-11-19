@@ -1,3 +1,6 @@
+import type { Locale } from "@/lib/i18n/config";
+import type { Localized } from "@/lib/i18n/localized";
+
 export type RichTextMark = {
   type: string;
   attrs?: Record<string, unknown>;
@@ -47,8 +50,8 @@ export function richTextToPlain(doc: RichTextDoc | null | undefined): string {
 }
 
 export function pickRichText(
-  field: { az: RichTextDoc; ru?: RichTextDoc | null; en?: RichTextDoc | null } | null | undefined,
-  locale: "az" | "ru" | "en",
+  field: Localized<RichTextDoc> | null | undefined,
+  locale: Locale,
 ): RichTextDoc | null {
   if (!field) return null;
   const value = field[locale];

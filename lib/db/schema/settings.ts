@@ -14,15 +14,15 @@ export type SettingsPhone = { label: Localized; number: string };
 
 export type SettingsSocial = { network: SocialNetwork; url: string };
 
-export type SettingsHeroSlide = {
-  imageId: string;
-  mobileImageId?: string | null;
-  title: Localized;
-  lead: Localized | null;
-  href: string | null;
+export type SettingsHero = {
+  headline: Localized;
+  subline: Localized | null;
+  ctaLabel: Localized | null;
+  ctaHref: string | null;
+  filmId: string | null;
 };
 
-export const homeSectionKeys = ["categories", "products", "projects", "logos"] as const;
+export const homeSectionKeys = ["categories", "products", "brands", "clients", "posts"] as const;
 
 export type HomeSectionKey = (typeof homeSectionKeys)[number];
 
@@ -30,7 +30,7 @@ export const customBlockLayouts = ["media-left", "media-right", "media-top", "ba
 
 export type CustomBlockLayout = (typeof customBlockLayouts)[number];
 
-export const customBlockTones = ["white", "cream", "graphite"] as const;
+export const customBlockTones = ["white", "light", "navy"] as const;
 
 export type CustomBlockTone = (typeof customBlockTones)[number];
 
@@ -82,11 +82,11 @@ export const settings = pgTable(
     mapUrl: text("map_url"),
     workingHours: localized("working_hours"),
     socials: jsonb("socials").$type<SettingsSocial[]>().notNull().default([]),
-    heroSlides: jsonb("hero_slides").$type<SettingsHeroSlide[]>().notNull().default([]),
+    hero: jsonb("hero").$type<SettingsHero>(),
     homeSections: jsonb("home_sections").$type<SettingsHomeSection[]>().notNull().default([]),
     whatsappNumber: text("whatsapp_number"),
     legalName: text("legal_name"),
-    quoteNotifyEmail: text("quote_notify_email"),
+    consultationNotifyEmail: text("consultation_notify_email"),
     seoTitle: localized("seo_title"),
     seoDescription: localized("seo_description"),
     ogImageId: uuid("og_image_id").references(() => media.id, { onDelete: "set null" }),

@@ -1,20 +1,18 @@
 import { relations } from "drizzle-orm";
 
 import {
+  brands,
   categories,
   productCategories,
+  productDocuments,
   productImages,
   productRelations,
   products,
 } from "./catalog";
-import { logos, pages, posts, projectImages, projects } from "./content";
+import { consultationRequestProducts, consultationRequests } from "./consultations";
+import { clientLogos, contactPersons, heroFilms, pages, posts } from "./content";
 import { media } from "./media";
 import { menuItems, menus } from "./navigation";
-import { quoteRequestProducts, quoteRequests } from "./quotes";
-
-export const mediaRelations = relations(media, ({ one }) => ({
-  original: one(media, { fields: [media.originalId], references: [media.id] }),
-}));
 
 export const categoriesRelations = relations(categories, ({ one, many }) => ({
   parent: one(categories, {
@@ -27,12 +25,27 @@ export const categoriesRelations = relations(categories, ({ one, many }) => ({
   products: many(productCategories),
 }));
 
+export const brandsRelations = relations(brands, ({ one, many }) => ({
+  logo: one(media, { fields: [brands.logoId], references: [media.id] }),
+  products: many(products),
+}));
+
 export const productsRelations = relations(products, ({ one, many }) => ({
+  brand: one(brands, { fields: [products.brandId], references: [brands.id] }),
   categories: many(productCategories),
   images: many(productImages),
+  documents: many(productDocuments),
   related: many(productRelations, { relationName: "product_related_from" }),
-  model: one(media, { fields: [products.modelId], references: [media.id] }),
-  modelPoster: one(media, { fields: [products.modelPosterId], references: [media.id] }),
+  video: one(media, {
+    fields: [products.videoId],
+    references: [media.id],
+    relationName: "product_video",
+  }),
+  videoPoster: one(media, {
+    fields: [products.videoPosterId],
+    references: [media.id],
+    relationName: "product_video_poster",
+  }),
 }));
 
 export const productCategoriesRelations = relations(productCategories, ({ one }) => ({
@@ -48,6 +61,11 @@ export const productImagesRelations = relations(productImages, ({ one }) => ({
   media: one(media, { fields: [productImages.mediaId], references: [media.id] }),
 }));
 
+export const productDocumentsRelations = relations(productDocuments, ({ one }) => ({
+  product: one(products, { fields: [productDocuments.productId], references: [products.id] }),
+  media: one(media, { fields: [productDocuments.mediaId], references: [media.id] }),
+}));
+
 export const productRelationsRelations = relations(productRelations, ({ one }) => ({
   product: one(products, {
     fields: [productRelations.productId],
@@ -55,16 +73,6 @@ export const productRelationsRelations = relations(productRelations, ({ one }) =
     relationName: "product_related_from",
   }),
   related: one(products, { fields: [productRelations.relatedId], references: [products.id] }),
-}));
-
-export const projectsRelations = relations(projects, ({ one, many }) => ({
-  cover: one(media, { fields: [projects.coverId], references: [media.id] }),
-  images: many(projectImages),
-}));
-
-export const projectImagesRelations = relations(projectImages, ({ one }) => ({
-  project: one(projects, { fields: [projectImages.projectId], references: [projects.id] }),
-  media: one(media, { fields: [projectImages.mediaId], references: [media.id] }),
 }));
 
 export const pagesRelations = relations(pages, ({ one }) => ({
@@ -75,8 +83,16 @@ export const postsRelations = relations(posts, ({ one }) => ({
   cover: one(media, { fields: [posts.coverId], references: [media.id] }),
 }));
 
-export const logosRelations = relations(logos, ({ one }) => ({
-  image: one(media, { fields: [logos.imageId], references: [media.id] }),
+export const clientLogosRelations = relations(clientLogos, ({ one }) => ({
+  image: one(media, { fields: [clientLogos.imageId], references: [media.id] }),
+}));
+
+export const contactPersonsRelations = relations(contactPersons, ({ one }) => ({
+  photo: one(media, { fields: [contactPersons.photoId], references: [media.id] }),
+}));
+
+export const heroFilmsRelations = relations(heroFilms, ({ one }) => ({
+  poster: one(media, { fields: [heroFilms.posterId], references: [media.id] }),
 }));
 
 export const menusRelations = relations(menus, ({ many }) => ({
@@ -93,17 +109,22 @@ export const menuItemsRelations = relations(menuItems, ({ one, many }) => ({
   children: many(menuItems, { relationName: "menu_item_parent" }),
   category: one(categories, { fields: [menuItems.categoryId], references: [categories.id] }),
   page: one(pages, { fields: [menuItems.pageId], references: [pages.id] }),
-  project: one(projects, { fields: [menuItems.projectId], references: [projects.id] }),
 }));
 
-export const quoteRequestsRelations = relations(quoteRequests, ({ many }) => ({
-  products: many(quoteRequestProducts),
+export const consultationRequestsRelations = relations(consultationRequests, ({ many }) => ({
+  products: many(consultationRequestProducts),
 }));
 
-export const quoteRequestProductsRelations = relations(quoteRequestProducts, ({ one }) => ({
-  quoteRequest: one(quoteRequests, {
-    fields: [quoteRequestProducts.quoteRequestId],
-    references: [quoteRequests.id],
+export const consultationRequestProductsRelations = relations(
+  consultationRequestProducts,
+  ({ one }) => ({
+    consultationRequest: one(consultationRequests, {
+      fields: [consultationRequestProducts.consultationRequestId],
+      references: [consultationRequests.id],
+    }),
+    product: one(products, {
+      fields: [consultationRequestProducts.productId],
+      references: [products.id],
+    }),
   }),
-  product: one(products, { fields: [quoteRequestProducts.productId], references: [products.id] }),
-}));
+);

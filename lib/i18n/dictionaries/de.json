@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "siteName": "CEWM",
+    "description": "CEWM: der HOMAG-Partner für Holzbearbeitungsmaschinen in Aserbaidschan. Maschinen und Beratung für Möbel- und Holzbearbeitungsbetriebe.",
+    "homeTitle": "CEWM: HOMAG-Holzbearbeitungsmaschinen in Aserbaidschan"
+  },
+  "common": {
+    "skipToContent": "Zum Inhalt springen",
+    "requestConsultation": "Beratung anfragen",
+    "language": "Sprache",
+    "more": "Mehr erfahren",
+    "home": "Startseite",
+    "mainNavigation": "Hauptmenü",
+    "allProducts": "Alle Produkte",
+    "catalogue": "Katalog (PDF)",
+    "breadcrumb": "Brotkrumennavigation",
+    "contactUs": "Kontakt aufnehmen",
+    "previous": "Zurück",
+    "next": "Weiter"
+  },
+  "contact": {
+    "title": "Kontakt",
+    "intro": "Rufen Sie uns an, schreiben Sie uns oder füllen Sie das Formular aus.",
+    "persons": "Ansprechpartner",
+    "phone": "Telefon",
+    "email": "E-Mail",
+    "address": "Adresse",
+    "hours": "Öffnungszeiten",
+    "openMap": "In der Karte öffnen",
+    "whatsapp": "Per WhatsApp schreiben",
+    "call": "{name}: anrufen",
+    "write": "{name}: E-Mail schreiben"
+  },
+  "footer": {
+    "contacts": "Kontakt",
+    "followUs": "Folgen Sie uns",
+    "rights": "Alle Rechte vorbehalten."
+  },
+  "home": {
+    "categoriesTitle": "Produktkategorien",
+    "productsTitle": "Ausgewählte Maschinen",
+    "brandsTitle": "Marken, die wir vertreten",
+    "clientsTitle": "Unsere Kunden",
+    "postsTitle": "Blog"
+  },
+  "catalog": {
+    "title": "Produkte",
+    "description": "Der CEWM-Katalog: Holzbearbeitungsmaschinen und Anlagen von HOMAG und Partnermarken.",
+    "indexTitle": "Produktkategorien",
+    "indexDescription": "Zuschnitt, Kantenanleimen, CNC-Bearbeitungszentren, Bohren und Dübeleintreiben, Montage, Verpackungstechnik und Software.",
+    "categories": "Kategorien",
+    "count": "{shown} von {total} Produkten",
+    "loadMore": "Mehr anzeigen",
+    "empty": "In diesem Bereich gibt es noch keine Produkte.",
+    "pageSuffix": "Seite {page}",
+    "categoryDescription": "{name}: Holzbearbeitungsmaschinen im CEWM-Katalog."
+  },
+  "product": {
+    "brand": "Marke",
+    "model": "Modell",
+    "benefits": "Vorteile",
+    "specs": "Technische Daten",
+    "parameter": "Merkmal",
+    "value": "Wert",
+    "documents": "Downloads",
+    "download": "Herunterladen",
+    "video": "Video",
+    "gallery": "Bilder",
+    "related": "Ähnliche Produkte",
+    "description": "{name} im CEWM-Katalog. Fordern Sie eine Beratung zu Preis und Technik an."
+  },
+  "blog": {
+    "title": "Blog",
+    "description": "Neuigkeiten von CEWM und Beiträge zur Holzbearbeitungstechnik.",
+    "read": "Lesen",
+    "empty": "Noch keine Beiträge.",
+    "related": "Weitere Beiträge",
+    "loadMore": "Mehr anzeigen",
+    "shown": "{shown} von {total} Beiträgen"
+  },
+  "brands": {
+    "title": "Marken",
+    "visit": "Website der Marke",
+    "empty": "Die Liste folgt in Kürze."
+  },
+  "clients": {
+    "title": "Kunden",
+    "empty": "Die Liste folgt in Kürze."
+  },
+  "consultation": {
+    "title": "Beratung anfragen",
+    "intro": "Füllen Sie das Formular aus, unser Fachberater meldet sich bei Ihnen.",
+    "name": "Vor- und Nachname",
+    "phone": "Telefon",
+    "phoneHint": "Zum Beispiel 050 123 45 67",
+    "email": "E-Mail",
+    "company": "Firma",
+    "message": "Nachricht",
+    "messagePlaceholder": "Welche Maschinen Sie interessieren, Ihr Produktionsvolumen, Ihre Fragen",
+    "products": "Ausgewählte Produkte",
+    "removeProduct": "Aus der Liste entfernen",
+    "submit": "Senden",
+    "sending": "Wird gesendet",
+    "required": "Pflichtfeld",
+    "errorName": "Geben Sie Ihren Namen ein (mindestens 2 Buchstaben).",
+    "errorPhone": "Geben Sie die Nummer als 050 123 45 67 oder +994 50 123 45 67 ein.",
+    "errorEmail": "Die E-Mail-Adresse ist ungültig.",
+    "errorTooLong": "Der Text ist zu lang.",
+    "errorGeneric": "Das Senden ist fehlgeschlagen. Versuchen Sie es später erneut oder rufen Sie uns an.",
+    "errorRateLimit": "In der letzten Stunde wurden zu viele Anfragen gesendet. Versuchen Sie es später erneut oder rufen Sie uns an.",
+    "successTitle": "Ihre Anfrage ist eingegangen",
+    "successBody": "Vielen Dank. Unser Fachberater meldet sich in Kürze bei Ihnen.",
+    "successLink": "Produkte ansehen",
+    "honeypot": "Dieses Feld leer lassen"
+  },
+  "locales": {
+    "az": "Azərbaycanca",
+    "ru": "Русский",
+    "en": "English",
+    "de": "Deutsch"
+  },
+  "notFound": {
+    "title": "Seite nicht gefunden",
+    "body": "Die gesuchte Seite wurde verschoben oder gelöscht.",
+    "home": "Zur Startseite",
+    "products": "Produkte"
+  },
+  "error": {
+    "title": "Ein Fehler ist aufgetreten",
+    "body": "Die Seite konnte nicht geladen werden. Bitte versuchen Sie es gleich noch einmal.",
+    "retry": "Erneut versuchen"
+  }
+}

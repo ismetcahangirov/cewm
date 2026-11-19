@@ -14,15 +14,9 @@ import {
 
 import { categories } from "./catalog";
 import { id, legacyKey, localized, timestamps } from "./columns";
-import { pages, projects } from "./content";
+import { pages } from "./content";
 
-export const menuItemTarget = pgEnum("menu_item_target", [
-  "none",
-  "category",
-  "page",
-  "project",
-  "url",
-]);
+export const menuItemTarget = pgEnum("menu_item_target", ["none", "category", "page", "url"]);
 
 export const menus = pgTable("menus", {
   id: id(),
@@ -47,7 +41,6 @@ export const menuItems = pgTable(
     target: menuItemTarget("target").notNull().default("none"),
     categoryId: uuid("category_id").references(() => categories.id, { onDelete: "cascade" }),
     pageId: uuid("page_id").references(() => pages.id, { onDelete: "cascade" }),
-    projectId: uuid("project_id").references(() => projects.id, { onDelete: "cascade" }),
     url: text("url"),
     sortOrder: integer("sort_order").notNull().default(0),
     legacyKey: legacyKey(),
@@ -59,7 +52,6 @@ export const menuItems = pgTable(
       "menu_items_target_ref",
       sql`(${t.target} <> 'category' or ${t.categoryId} is not null)
         and (${t.target} <> 'page' or ${t.pageId} is not null)
-        and (${t.target} <> 'project' or ${t.projectId} is not null)
         and (${t.target} <> 'url' or ${t.url} is not null)`,
     ),
   ],

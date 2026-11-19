@@ -1,90 +1,33 @@
 import {
   boolean,
-  date,
   index,
   integer,
+  jsonb,
   pgEnum,
   pgTable,
-  primaryKey,
   text,
   timestamp,
-  uniqueIndex,
   uuid,
 } from "drizzle-orm/pg-core";
 
 import {
   id,
   legacyKey,
-  localeKey,
   localized,
   localizedRichText,
   publishStatus,
+  slugIndexes,
   timestamps,
 } from "./columns";
 import { media } from "./media";
 
-export const projectType = pgEnum("project_type", ["completed", "3d-visual"]);
-
 export const pageKind = pgEnum("page_kind", [
   "about",
-  "references",
-  "partners",
-  "quote",
   "contact",
+  "consultation",
+  "brands",
+  "clients",
 ]);
-
-export const employmentType = pgEnum("employment_type", [
-  "full-time",
-  "part-time",
-  "contract",
-  "internship",
-]);
-
-export const logoGroup = pgEnum("logo_group", ["references", "partners"]);
-
-export const projects = pgTable(
-  "projects",
-  {
-    id: id(),
-    slug: localized("slug").notNull(),
-    title: localized("title").notNull(),
-    excerpt: localized("excerpt"),
-    body: localizedRichText("body"),
-    clientName: text("client_name"),
-    type: projectType("type").notNull().default("completed"),
-    coverId: uuid("cover_id").references(() => media.id, { onDelete: "set null" }),
-    status: publishStatus("status").notNull().default("draft"),
-    sortOrder: integer("sort_order").notNull().default(0),
-    seoTitle: localized("seo_title"),
-    seoDescription: localized("seo_description"),
-    legacyKey: legacyKey(),
-    ...timestamps,
-  },
-  (t) => [
-    index("projects_type_idx").on(t.type),
-    uniqueIndex("projects_slug_az_key").on(localeKey(t.slug, "az")),
-    uniqueIndex("projects_slug_ru_key").on(localeKey(t.slug, "ru")),
-    uniqueIndex("projects_slug_en_key").on(localeKey(t.slug, "en")),
-  ],
-);
-
-export const projectImages = pgTable(
-  "project_images",
-  {
-    projectId: uuid("project_id")
-      .notNull()
-      .references(() => projects.id, { onDelete: "cascade" }),
-    mediaId: uuid("media_id")
-      .notNull()
-      .references(() => media.id, { onDelete: "restrict" }),
-    position: integer("position").notNull(),
-    caption: localized("caption"),
-  },
-  (t) => [
-    primaryKey({ columns: [t.projectId, t.mediaId] }),
-    index("project_images_media_id_idx").on(t.mediaId),
-  ],
-);
 
 export const pages = pgTable(
   "pages",
@@ -101,11 +44,7 @@ export const pages = pgTable(
     legacyKey: legacyKey(),
     ...timestamps,
   },
-  (t) => [
-    uniqueIndex("pages_slug_az_key").on(localeKey(t.slug, "az")),
-    uniqueIndex("pages_slug_ru_key").on(localeKey(t.slug, "ru")),
-    uniqueIndex("pages_slug_en_key").on(localeKey(t.slug, "en")),
-  ],
+  (t) => [...slugIndexes("pages", t.slug)],
 );
 
 export const posts = pgTable(
@@ -124,44 +63,11 @@ export const posts = pgTable(
     legacyKey: legacyKey(),
     ...timestamps,
   },
-  (t) => [
-    index("posts_published_at_idx").on(t.publishedAt),
-    uniqueIndex("posts_slug_az_key").on(localeKey(t.slug, "az")),
-    uniqueIndex("posts_slug_ru_key").on(localeKey(t.slug, "ru")),
-    uniqueIndex("posts_slug_en_key").on(localeKey(t.slug, "en")),
-  ],
+  (t) => [index("posts_published_at_idx").on(t.publishedAt), ...slugIndexes("posts", t.slug)],
 );
 
-export const vacancies = pgTable(
-  "vacancies",
-  {
-    id: id(),
-    slug: localized("slug").notNull(),
-    title: localized("title").notNull(),
-    summary: localized("summary"),
-    content: localizedRichText("content"),
-    location: localized("location"),
-    employmentType: employmentType("employment_type").notNull().default("full-time"),
-    salary: localized("salary"),
-    applyEmail: text("apply_email"),
-    closesOn: date("closes_on"),
-    coverId: uuid("cover_id").references(() => media.id, { onDelete: "set null" }),
-    status: publishStatus("status").notNull().default("draft"),
-    publishedAt: timestamp("published_at", { withTimezone: true }),
-    seoTitle: localized("seo_title"),
-    seoDescription: localized("seo_description"),
-    ...timestamps,
-  },
-  (t) => [
-    index("vacancies_status_idx").on(t.status, t.publishedAt),
-    uniqueIndex("vacancies_slug_az_key").on(localeKey(t.slug, "az")),
-    uniqueIndex("vacancies_slug_ru_key").on(localeKey(t.slug, "ru")),
-    uniqueIndex("vacancies_slug_en_key").on(localeKey(t.slug, "en")),
-  ],
-);
-
-export const logos = pgTable(
-  "logos",
+export const clientLogos = pgTable(
+  "client_logos",
   {
     id: id(),
     name: text("name").notNull(),
@@ -169,29 +75,45 @@ export const logos = pgTable(
       .notNull()
       .references(() => media.id, { onDelete: "restrict" }),
     url: text("url"),
-    group: logoGroup("group").notNull(),
     sortOrder: integer("sort_order").notNull().default(0),
     isActive: boolean("is_active").notNull().default(true),
     legacyKey: legacyKey(),
     ...timestamps,
   },
-  (t) => [index("logos_group_idx").on(t.group, t.sortOrder)],
+  (t) => [index("client_logos_order_idx").on(t.isActive, t.sortOrder)],
 );
 
-export const teamMembers = pgTable(
-  "team_members",
+export const contactPersons = pgTable(
+  "contact_persons",
   {
     id: id(),
-    name: text("name").notNull(),
+    name: localized("name").notNull(),
     role: localized("role").notNull(),
-    bio: localized("bio"),
-    photoId: uuid("photo_id").references(() => media.id, { onDelete: "set null" }),
-    startedYear: integer("started_year"),
-    phone: text("phone"),
+    phones: jsonb("phones").$type<string[]>().notNull().default([]),
     email: text("email"),
+    whatsapp: text("whatsapp"),
+    photoId: uuid("photo_id").references(() => media.id, { onDelete: "set null" }),
     sortOrder: integer("sort_order").notNull().default(0),
     isActive: boolean("is_active").notNull().default(true),
     ...timestamps,
   },
-  (t) => [index("team_members_order_idx").on(t.isActive, t.sortOrder)],
+  (t) => [index("contact_persons_order_idx").on(t.isActive, t.sortOrder)],
 );
+
+export const heroFilmFormats = ["webp", "avif", "jpg"] as const;
+
+export type HeroFilmFormat = (typeof heroFilmFormats)[number];
+
+export const heroFilmFormat = pgEnum("hero_film_format", heroFilmFormats);
+
+export const heroFilms = pgTable("hero_films", {
+  id: id(),
+  name: text("name").notNull(),
+  keyPrefix: text("key_prefix").notNull().unique(),
+  frameCount: integer("frame_count").notNull(),
+  frameWidth: integer("frame_width").notNull(),
+  frameHeight: integer("frame_height").notNull(),
+  format: heroFilmFormat("format").notNull().default("webp"),
+  posterId: uuid("poster_id").references(() => media.id, { onDelete: "set null" }),
+  ...timestamps,
+});

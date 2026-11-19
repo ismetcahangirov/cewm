@@ -6,26 +6,26 @@ import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
 // tsx loads lib/ as CommonJS, whose `export *` re-exports are invisible to an ESM namespace import.
-const schema = createRequire(import.meta.url)(
-  "../lib/db/schema",
-) as typeof import("../lib/db/schema");
+const load = createRequire(import.meta.url);
+const schema = load("../lib/db/schema") as typeof import("../lib/db/schema");
+const { seedDatabase } = load("../lib/db/seed") as typeof import("../lib/db/seed");
 
 const url = process.env.DATABASE_URL;
 if (!url) throw new Error("DATABASE_URL is not set");
 
 const client = postgres(url, { max: 1 });
-const db = drizzle(client, { schema });
 
 try {
-  const inserted = await db
-    .insert(schema.settings)
-    .values({ id: 1, legalName: "Mebline" })
-    .onConflictDoNothing()
-    .returning({ id: schema.settings.id });
+  const summary = await seedDatabase(drizzle(client, { schema }));
   console.log(
-    inserted.length
-      ? "Seeded the settings row; run `pnpm migrate:wp` to import the WordPress content"
-      : "Settings row already present; nothing to seed",
+    [
+      summary.settings ? "settings row created" : "settings row already present",
+      `${summary.brands} brands`,
+      `${summary.categories} categories`,
+      `${summary.contactPersons} contact persons`,
+      `${summary.pages} pages`,
+      `${summary.menus} menus added`,
+    ].join(", "),
   );
 } finally {
   await client.end();

@@ -9,7 +9,6 @@ import {
   primaryKey,
   text,
   timestamp,
-  uniqueIndex,
   uuid,
   type AnyPgColumn,
 } from "drizzle-orm/pg-core";
@@ -18,15 +17,15 @@ import type { Localized } from "../../i18n/localized";
 import {
   id,
   legacyKey,
-  localeKey,
   localized,
   localizedRichText,
   publishStatus,
+  slugIndexes,
   timestamps,
 } from "./columns";
 import { media } from "./media";
 
-export type ProductSpec = { key: Localized; value: Localized };
+export type ProductSpec = { label: Localized; value: Localized; unit: Localized | null };
 
 export const categories = pgTable(
   "categories",
@@ -46,12 +45,24 @@ export const categories = pgTable(
     legacyKey: legacyKey(),
     ...timestamps,
   },
-  (t) => [
-    index("categories_parent_id_idx").on(t.parentId),
-    uniqueIndex("categories_slug_az_key").on(localeKey(t.slug, "az")),
-    uniqueIndex("categories_slug_ru_key").on(localeKey(t.slug, "ru")),
-    uniqueIndex("categories_slug_en_key").on(localeKey(t.slug, "en")),
-  ],
+  (t) => [index("categories_parent_id_idx").on(t.parentId), ...slugIndexes("categories", t.slug)],
+);
+
+export const brands = pgTable(
+  "brands",
+  {
+    id: id(),
+    name: text("name").notNull(),
+    slug: text("slug").notNull().unique(),
+    logoId: uuid("logo_id").references(() => media.id, { onDelete: "set null" }),
+    description: localized("description"),
+    websiteUrl: text("website_url"),
+    sortOrder: integer("sort_order").notNull().default(0),
+    isActive: boolean("is_active").notNull().default(true),
+    legacyKey: legacyKey(),
+    ...timestamps,
+  },
+  (t) => [index("brands_order_idx").on(t.isActive, t.sortOrder)],
 );
 
 export const products = pgTable(
@@ -63,9 +74,12 @@ export const products = pgTable(
     shortDescription: localizedRichText("short_description"),
     description: localizedRichText("description"),
     sku: text("sku"),
+    brandId: uuid("brand_id").references(() => brands.id, { onDelete: "set null" }),
+    benefits: jsonb("benefits").$type<Localized[]>().notNull().default([]),
     specs: jsonb("specs").$type<ProductSpec[]>().notNull().default([]),
-    modelId: uuid("model_id").references(() => media.id, { onDelete: "set null" }),
-    modelPosterId: uuid("model_poster_id").references(() => media.id, { onDelete: "set null" }),
+    videoId: uuid("video_id").references(() => media.id, { onDelete: "set null" }),
+    videoUrl: text("video_url"),
+    videoPosterId: uuid("video_poster_id").references(() => media.id, { onDelete: "set null" }),
     status: publishStatus("status").notNull().default("draft"),
     publishedAt: timestamp("published_at", { withTimezone: true }),
     deletedAt: timestamp("deleted_at", { withTimezone: true }),
@@ -81,9 +95,12 @@ export const products = pgTable(
     index("products_status_idx").on(t.status),
     index("products_deleted_at_idx").on(t.deletedAt),
     index("products_sku_idx").on(t.sku),
-    uniqueIndex("products_slug_az_key").on(localeKey(t.slug, "az")),
-    uniqueIndex("products_slug_ru_key").on(localeKey(t.slug, "ru")),
-    uniqueIndex("products_slug_en_key").on(localeKey(t.slug, "en")),
+    index("products_brand_id_idx").on(t.brandId),
+    ...slugIndexes("products", t.slug),
+    check(
+      "products_single_video",
+      sql`not (${t.videoId} is not null and ${t.videoUrl} is not null)`,
+    ),
   ],
 );
 
@@ -117,6 +134,24 @@ export const productImages = pgTable(
   (t) => [
     primaryKey({ columns: [t.productId, t.mediaId] }),
     index("product_images_media_id_idx").on(t.mediaId),
+  ],
+);
+
+export const productDocuments = pgTable(
+  "product_documents",
+  {
+    productId: uuid("product_id")
+      .notNull()
+      .references(() => products.id, { onDelete: "cascade" }),
+    mediaId: uuid("media_id")
+      .notNull()
+      .references(() => media.id, { onDelete: "restrict" }),
+    title: localized("title").notNull(),
+    position: integer("position").notNull(),
+  },
+  (t) => [
+    primaryKey({ columns: [t.productId, t.mediaId] }),
+    index("product_documents_media_id_idx").on(t.mediaId),
   ],
 );
 

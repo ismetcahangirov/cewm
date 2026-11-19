@@ -26,7 +26,7 @@ const input = z
   .safeParse(values);
 
 if (!input.success) {
-  console.error('Usage: pnpm auth:owner --email owner@mebline.az --name "Full Name"');
+  console.error('Usage: pnpm auth:owner --email owner@example.com --name "Full Name"');
   process.exit(1);
 }
 
