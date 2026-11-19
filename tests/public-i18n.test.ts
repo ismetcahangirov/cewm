@@ -45,6 +45,24 @@ describe("public dictionaries", () => {
     }
   });
 
+  it("keep each locale in its own script and free of emoji, shouting and glued suffixes", () => {
+    const emoji = /[\u{1F300}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B50}]/u;
+    const azerbaijaniLetters = /[əğışƏĞİŞ]/;
+    const cyrillic = /[Ѐ-ӿ]/;
+    const shouting = /\p{Lu}{5,}/u;
+    for (const locale of locales) {
+      for (const [key, value] of Object.entries(flatten(dictionaries[locale] as Tree))) {
+        const label = `${locale}: ${key}`;
+        expect(emoji.test(value), label).toBe(false);
+        expect(shouting.test(value.replace(/CEWM|HOMAG|WhatsApp|PDF/g, "")), label).toBe(false);
+        expect(/\{\w+\}-\p{L}/u.test(value), label).toBe(false);
+        if (key.startsWith("locales.")) continue;
+        if (locale !== "az") expect(azerbaijaniLetters.test(value), label).toBe(false);
+        if (locale !== "ru") expect(cyrillic.test(value), label).toBe(false);
+      }
+    }
+  });
+
   it("translate German on its own rather than copying English", () => {
     const english = flatten(en);
     const german = flatten(de);
