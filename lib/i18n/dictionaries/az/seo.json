@@ -1,0 +1,13 @@
+{
+  "eyebrow": {
+    "home": "Ofis mebeli",
+    "catalog": "Kataloq",
+    "projects": "Portfolio",
+    "blog": "Yazılar",
+    "vacancies": "Karyera"
+  },
+  "description": {
+    "product": "{name}: Mebline ofis mebeli kataloqunda. Qiymət üçün təklif alın.",
+    "project": "{name}: Mebline-ın ofis layihələrindən biri."
+  }
+}

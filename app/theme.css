@@ -1,0 +1,549 @@
+@font-face {
+  font-family: "Work Sans Latin Fallback";
+  src: local("Arial");
+  ascent-override: 83.09%;
+  descent-override: 21.71%;
+  line-gap-override: 0%;
+  size-adjust: 111.93%;
+  unicode-range: U+0000-036F, U+1E00-1EFF, U+2000-22FF;
+}
+
+@theme inline {
+  --animate-marquee: marquee var(--marquee-duration, 40s) linear infinite; /* logo strip, right to left; inline so the per-strip duration applies */
+  --font-sans:
+    "workSans", "workSansExtended", "Work Sans Latin Fallback", "Golos Text", "Golos Text Fallback",
+    ui-sans-serif, system-ui, sans-serif;
+  --font-brand:
+    "meblineDisplay", "workSans", "workSansExtended", "Work Sans Latin Fallback", ui-sans-serif,
+    system-ui, sans-serif; /* Mebline lettering: only M, e, b, l, i, n */
+}
+
+@theme {
+  --font-weight-text: 450; /* body copy and card titles, between normal and medium */
+  --color-*: initial;
+  --color-white: #ffffff;
+  --color-black: #000000; /* nav links, mega menu, input underline */
+  --color-fg: #303030; /* body text */
+  --color-heading: #444444; /* headings, outline-button text, badge background */
+  --color-graphite: #54565a; /* brand dark: filled buttons, dark band, dots, borders of outline buttons */
+  --color-muted: #767676; /* breadcrumb, card meta, captions; on white only */
+  --color-sand: #e1d4c7; /* text on graphite, downloads band, related band, form panel */
+  --color-cream: #f2e9dc; /* footer, statement band, large decorative numerals */
+  --color-taupe: #8f8373; /* the grey of the logo mark; scrollbar thumb */
+  --color-surface: #f5f5f5; /* product image background, FAQ band, sticky product sub-nav */
+  --color-chip: #dadada; /* active filter chip */
+  --color-line: #e6e6e6; /* default 1 px borders, filter bar */
+  --color-line-strong: #a1a1b3; /* accordion rows, list rows, spec rows */
+  --color-error: #e8024a; /* hsl(343 98% 46%), form errors and destructive actions */
+
+  --text-*: initial;
+  --text-display: clamp(2.625rem, 1.74rem + 3.62vw, 5rem); /* 42 -> 80 */
+  --text-display--line-height: calc(1em + 0.625rem);
+  --text-statement: clamp(2rem, 1.35rem + 2.667vw, 3.75rem); /* 32 -> 60 */
+  --text-statement--line-height: calc(1em + 0.625rem);
+  --text-h1: clamp(1.875rem, 1.41rem + 1.905vw, 3.125rem); /* 30 -> 50 */
+  --text-h1--line-height: calc(1em + 0.625rem);
+  --text-h2: clamp(1.75rem, 1.33rem + 1.714vw, 2.875rem); /* 28 -> 46 */
+  --text-h2--line-height: calc(1em + 0.625rem);
+  --text-intro: clamp(1.75rem, 1.565rem + 0.762vw, 2.25rem); /* 28 -> 36 */
+  --text-intro--line-height: calc(1em + 0.75rem);
+  --text-h3: clamp(1.375rem, 1.096rem + 1.143vw, 2.125rem); /* 22 -> 34 */
+  --text-h3--line-height: calc(1em + 0.625rem);
+  --text-h4: clamp(1.375rem, 1.19rem + 0.762vw, 1.875rem); /* 22 -> 30 */
+  --text-h4--line-height: calc(1em + 0.75rem);
+  --text-menu: 2rem; /* 32, mega menu level 1 */
+  --text-menu--line-height: 2.625rem;
+  --text-lead: clamp(1.125rem, 1.03rem + 0.381vw, 1.375rem); /* 18 -> 22 */
+  --text-lead--line-height: 1.55;
+  --text-card: 1.125rem; /* 18 */
+  --text-card--line-height: 1.875rem;
+  --text-base: clamp(1rem, 0.977rem + 0.095vw, 1.0625rem); /* 16 -> 17 */
+  --text-base--line-height: 1.76;
+  --text-small: clamp(0.875rem, 0.85rem + 0.095vw, 0.9375rem); /* 14 -> 15 */
+  --text-small--line-height: 1.67;
+  --text-meta: clamp(0.8125rem, 0.789rem + 0.095vw, 0.875rem); /* 13 -> 14 */
+  --text-meta--line-height: 1.71;
+  --text-badge: clamp(0.625rem, 0.555rem + 0.286vw, 0.8125rem); /* 10 -> 13 */
+  --text-badge--line-height: 0.75rem;
+
+  --breakpoint-xl: 75rem; /* 1200: desktop navigation appears */
+
+  --spacing-section: clamp(
+    3rem,
+    1.05rem + 6.5vw,
+    6.25rem
+  ); /* 48 -> 100, between sections and inside bands */
+  --spacing-column: clamp(
+    2.5rem,
+    1.75rem + 2.5vw,
+    3.75rem
+  ); /* 40 -> 60, gap between text columns */
+
+  --radius-*: initial;
+  --radius-xs: 2px; /* badge */
+  --radius-sm: 4px; /* sub-category chip, admin inputs */
+
+  --shadow-*: initial;
+  --shadow-header: 0 0 28px -10px rgb(0 0 0 / 0.75);
+  --shadow-chip: 0 0 10px 0 rgb(0 0 0 / 0.1);
+
+  --ease-standard: cubic-bezier(0.25, 0.1, 0.25, 1); /* CSS "ease" */
+  --ease-out: cubic-bezier(0, 0, 0.58, 1); /* CSS "ease-out" */
+  --ease-soft: cubic-bezier(0.165, 0.84, 0.44, 1); /* accordion content */
+
+  --animate-hero-zoom: hero-zoom 9s var(--ease-out) both;
+  --animate-draw-x: draw-x 1.4s var(--ease-standard) both;
+  --animate-panel-in: panel-in 350ms var(--ease-standard) both; /* menu and drawer panels */
+  --animate-fade-in: fade-in 400ms var(--ease-standard) both; /* mega menu photo swap */
+  --animate-reveal-up: reveal-up 700ms var(--ease-soft) both; /* hero text on load and slide change */
+
+  @keyframes hero-zoom {
+    from {
+      transform: scale(1.2);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translateX(24px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes reveal-up {
+    from {
+      opacity: 0;
+      translate: 0 3.75rem;
+    }
+    to {
+      opacity: 1;
+      translate: none;
+    }
+  }
+  @keyframes draw-x {
+    from {
+      transform: scaleX(0);
+    }
+    to {
+      transform: scaleX(1);
+    }
+  }
+}
+
+/* Header nav link: a 1 px line draws in from left to right on hover; stays for the current page or an open menu. */
+@utility nav-line {
+  position: relative;
+  &::after {
+    content: "";
+    position: absolute;
+    inset-inline: 0;
+    bottom: calc(var(--spacing) * 2.5);
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 300ms var(--ease-standard);
+  }
+  &[aria-current="page"]::after,
+  &[aria-expanded="true"]::after,
+  &:focus-visible::after {
+    transform: scaleX(1);
+  }
+  @media (hover: hover) {
+    &:hover::after {
+      transform: scaleX(1);
+    }
+  }
+}
+
+/* Horizontal card row whose cards share title and text lines through subgrid. */
+@utility card-row {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: auto auto auto;
+  grid-auto-columns: 80%;
+  @variant sm {
+    grid-auto-columns: 50%;
+  }
+  @variant lg {
+    grid-auto-columns: calc(100% / 3);
+  }
+}
+
+@utility container-page {
+  width: 100%;
+  max-width: 100rem; /* 1600 */
+  margin-inline: auto;
+  padding-inline: 1.25rem; /* 20 below 640 */
+  @media (width >= 40rem) {
+    padding-inline: 1.875rem; /* 30 from 640 */
+  }
+}
+
+@utility hero-h-full {
+  height: 75svh;
+  min-height: 35rem; /* 560 */
+  @media (width >= 40rem) {
+    height: 100svh;
+    max-height: 61.25rem; /* 980: 900 below an 80 px header */
+  }
+}
+
+@utility hero-h {
+  height: 75svh;
+  min-height: 35rem; /* 560 */
+  @media (width >= 40rem) {
+    height: calc(100svh - 4rem);
+    max-height: 56.25rem; /* 900 */
+  }
+  @media (width >= 75rem) {
+    height: calc(100svh - 5rem);
+  }
+}
+
+@layer base {
+  html {
+    color: var(--color-fg);
+    background: var(--color-white);
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    html {
+      scroll-behavior: smooth;
+    }
+  }
+  body {
+    font-weight: var(--font-weight-text);
+    font-size: var(--text-base);
+    line-height: var(--text-base--line-height);
+  }
+  h1,
+  h2,
+  h3,
+  h4 {
+    color: var(--color-heading);
+    font-weight: 400;
+    text-wrap: balance;
+  }
+  :focus-visible {
+    outline: 2px solid var(--color-graphite);
+    outline-offset: 2px;
+  }
+  .on-dark :focus-visible {
+    outline-color: var(--color-white);
+  }
+  ::selection {
+    background: var(--color-sand);
+    color: var(--color-black);
+  }
+  * {
+    border-color: var(--color-line);
+    scrollbar-width: thin;
+  }
+  html {
+    scrollbar-color: var(--color-taupe) var(--color-white);
+  }
+  @supports not (scrollbar-color: auto) {
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+    ::-webkit-scrollbar-track {
+      background: var(--color-white);
+    }
+    ::-webkit-scrollbar-thumb {
+      background: var(--color-taupe);
+      border: 2px solid var(--color-white);
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--color-graphite);
+    }
+    ::-webkit-scrollbar-corner {
+      background: var(--color-white);
+    }
+  }
+}
+
+/* Scroll reveal (turansk.com): hidden only while scripts run and motion is allowed; RevealObserver adds data-revealed once. */
+@media (scripting: enabled) and (prefers-reduced-motion: no-preference) {
+  [data-reveal] {
+    opacity: 0;
+    translate: 0 3.75rem;
+    transition:
+      opacity 700ms var(--ease-soft) var(--reveal-delay, 0ms),
+      translate 700ms var(--ease-soft) var(--reveal-delay, 0ms);
+  }
+  [data-reveal="left"] {
+    translate: -3.75rem 0;
+  }
+  [data-reveal="right"] {
+    translate: 3.75rem 0;
+  }
+  [data-reveal][data-revealed] {
+    opacity: 1;
+    translate: none;
+  }
+}
+[data-marquee]:hover > *,
+[data-marquee]:focus-within > * {
+  animation-play-state: paused;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-hero-zoom,
+  .animate-draw-x,
+  .animate-panel-in,
+  .animate-fade-in,
+  .animate-reveal-up,
+  .animate-marquee,
+  .animate-in,
+  .animate-out {
+    animation: none;
+  }
+  *,
+  ::before,
+  ::after {
+    transition-duration: 0s;
+  }
+}
+
+:root {
+  --background: #ffffff;
+  --foreground: #303030;
+  --card: #ffffff;
+  --card-foreground: #303030;
+  --popover: #ffffff;
+  --popover-foreground: #303030;
+  --primary: #54565a;
+  --primary-foreground: #ffffff;
+  --secondary: #f5f5f5;
+  --secondary-foreground: #303030;
+  --muted: #f5f5f5;
+  --muted-foreground: #767676;
+  --accent: #f2e9dc;
+  --accent-foreground: #000000;
+  --destructive: #e8024a;
+  --border: #e6e6e6;
+  --input: #e6e6e6;
+  --ring: #54565a;
+  --chart-1: #54565a;
+  --chart-2: #e1d4c7;
+  --chart-3: #767676;
+  --chart-4: #dadada;
+  --chart-5: #a1a1b3;
+  --sidebar: #f5f5f5;
+  --sidebar-foreground: #303030;
+  --sidebar-primary: #54565a;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #f2e9dc;
+  --sidebar-accent-foreground: #000000;
+  --sidebar-border: #e6e6e6;
+  --sidebar-ring: #54565a;
+  --radius: 0.25rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-chart-1: var(--chart-1);
+  --color-chart-2: var(--chart-2);
+  --color-chart-3: var(--chart-3);
+  --color-chart-4: var(--chart-4);
+  --color-chart-5: var(--chart-5);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+
+  --radius-md: var(--radius);
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius);
+
+  --shadow-xs: 0 0 0 0 transparent;
+  --shadow-sm: 0 0 0 0 transparent;
+  --shadow-md: var(--shadow-chip);
+  --shadow-lg: var(--shadow-chip);
+}
+
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@layer components {
+  .rich-text {
+    color: var(--color-fg);
+    > * + * {
+      margin-top: 1.25rem;
+    }
+    h2,
+    h3,
+    h4,
+    h5,
+    h6 {
+      margin-top: 2.5rem;
+      color: var(--color-heading);
+    }
+    h2 {
+      font-size: var(--text-h3);
+      line-height: var(--text-h3--line-height);
+      font-weight: 400;
+    }
+    h3,
+    h4,
+    h5,
+    h6 {
+      font-size: var(--text-h4);
+      line-height: var(--text-h4--line-height);
+      font-weight: 400;
+    }
+    strong {
+      font-weight: 500;
+    }
+    a {
+      text-decoration-line: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 4px;
+      transition: color 200ms var(--ease-standard);
+    }
+    a:hover {
+      color: var(--color-graphite);
+    }
+    ul,
+    ol {
+      padding-left: 1.25rem;
+    }
+    ul {
+      list-style-type: disc;
+    }
+    ol {
+      list-style-type: decimal;
+    }
+    li + li {
+      margin-top: 0.5rem;
+    }
+    li::marker {
+      color: var(--color-graphite);
+    }
+    blockquote {
+      border-left: 1px solid var(--color-graphite);
+      padding-left: 1.25rem;
+      font-size: var(--text-lead);
+      line-height: var(--text-lead--line-height);
+      color: var(--color-heading);
+    }
+    hr {
+      border-color: var(--color-line-strong);
+    }
+    figure img {
+      width: 100%;
+      height: auto;
+    }
+    figcaption {
+      margin-top: 0.625rem;
+      font-size: var(--text-meta);
+      line-height: var(--text-meta--line-height);
+      color: var(--color-muted);
+    }
+    .rich-table {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-small);
+      line-height: var(--text-small--line-height);
+    }
+    th,
+    td {
+      border-bottom: 1px solid var(--color-line-strong);
+      padding: 0.75rem 1rem 0.75rem 0;
+      text-align: left;
+      vertical-align: top;
+    }
+    th {
+      font-weight: 500;
+      color: var(--color-heading);
+    }
+    th > p,
+    td > p {
+      margin: 0;
+    }
+  }
+}
+
+/* Product page: the sticky sub-navigation follows the header, the phone quote bar keeps the footer readable. */
+@custom-variant header-hidden (&:where(body:has([data-site-header][data-hidden]) *));
+
+/* Over the hero the header is transparent; a mouse hover turns it white (touch has no hover to undo). */
+/* A page kept for back navigation stays in the DOM with an inline display: none, so its hero is skipped. */
+@custom-variant over-hero {
+  @media (hover: hover) and (pointer: fine) {
+    &:where(
+      body:has(main > [data-hero]:not([style*="display: none"]))
+        [data-site-header]:not([data-solid], :hover),
+      body:has(main > [data-hero]:not([style*="display: none"]))
+        [data-site-header]:not([data-solid], :hover)
+        *
+    ) {
+      @slot;
+    }
+  }
+  @media not ((hover: hover) and (pointer: fine)) {
+    &:where(
+      body:has(main > [data-hero]:not([style*="display: none"]))
+        [data-site-header]:not([data-solid]),
+      body:has(main > [data-hero]:not([style*="display: none"]))
+        [data-site-header]:not([data-solid])
+        *
+    ) {
+      @slot;
+    }
+  }
+}
+
+@media (width < 48rem) {
+  body:has([data-quote-bar]) {
+    padding-bottom: 3.5rem;
+  }
+}

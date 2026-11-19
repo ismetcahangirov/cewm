@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "siteName": "Mebline",
+    "description": "Bakıda ofis mebeli istehsalı: iş masaları, kürsülər, ofis divanları, rəflər və layihə əsasında mebel.",
+    "homeTitle": "Mebline: Bakıda ofis mebeli istehsalı"
+  },
+  "common": {
+    "skipToContent": "Məzmuna keç",
+    "requestQuote": "Təklif al",
+    "language": "Dil",
+    "more": "Ətraflı",
+    "all": "Hamısı",
+    "close": "Bağla",
+    "back": "Geri",
+    "previous": "Əvvəlki",
+    "next": "Növbəti",
+    "home": "Ana səhifə",
+    "mainNavigation": "Əsas menyu",
+    "openMenu": "Menyunu aç",
+    "closeMenu": "Menyunu bağla",
+    "allProducts": "Bütün məhsullar",
+    "projects": "Layihələr",
+    "catalogue": "Kataloq (PDF)",
+    "viewAllIn": "Bütün bölmə",
+    "breadcrumb": "Naviqasiya yolu",
+    "contactUs": "Bizimlə əlaqə"
+  },
+  "contact": {
+    "phone": "Telefon",
+    "email": "E-poçt",
+    "address": "Ünvan",
+    "hours": "İş saatları",
+    "openMap": "Xəritədə aç",
+    "whatsapp": "WhatsApp ilə yazın"
+  },
+  "footer": {
+    "statement": "Ofisiniz üçün təklif alın",
+    "contacts": "Əlaqə",
+    "followUs": "Bizi izləyin",
+    "social": "Sosial şəbəkələr"
+  },
+  "home": {
+    "slide": "Slayd",
+    "categoriesEyebrow": "Kateqoriyalar",
+    "categoriesTitle": "Ofis üçün mebel və həllər",
+    "productsTitle": "Seçilmiş məhsullar",
+    "projectsTitle": "Layihələr",
+    "visualProject": "3D vizual",
+    "ctaEyebrow": "Layihəniz var?",
+    "ctaTitle": "Ofisin ölçülərini göndərin, təklifi biz hazırlayaq",
+    "ctaBody": "Məhsulları seçin və ya otaqların planını əlavə edin. Mebline komandası mebel dəstini və qiyməti hazırlayıb sizinlə əlaqə saxlayacaq.",
+    "references": "Referanslar",
+    "partners": "Partnyorlarımız",
+    "soundOn": "Səsi aç",
+    "soundOff": "Səsi bağla"
+  },
+  "locales": {
+    "az": "Azərbaycanca",
+    "ru": "Русский",
+    "en": "English"
+  },
+  "notFound": {
+    "title": "Səhifə tapılmadı",
+    "body": "Axtardığınız səhifə köçürülüb və ya silinib.",
+    "home": "Ana səhifəyə qayıt",
+    "products": "Məhsullar",
+    "browse": "Kateqoriyalara baxın"
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "products": "Məhsullar",
+  "sections": "Məhsul bölmələri",
+  "features": "Xüsusiyyətlər",
+  "gallery": "Qalereya",
+  "related": "Oxşar məhsullar",
+  "specs": "Texniki göstəricilər",
+  "model": "Model",
+  "photos": "Məhsulun şəkilləri",
+  "photo": "Şəkil",
+  "openPhoto": "Şəkli böyüt",
+  "viewer": "Şəkillərə baxış",
+  "view3d": "3D-də bax",
+  "model3d": "3D model",
+  "project": {
+    "client": "Müştəri",
+    "type": "Növ",
+    "completed": "Tamamlanmış layihə",
+    "visual": "3D vizual",
+    "facts": "Layihə haqqında",
+    "story": "Layihənin şəkilləri",
+    "previous": "Əvvəlki layihə",
+    "next": "Növbəti layihə",
+    "neighbours": "Digər layihələr"
+  }
+}

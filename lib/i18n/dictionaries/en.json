@@ -1,0 +1,69 @@
+{
+  "meta": {
+    "siteName": "Mebline",
+    "description": "Office furniture made in Baku: desks, office chairs, sofas, shelving and furniture built to a project.",
+    "homeTitle": "Mebline: office furniture made in Baku"
+  },
+  "common": {
+    "skipToContent": "Skip to content",
+    "requestQuote": "Request a quote",
+    "language": "Language",
+    "more": "Learn more",
+    "all": "View all",
+    "close": "Close",
+    "back": "Back",
+    "previous": "Previous",
+    "next": "Next",
+    "home": "Home",
+    "mainNavigation": "Main menu",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "allProducts": "All products",
+    "projects": "Projects",
+    "catalogue": "Catalogue (PDF)",
+    "viewAllIn": "Whole section",
+    "breadcrumb": "Breadcrumb",
+    "contactUs": "Contact us"
+  },
+  "contact": {
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "hours": "Opening hours",
+    "openMap": "Open in maps",
+    "whatsapp": "Message us on WhatsApp"
+  },
+  "footer": {
+    "statement": "Get a quote for your office",
+    "contacts": "Contact",
+    "followUs": "Follow us",
+    "social": "Social media"
+  },
+  "home": {
+    "slide": "Slide",
+    "categoriesEyebrow": "Categories",
+    "categoriesTitle": "Furniture and fit-out for offices",
+    "productsTitle": "Featured products",
+    "projectsTitle": "Projects",
+    "visualProject": "3D visual",
+    "ctaEyebrow": "Have a project?",
+    "ctaTitle": "Send us your office dimensions and we will prepare the quote",
+    "ctaBody": "Choose products or attach a floor plan. The Mebline team will put together the furniture set and the price, then get in touch.",
+    "references": "References",
+    "partners": "Partners",
+    "soundOn": "Turn sound on",
+    "soundOff": "Turn sound off"
+  },
+  "locales": {
+    "az": "Azərbaycanca",
+    "ru": "Русский",
+    "en": "English"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you are looking for has moved or been removed.",
+    "home": "Back to the home page",
+    "products": "Products",
+    "browse": "Browse the categories"
+  }
+}

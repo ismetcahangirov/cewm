@@ -1,0 +1,13 @@
+{
+  "title": "Products",
+  "description": "The Mebline office furniture catalogue: desks, chairs, sofas, shelving and other office products.",
+  "indexTitle": "Product categories",
+  "indexDescription": "Mebline office furniture categories: executive and manager suites, workstations, meeting tables, chairs, reception, soft seating and metal furniture.",
+  "categoriesLabel": "Categories",
+  "productsLabel": "Products",
+  "count": "{shown} / {total} products",
+  "loadMore": "Load more",
+  "empty": "There are no products in this section yet.",
+  "pageSuffix": "Page {page}",
+  "categoryDescription": "{name}: products in the Mebline office furniture catalogue."
+}

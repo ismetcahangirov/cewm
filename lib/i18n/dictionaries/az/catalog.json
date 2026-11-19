@@ -1,0 +1,13 @@
+{
+  "title": "Məhsullar",
+  "description": "Mebline ofis mebeli kataloqu: iş masaları, kürsülər, divanlar, rəflər və digər ofis məhsulları.",
+  "indexTitle": "Məhsul kateqoriyaları",
+  "indexDescription": "Mebline ofis mebeli kateqoriyaları: rəhbər və menecer dəstləri, iş yerləri, toplantı masaları, kürsülər, resepşn, yumşaq və metal mebel.",
+  "categoriesLabel": "Kateqoriyalar",
+  "productsLabel": "Məhsullar",
+  "count": "{shown} / {total} məhsul",
+  "loadMore": "Daha çox",
+  "empty": "Bu bölmədə hələ məhsul yoxdur.",
+  "pageSuffix": "Səhifə {page}",
+  "categoryDescription": "{name}: Mebline ofis mebeli kataloqunda məhsullar."
+}

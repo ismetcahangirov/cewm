@@ -1,0 +1,111 @@
+import type { Messages } from "../translate";
+
+export const ru = {
+  İstifadəçilər: "Пользователи",
+  Deaktiv: "Отключён",
+  "Dəvət gözləyir": "Ожидает приглашения",
+  Aktiv: "Активен",
+  "«{name}» üçün rol sahib olsun?": "Сделать «{name}» владельцем?",
+  "«{name}» üçün rol redaktor olsun?": "Сделать «{name}» редактором?",
+  "Sahib bütün bölmələri və istifadəçiləri idarə edə bilir.":
+    "Владелец управляет всеми разделами и пользователями.",
+  "Redaktor istifadəçiləri görmür və onları idarə edə bilmir.":
+    "Редактор не видит пользователей и не может ими управлять.",
+  "Rolu dəyiş": "Сменить роль",
+  "«{name}» yenidən aktiv edilsin?": "Снова активировать «{name}»?",
+  "İstifadəçi öz şifrəsi ilə yenidən daxil ola biləcək.":
+    "Пользователь снова сможет войти со своим паролем.",
+  "Aktiv et": "Активировать",
+  "«{name}» deaktiv edilsin?": "Отключить «{name}»?",
+  "Bütün açıq sessiyaları bağlanacaq və daxil ola bilməyəcək.":
+    "Все открытые сеансы будут закрыты, и войти будет нельзя.",
+  "Deaktiv et": "Отключить",
+  Ad: "Имя",
+  "(siz)": "(вы)",
+  "E-poçt": "Эл. почта",
+  Rol: "Роль",
+  Status: "Статус",
+  "Son giriş": "Последний вход",
+  "Əlavə olunub": "Добавлен",
+  "{name}: rol dəyişdi.": "{name}: роль изменена.",
+  "{name} aktiv edildi.": "{name}: активирован.",
+  "{name} deaktiv edildi.": "{name}: отключён.",
+  "Dəvət yenidən göndərildi: {email}": "Приглашение отправлено повторно: {email}",
+  "{name}: əməliyyatlar": "{name}: действия",
+  "Sahib et": "Сделать владельцем",
+  "Redaktor et": "Сделать редактором",
+  "Dəvəti yenidən göndər": "Отправить приглашение повторно",
+  "İdarə panelinə kimin daxil ola biləcəyini burada idarə edin.":
+    "Здесь вы управляете тем, кто может входить в панель управления.",
+  "Yenidən yüklə": "Загрузить снова",
+  "İstifadəçilər yüklənmədi.": "Не удалось загрузить пользователей.",
+  "Ad və ya e-poçt ilə axtar": "Поиск по имени или эл. почте",
+  "Axtarışa uyğun istifadəçi tapılmadı.": "Пользователей по запросу не найдено.",
+  "Hələ istifadəçi yoxdur.": "Пользователей пока нет.",
+  "Bütün bölmələr və istifadəçilərin idarəsi.": "Управление всеми разделами и пользователями.",
+  "Kataloq, məzmun və müraciətlər. İstifadəçiləri görmür.":
+    "Каталог, контент и заявки. Пользователей не видит.",
+  "Dəvət göndərildi: {email}": "Приглашение отправлено: {email}",
+  "İstifadəçi dəvət et": "Пригласить пользователя",
+  "Göstərilən ünvana şifrə təyin etmək üçün link göndəriləcək. Link 24 saat etibarlıdır.":
+    "На указанный адрес придёт ссылка для установки пароля. Ссылка действует 24 часа.",
+  "Ad və soyad": "Имя и фамилия",
+  "Ləğv et": "Отмена",
+  Göndərilir: "Отправка",
+  "Dəvət göndər": "Отправить приглашение",
+} satisfies Messages;
+
+export const en: Record<keyof typeof ru, string> = {
+  İstifadəçilər: "Users",
+  Deaktiv: "Deactivated",
+  "Dəvət gözləyir": "Invite pending",
+  Aktiv: "Active",
+  "«{name}» üçün rol sahib olsun?": "Make “{name}” an owner?",
+  "«{name}» üçün rol redaktor olsun?": "Make “{name}” an editor?",
+  "Sahib bütün bölmələri və istifadəçiləri idarə edə bilir.":
+    "An owner can manage every section and all users.",
+  "Redaktor istifadəçiləri görmür və onları idarə edə bilmir.":
+    "An editor does not see users and cannot manage them.",
+  "Rolu dəyiş": "Change role",
+  "«{name}» yenidən aktiv edilsin?": "Reactivate “{name}”?",
+  "İstifadəçi öz şifrəsi ilə yenidən daxil ola biləcək.":
+    "The user will be able to sign in again with their own password.",
+  "Aktiv et": "Activate",
+  "«{name}» deaktiv edilsin?": "Deactivate “{name}”?",
+  "Bütün açıq sessiyaları bağlanacaq və daxil ola bilməyəcək.":
+    "All open sessions will be closed and they will not be able to sign in.",
+  "Deaktiv et": "Deactivate",
+  Ad: "Name",
+  "(siz)": "(you)",
+  "E-poçt": "Email",
+  Rol: "Role",
+  Status: "Status",
+  "Son giriş": "Last sign-in",
+  "Əlavə olunub": "Added",
+  "{name}: rol dəyişdi.": "{name}: role changed.",
+  "{name} aktiv edildi.": "{name} was activated.",
+  "{name} deaktiv edildi.": "{name} was deactivated.",
+  "Dəvət yenidən göndərildi: {email}": "Invite sent again: {email}",
+  "{name}: əməliyyatlar": "{name}: actions",
+  "Sahib et": "Make owner",
+  "Redaktor et": "Make editor",
+  "Dəvəti yenidən göndər": "Resend invite",
+  "İdarə panelinə kimin daxil ola biləcəyini burada idarə edin.":
+    "Manage who can sign in to the dashboard here.",
+  "Yenidən yüklə": "Reload",
+  "İstifadəçilər yüklənmədi.": "Users could not be loaded.",
+  "Ad və ya e-poçt ilə axtar": "Search by name or email",
+  "Axtarışa uyğun istifadəçi tapılmadı.": "No users match the search.",
+  "Hələ istifadəçi yoxdur.": "No users yet.",
+  "Bütün bölmələr və istifadəçilərin idarəsi.": "Manages every section and all users.",
+  "Kataloq, məzmun və müraciətlər. İstifadəçiləri görmür.":
+    "Catalogue, content and requests. Does not see users.",
+  "Dəvət göndərildi: {email}": "Invite sent: {email}",
+  "İstifadəçi dəvət et": "Invite user",
+  "Göstərilən ünvana şifrə təyin etmək üçün link göndəriləcək. Link 24 saat etibarlıdır.":
+    "A link to set a password will be sent to this address. The link is valid for 24 hours.",
+  "Ad və soyad": "Full name",
+  "Ləğv et": "Cancel",
+  Göndərilir: "Sending",
+  "Dəvət göndər": "Send invite",
+};

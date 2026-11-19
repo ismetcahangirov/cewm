@@ -1,0 +1,193 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+  contents: read
+
+env:
+  NEXT_TELEMETRY_DISABLED: 1
+
+jobs:
+  checks:
+    name: Lint, format, typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint
+      - run: pnpm format:check
+      - run: pnpm typecheck
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - uses: actions/cache@v4
+        with:
+          path: .next/cache
+          key: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-${{ hashFiles('app/**', 'components/**', 'lib/**') }}
+          restore-keys: next-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}-
+      - run: pnpm build
+
+  migrations:
+    name: Database migrations
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: mebline
+          POSTGRES_PASSWORD: mebline
+          POSTGRES_DB: mebline
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mebline -d mebline"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgres://mebline:mebline@localhost:5432/mebline
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Schema and migrations are in sync
+        run: |
+          pnpm db:generate
+          git diff --exit-code -- drizzle
+          test -z "$(git status --porcelain -- drizzle)"
+      - run: pnpm db:migrate
+      - name: Migrations are idempotent
+        run: pnpm db:migrate
+      - run: pnpm db:seed
+
+  tests:
+    name: Tests
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:17-alpine
+        env:
+          POSTGRES_USER: mebline
+          POSTGRES_PASSWORD: mebline
+          POSTGRES_DB: mebline
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mebline -d mebline"
+          --health-interval 5s
+          --health-timeout 3s
+          --health-retries 10
+      mailpit:
+        image: axllent/mailpit:v1.31
+        ports:
+          - 1025:1025
+          - 8025:8025
+      storage:
+        image: rustfs/rustfs:1.0.3
+        env:
+          RUSTFS_ACCESS_KEY: mebline
+          RUSTFS_SECRET_KEY: mebline-secret
+        ports:
+          - 9000:9000
+    env:
+      DATABASE_URL: postgres://mebline:mebline@localhost:5432/mebline
+      BETTER_AUTH_SECRET: ci-only-secret-not-used-anywhere-else-0123456789
+      BETTER_AUTH_URL: http://localhost:3000
+      S3_ENDPOINT: http://localhost:9000
+      S3_REGION: eu-central
+      S3_BUCKET: mebline
+      S3_ACCESS_KEY_ID: mebline
+      S3_SECRET_ACCESS_KEY: mebline-secret
+      SMTP_HOST: localhost
+      SMTP_PORT: 1025
+      SMTP_USER: mebline
+      SMTP_PASSWORD: mebline
+      SMTP_FROM: Mebline <no-reply@mebline.az>
+      QUOTE_NOTIFY_EMAIL: info@mebline.az
+      MAILPIT_URL: http://localhost:8025
+    steps:
+      - uses: actions/checkout@v5
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Wait for object storage
+        run: |
+          for i in $(seq 1 30); do
+            curl -s -o /dev/null http://localhost:9000 && exit 0
+            sleep 1
+          done
+          exit 1
+      - run: pnpm db:migrate
+      - run: pnpm test
+
+  docker:
+    name: Docker image
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: docker/setup-buildx-action@v3
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          load: true
+          tags: mebline:ci
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Health route answers from the container
+        run: |
+          docker run -d --name mebline -p 3000:3000 mebline:ci
+          for i in $(seq 1 30); do
+            if curl -fsS http://localhost:3000/api/health; then exit 0; fi
+            sleep 1
+          done
+          docker logs mebline
+          exit 1
+
+  ci-complete:
+    name: CI complete
+    if: always()
+    needs: [checks, build, migrations, tests, docker]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Every job that ran succeeded
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          echo "$RESULTS"
+          failed=$(echo "$RESULTS" | jq -r 'to_entries[] | select(.value.result != "success" and .value.result != "skipped") | .key')
+          for job in checks build migrations tests docker; do
+            echo "$RESULTS" | jq -e --arg j "$job" 'has($j)' > /dev/null || { echo "missing job: $job"; exit 1; }
+          done
+          if [ -n "$failed" ]; then
+            echo "Failed jobs: $failed"
+            exit 1
+          fi
