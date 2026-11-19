@@ -1,4 +1,5 @@
 import { eq, inArray } from "drizzle-orm";
+import { revalidateTag } from "next/cache";
 import sharp from "sharp";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -81,6 +82,19 @@ describe("media administration", () => {
     expect(page.rows.map((row) => row.id)).toContain(item.id);
   });
 
+  it("expires every public tag when alt text changes, so logos, contact photos and the hero poster follow", async () => {
+    const item = await register(await upload("alt-tags", await png(15)));
+    vi.mocked(revalidateTag).mockClear();
+    const saved = await call("/api/admin/media/[id]", "PATCH", {
+      cookie,
+      params: { id: item.id },
+      body: { alt: { az: "Yeni alt mətn" } },
+    });
+    expect(saved.status).toBe(200);
+    const tags = vi.mocked(revalidateTag).mock.calls.map(([tag]) => tag);
+    expect(tags).toEqual(expect.arrayContaining(["catalog", "content", "settings"]));
+  });
+
   it("lists where a file is used and refuses to delete it meanwhile", async () => {
     const item = await register(await upload("used", await png(40)));
     const [product] = await getDb()
@@ -147,12 +161,29 @@ describe("media administration", () => {
     expect(JSON.stringify(row?.description)).not.toContain(oldKey);
     expect(await objectExists(oldKey)).toBe(false);
     expect(await objectExists(newKey)).toBe(true);
+
+    const retried = await call("/api/admin/media/[id]/replace", "POST", {
+      cookie,
+      params: { id: item.id },
+      body: { key: newKey },
+    });
+    expect(retried.status).toBe(200);
+    expect(((await retried.json()) as MediaDto).key).toBe(newKey);
+    expect(await objectExists(newKey)).toBe(true);
   });
 
   it("refuses a replacement of another kind or one already in the library", async () => {
     const first = await register(await upload("first", await png(70)));
     const secondBytes = await png(80);
-    await register(await upload("second", secondBytes));
+    const second = await register(await upload("second", secondBytes));
+
+    const taken = await call("/api/admin/media/[id]/replace", "POST", {
+      cookie,
+      params: { id: first.id },
+      body: { key: second.key },
+    });
+    expect(taken.status).toBe(409);
+    expect(await objectExists(second.key)).toBe(true);
 
     const pdfKey = `uploads/2026/11/doc-${run}.pdf`;
     keys.push(pdfKey);

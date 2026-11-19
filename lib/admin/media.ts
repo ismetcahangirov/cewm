@@ -453,6 +453,9 @@ export async function replaceMedia(id: string, key: string): Promise<ReplaceMedi
   const db = getDb();
   const current = await findMedia(id);
   if (!current) return { status: "not-found", message: "Fayl tapılmadı." };
+  if (current.key === key) return { status: "replaced", media: toMediaDto(current) };
+  const [owner] = await db.select({ id: media.id }).from(media).where(eq(media.key, key));
+  if (owner) return { status: "duplicate", message: "Bu fayl kitabxanada artıq var." };
 
   const declared = declaredTypeOf(key);
   const body = await readMediaBytes(key);
