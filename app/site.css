@@ -674,7 +674,7 @@
 
 .stack {
   --stack-height: min(66svh, 40rem);
-  --word-column: 28cqw;
+  --word-column: max(5.25rem, 26cqw);
   --photo-column: clamp(10rem, 30cqw, 26rem);
   display: grid;
   grid-auto-rows: 1fr;
@@ -711,20 +711,23 @@
 }
 
 .stack-word {
-  min-width: 0;
-  padding: 1.75rem 0.5rem 1.75rem 1.75rem;
+  align-self: stretch;
+  justify-self: center;
+  padding: 1.375rem 0.08em;
+  overflow: clip;
   font-family: var(--font-display);
-  font-size: clamp(
-    1.75rem,
-    calc((var(--word-column) - 2.25rem) / (var(--chars) * 0.52)),
-    min(5.5rem, 9.5svh)
+  font-size: min(
+    clamp(3rem, 9.5svh, 8rem),
+    calc((var(--word-room, var(--stack-height) - 2.75rem)) / (var(--chars) * 0.56)),
+    calc((var(--word-column) - 1rem) / (var(--lines) * 0.95))
   );
   font-weight: var(--font-weight-medium);
-  line-height: 0.95;
+  line-height: 0.92;
   letter-spacing: -0.045em;
-  text-align: start;
-  hyphens: auto;
-  overflow-wrap: anywhere;
+  text-align: center;
+  white-space: nowrap;
+  writing-mode: vertical-rl;
+  transform: rotate(180deg);
 }
 
 .stack-word-line {
@@ -785,6 +788,9 @@
 }
 
 @media (max-width: 767px) {
+  .stack {
+    --word-column: 27cqw;
+  }
   .stack-card {
     grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto 1fr;
@@ -795,19 +801,14 @@
     align-self: auto;
   }
   .stack-text {
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 30% minmax(0, 1fr);
     grid-row: 2;
-    align-self: center;
-    gap: 0.875rem;
-    padding: 1.375rem 1.125rem 1.5rem;
-  }
-  .stack-word {
-    padding: 0;
-    font-size: clamp(1.75rem, 11cqw, 3rem);
+    align-self: stretch;
+    --word-room: calc(var(--stack-height) - 56.25cqw - 2.75rem);
   }
   .stack-body {
-    padding: 0;
+    padding: 1.375rem 1.125rem 1.375rem 0.25rem;
   }
 }
 
