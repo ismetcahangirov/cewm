@@ -2,6 +2,8 @@ import type { CSSProperties } from "react";
 
 import { cx } from "@/lib/cx";
 
+import { ModelText } from "./model-text";
+
 const sizes = {
   h1: { className: "text-h1", fit: "var(--text-h1)" },
   h2: { className: "text-h2", fit: "var(--text-h2)" },
@@ -35,7 +37,7 @@ export function FitHeading({
         className={cx("fit-title", sizes[size].className, className)}
         style={{ "--fit": sizes[size].fit, "--longest": longestWord(text) } as CSSProperties}
       >
-        {text}
+        <ModelText text={text} />
       </Tag>
     </div>
   );

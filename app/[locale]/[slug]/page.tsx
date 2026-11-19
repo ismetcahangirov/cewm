@@ -485,7 +485,7 @@ function ArticlePage({ page, locale, dict, extra }: PageProps2 & { extra?: React
               src={page.cover.src}
               alt={page.cover.alt}
               fill
-              sizes="100vw"
+              sizes="(min-width: 768px) 150vw, 140vw"
               loading="eager"
               className="object-cover"
             />

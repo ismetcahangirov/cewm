@@ -37,7 +37,7 @@ export type GalleryLabels = {
   position: string;
 };
 
-const stageSizes = "(min-width: 1024px) 58vw, 100vw";
+const stageSizes = "(min-width: 1024px) 80vw, 140vw";
 
 function slideTo(track: HTMLElement | null, index: number, instant = false) {
   if (!track) return;
@@ -243,7 +243,7 @@ export function ProductGallery({
                 }}
                 className="gallery-thumb"
               >
-                <Image src={image.src} alt="" fill sizes="96px" className="object-cover" />
+                <Image src={image.src} alt="" fill sizes="136px" className="object-cover" />
               </a>
             </li>
           ))}

@@ -128,6 +128,22 @@
   }
 }
 
+@media (max-width: 767px) {
+  [data-clip-expand] {
+    height: auto;
+  }
+  [data-clip-expand] .stage {
+    position: relative;
+    height: auto;
+    aspect-ratio: 16 / 9;
+  }
+  [data-clip-expand] .stage-media {
+    animation: none;
+    clip-path: none !important;
+    transform: none !important;
+  }
+}
+
 .wm-l {
   display: inline-block;
 }

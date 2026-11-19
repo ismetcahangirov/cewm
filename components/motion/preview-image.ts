@@ -11,7 +11,7 @@ export function previewImage(
     width: image.width,
     height: image.height,
     alt: "",
-    sizes: "320px",
+    sizes: "640px",
   }).props;
   return {
     src,

@@ -72,7 +72,7 @@ export default async function BlogPage({ searchParams }: PageProps<"/[locale]/bl
                           src={post.image.src}
                           alt={post.image.alt}
                           fill
-                          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                          sizes="(min-width: 1024px) 46vw, (min-width: 640px) 70vw, 140vw"
                           className="machine-card-photo object-cover"
                         />
                       </div>
