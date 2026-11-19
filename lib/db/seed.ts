@@ -192,11 +192,17 @@ export async function seedDatabase(db: Database): Promise<SeedSummary> {
       .onConflictDoNothing()
       .returning({ id: schema.brands.id });
 
-    const categoryRows = await tx
-      .insert(schema.categories)
-      .values(seedCategories.map((category, sortOrder) => ({ ...category, sortOrder })))
-      .onConflictDoNothing()
-      .returning({ id: schema.categories.id });
+    const [anyCategory] = await tx
+      .select({ id: schema.categories.id })
+      .from(schema.categories)
+      .limit(1);
+    const categoryRows = anyCategory
+      ? []
+      : await tx
+          .insert(schema.categories)
+          .values(seedCategories.map((category, sortOrder) => ({ ...category, sortOrder })))
+          .onConflictDoNothing()
+          .returning({ id: schema.categories.id });
 
     let contactPersons = 0;
     for (const [sortOrder, person] of seedContactPersons.entries()) {
