@@ -45,58 +45,60 @@ export function CategoryStack({ items, label }: { items: StackCategory[]; label:
               className="stack-card"
               style={{ "--i": index } as CSSProperties}
             >
-              <span
-                aria-hidden="true"
-                className="stack-word"
-                style={
-                  {
-                    "--chars": Math.max(...lines.map((line) => line.length)),
-                    "--lines": lines.length,
-                  } as CSSProperties
-                }
-              >
-                {lines.map((line) => (
-                  <span key={line} className="stack-word-line">
-                    {line}
-                  </span>
-                ))}
-              </span>
-              <div className="stack-body">
-                <span className="stack-index text-label tabular text-cyan">
-                  {String(index + 1).padStart(2, "0")}
+              <div className="stack-text">
+                <span
+                  aria-hidden="true"
+                  className="stack-word"
+                  style={
+                    {
+                      "--chars": Math.max(...lines.map((line) => line.length)),
+                      "--lines": lines.length,
+                    } as CSSProperties
+                  }
+                >
+                  {lines.map((line) => (
+                    <span key={line} className="stack-word-line">
+                      {line}
+                    </span>
+                  ))}
                 </span>
-                <h3 className="text-safe text-h3 text-white">
-                  <Link href={item.href} className="stack-link">
-                    {item.name}
-                  </Link>
-                </h3>
-                {item.summary ? (
-                  <p className="text-on-navy-muted max-w-xl text-base">{item.summary}</p>
-                ) : null}
-                {item.tags.length ? (
-                  <ul className="flex flex-wrap gap-2">
-                    {item.tags.map((tag) => (
-                      <li
-                        key={tag}
-                        className="tabular rounded-full border border-white/40 px-3 py-1 text-small text-white"
-                      >
-                        {tag}
-                      </li>
-                    ))}
-                  </ul>
-                ) : null}
+                <div className="stack-body">
+                  <span className="stack-index text-label tabular text-cyan">
+                    {String(index + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className="text-safe text-h3 text-white">
+                    <Link href={item.href} className="stack-link">
+                      {item.name}
+                    </Link>
+                  </h3>
+                  {item.summary ? (
+                    <p className="text-on-navy-muted max-w-xl text-base">{item.summary}</p>
+                  ) : null}
+                  {item.tags.length ? (
+                    <ul className="flex flex-wrap gap-2">
+                      {item.tags.map((tag) => (
+                        <li
+                          key={tag}
+                          className="tabular rounded-full border border-white/40 px-3 py-1 text-small text-white"
+                        >
+                          {tag}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                </div>
               </div>
-              {item.image ? (
-                <div className="stack-photo">
+              <div className="stack-photo">
+                {item.image ? (
                   <Image
                     src={item.image.src}
                     alt={item.image.alt}
                     fill
-                    sizes="(min-width: 1364px) 300px, (min-width: 546px) 22vw, 120px"
+                    sizes="(min-width: 768px) 1100px, 100vw"
                     className="object-cover"
                   />
-                </div>
-              ) : null}
+                ) : null}
+              </div>
             </li>
           );
         })}
