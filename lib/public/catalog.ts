@@ -5,21 +5,27 @@ import { cacheLife, cacheTag } from "next/cache";
 
 import { publicTags } from "@/lib/cache/tags";
 import { getDb } from "@/lib/db";
-import { categories, media, productCategories, productImages, products } from "@/lib/db/schema";
+import {
+  brands,
+  categories,
+  media,
+  productCategories,
+  productImages,
+  products,
+} from "@/lib/db/schema";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import { pickLocale, type Localized } from "@/lib/i18n/localized";
 import { routes } from "@/lib/routes";
 
-import { splitProductName, toPublicImage, type PublicImage } from "./images";
+import { toPublicImage, type PublicImage } from "./images";
 
 export type ProductCardItem = {
   id: string;
-  model: string;
-  type: string | null;
+  name: string;
+  brand: string | null;
   category: string | null;
   href: string;
   image: PublicImage | null;
-  hoverImage: PublicImage | null;
 };
 
 export type PublicCategory = {
@@ -56,7 +62,7 @@ export async function productCards(
 ): Promise<ProductCardItem[]> {
   if (!rows.length) return [];
   const ids = rows.map((row) => row.id);
-  const [images, categoryRows] = await Promise.all([
+  const [images, categoryRows, brandRows] = await Promise.all([
     getDb()
       .select({
         productId: productImages.productId,
@@ -65,28 +71,31 @@ export async function productCards(
       })
       .from(productImages)
       .innerJoin(media, eq(media.id, productImages.mediaId))
-      .where(and(inArray(productImages.productId, ids), sql`${productImages.position} < 2`))
-      .orderBy(asc(productImages.position)),
+      .where(and(inArray(productImages.productId, ids), sql`${productImages.position} = 0`)),
     getDb()
       .select({ productId: productCategories.productId, name: categories.name })
       .from(productCategories)
       .innerJoin(categories, eq(categories.id, productCategories.categoryId))
       .where(and(inArray(productCategories.productId, ids), eq(categories.isActive, true)))
       .orderBy(asc(categories.sortOrder)),
+    getDb()
+      .select({ productId: products.id, name: brands.name })
+      .from(products)
+      .innerJoin(brands, eq(brands.id, products.brandId))
+      .where(inArray(products.id, ids)),
   ]);
 
   return rows.map((row) => {
-    const { model, type } = splitProductName(pickLocale(row.name, locale));
-    const own = images.filter((image) => image.productId === row.id);
+    const name = pickLocale(row.name, locale);
+    const image = images.find((item) => item.productId === row.id);
     const category = categoryRows.find((item) => item.productId === row.id);
     return {
       id: row.id,
-      model,
-      type,
+      name,
+      brand: brandRows.find((item) => item.productId === row.id)?.name ?? null,
       category: category ? pickLocale(category.name, locale) : null,
       href: productHref(row.slug, locale),
-      image: toPublicImage(own[0], locale, model),
-      hoverImage: toPublicImage(own[1], locale, model),
+      image: toPublicImage(image, locale, name),
     };
   });
 }

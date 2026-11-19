@@ -1,32 +1,19 @@
 import "server-only";
 
-import { and, asc, count, desc, eq, inArray, lte, ne, sql } from "drizzle-orm";
+import { and, asc, count, desc, eq, lte, ne, sql } from "drizzle-orm";
 import { cacheLife, cacheTag } from "next/cache";
 
 import { publicTags } from "@/lib/cache/tags";
 import { pickRichText, type RichTextDoc } from "@/lib/content/rich-text";
 import { getDb } from "@/lib/db";
-import { logos, media, posts, projectImages, projects } from "@/lib/db/schema";
+import { media, posts } from "@/lib/db/schema";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import { pickExact, pickLocale, type Localized } from "@/lib/i18n/localized";
 import { routes } from "@/lib/routes";
 
 import { imageColumns } from "./catalog";
-import type { HomeLogo } from "./home";
 import { toPublicImage, type PublicImage } from "./images";
 import { slugMatches, slugRank } from "./slug";
-
-export type ProjectType = (typeof projects.type.enumValues)[number];
-
-export type ProjectListItem = {
-  id: string;
-  title: string;
-  excerpt: string | null;
-  isVisual: boolean;
-  type: ProjectType;
-  href: string;
-  image: PublicImage;
-};
 
 export type PostCardData = {
   id: string;
@@ -46,8 +33,6 @@ export type PublicPost = PostCardData & {
 
 export type PostPage = { items: PostCardData[]; total: number };
 
-export type LogoGroupName = (typeof logos.group.enumValues)[number];
-
 export const postsPerPage = 12;
 export const relatedPostCount = 3;
 
@@ -55,74 +40,6 @@ const visiblePost = and(eq(posts.status, "published"), lte(posts.publishedAt, sq
 
 function optionalText(value: Localized | null, locale: Locale): string | null {
   return value ? pickLocale(value, locale) || null : null;
-}
-
-export async function queryProjects(locale: Locale): Promise<ProjectListItem[]> {
-  const db = getDb();
-  const rows = await db
-    .select({
-      id: projects.id,
-      slug: projects.slug,
-      title: projects.title,
-      excerpt: projects.excerpt,
-      type: projects.type,
-      ...imageColumns,
-    })
-    .from(projects)
-    .leftJoin(media, eq(media.id, projects.coverId))
-    .where(eq(projects.status, "published"))
-    .orderBy(asc(projects.sortOrder), desc(projects.createdAt), asc(projects.id));
-
-  const withoutCover = rows.filter((row) => !row.key).map((row) => row.id);
-  const firstImages = withoutCover.length
-    ? await db
-        .selectDistinctOn([projectImages.projectId], {
-          projectId: projectImages.projectId,
-          ...imageColumns,
-        })
-        .from(projectImages)
-        .innerJoin(media, eq(media.id, projectImages.mediaId))
-        .where(inArray(projectImages.projectId, withoutCover))
-        .orderBy(asc(projectImages.projectId), asc(projectImages.position))
-    : [];
-  const fallback = new Map(firstImages.map((row) => [row.projectId, row]));
-
-  return rows.flatMap((row) => {
-    const title = pickLocale(row.title, locale);
-    const image = toPublicImage(row.key ? row : fallback.get(row.id), locale, title);
-    if (!image) return [];
-    return [
-      {
-        id: row.id,
-        title,
-        excerpt: optionalText(row.excerpt, locale),
-        isVisual: row.type === "3d-visual",
-        type: row.type,
-        href: localePath(locale, routes.project(pickLocale(row.slug, locale))),
-        image,
-      },
-    ];
-  });
-}
-
-export function filterProjects(
-  items: ProjectListItem[],
-  type: ProjectType | null,
-): ProjectListItem[] {
-  return type ? items.filter((item) => item.type === type) : items;
-}
-
-export function projectTypeFromQuery(value: string | string[] | undefined): ProjectType | null {
-  if (value === "tamamlanmis") return "completed";
-  if (value === "3d") return "3d-visual";
-  return null;
-}
-
-export async function getProjectList(locale: Locale): Promise<ProjectListItem[]> {
-  "use cache";
-  cacheTag(publicTags.content, publicTags.catalog);
-  cacheLife("hours");
-  return queryProjects(locale);
 }
 
 type PostRow = {
@@ -232,26 +149,6 @@ export async function getRelatedPosts(locale: Locale, excludeId: string): Promis
   cacheTag(publicTags.content, publicTags.catalog);
   cacheLife("minutes");
   return queryRelatedPosts(locale, excludeId);
-}
-
-export async function queryLogosByGroup(locale: Locale, group: LogoGroupName): Promise<HomeLogo[]> {
-  const rows = await getDb()
-    .select({ id: logos.id, name: logos.name, url: logos.url, ...imageColumns })
-    .from(logos)
-    .innerJoin(media, eq(media.id, logos.imageId))
-    .where(and(eq(logos.group, group), eq(logos.isActive, true)))
-    .orderBy(asc(logos.sortOrder), asc(logos.createdAt), asc(logos.id));
-  return rows.flatMap((row) => {
-    const image = toPublicImage(row, locale, row.name);
-    return image ? [{ id: row.id, name: row.name, url: row.url, image }] : [];
-  });
-}
-
-export async function getLogosByGroup(locale: Locale, group: LogoGroupName): Promise<HomeLogo[]> {
-  "use cache";
-  cacheTag(publicTags.content, publicTags.catalog);
-  cacheLife("hours");
-  return queryLogosByGroup(locale, group);
 }
 
 export function formatPostDate(iso: string, locale: Locale): string {

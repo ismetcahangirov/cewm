@@ -1,76 +1,78 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import Image from "next/image";
+import Link from "next/link";
 import { connection } from "next/server";
 
-import { CategoryIndex } from "@/components/site/catalog/category-index";
-import { JsonLdScript } from "@/components/site/json-ld";
-import { env } from "@/lib/env";
+import { PageHeading } from "@/components/site/page-heading";
 import { localePath } from "@/lib/i18n/config";
 import { getRequestDictionary } from "@/lib/i18n/server";
-import { getCategoryImages } from "@/lib/public/home";
-import { findCategoryMenu, getMenu } from "@/lib/public/menus";
-import { getSiteSettings } from "@/lib/public/settings";
+import { getCategoryTree } from "@/lib/public/catalog";
 import { staticPaths } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
-import { collectionPageJsonLd } from "@/lib/seo/json-ld";
 import { pageMetadata } from "@/lib/seo/metadata";
 
 export async function generateMetadata(): Promise<Metadata> {
-  await connection();
   const { locale, dict } = await getRequestDictionary();
   return pageMetadata({
     locale,
     title: dict.catalog.indexTitle,
     description: dict.catalog.indexDescription,
     paths: staticPaths(routes.categories()),
-    eyebrow: dict.seo.eyebrow.catalog,
   });
 }
 
-async function CategoriesContent() {
+export default async function CategoriesPage() {
   await connection();
   const { locale, dict } = await getRequestDictionary();
-  const [items, images, settings] = await Promise.all([
-    getMenu("main", locale),
-    getCategoryImages(locale),
-    getSiteSettings(),
-  ]);
-  const menu = findCategoryMenu(items, images);
-  if (!menu) notFound();
+  const tree = await getCategoryTree(locale);
 
   return (
     <>
-      <JsonLdScript
-        data={collectionPageJsonLd({
-          name: dict.catalog.indexTitle,
-          description: dict.catalog.indexDescription,
-          url: localePath(locale, routes.categories()),
-          locale,
-          siteUrl: env.NEXT_PUBLIC_SITE_URL,
-          items: menu.children.flatMap((child) =>
-            child.href ? [{ name: child.label, url: child.href }] : [],
-          ),
-        })}
+      <PageHeading
+        title={dict.catalog.indexTitle}
+        breadcrumbLabel={dict.common.breadcrumb}
+        breadcrumbs={[
+          { label: dict.common.home, href: localePath(locale) },
+          { label: dict.catalog.indexTitle, href: localePath(locale, routes.categories()) },
+        ]}
       />
-      <h1 className="sr-only">{dict.catalog.indexTitle}</h1>
-      <CategoryIndex
-        items={menu.children}
-        images={images}
-        labels={{
-          back: dict.common.back,
-          viewAllIn: dict.common.viewAllIn,
-          allProducts: dict.common.allProducts,
-          projects: dict.common.projects,
-          catalogue: dict.common.catalogue,
-        }}
-        allProductsHref={localePath(locale, routes.catalogue())}
-        projectsHref={localePath(locale, routes.projects())}
-        catalogueHref={settings.catalogueFile?.src ?? null}
-      />
+      <div className="container-page py-section">
+        <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {tree.map((category) => (
+            <li key={category.id} className="flex flex-col border border-line">
+              {category.image ? (
+                <Image
+                  src={category.image.src}
+                  alt={category.image.alt}
+                  width={category.image.width}
+                  height={category.image.height}
+                  sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                  className="aspect-[4/3] w-full object-cover"
+                />
+              ) : null}
+              <div className="p-4">
+                <Link
+                  href={category.href}
+                  className="text-card font-semibold text-navy hover:text-cyan"
+                >
+                  {category.name}
+                </Link>
+                {category.children.length ? (
+                  <ul className="mt-2 flex flex-col gap-1 text-small">
+                    {category.children.map((child) => (
+                      <li key={child.id}>
+                        <Link href={child.href} className="hover:text-cyan">
+                          {child.name}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
+              </div>
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   );
-}
-
-export default function CategoriesPage() {
-  return <CategoriesContent />;
 }

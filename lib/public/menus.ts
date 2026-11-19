@@ -6,7 +6,7 @@ import { cacheTag } from "next/cache";
 
 import { publicTags } from "@/lib/cache/tags";
 import { getDb } from "@/lib/db";
-import { categories, menuItems, menus, pages, projects } from "@/lib/db/schema";
+import { categories, menuItems, menus, pages } from "@/lib/db/schema";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import { pickLocale, type Localized } from "@/lib/i18n/localized";
 import { routes } from "@/lib/routes";
@@ -35,7 +35,6 @@ export type MenuSourceRow = {
   url: string | null;
   category: Linked;
   page: Linked;
-  project: Linked;
 };
 
 function slugIn(linked: Linked, locale: Locale): string | null {
@@ -52,10 +51,6 @@ export function resolveMenuHref(row: MenuSourceRow, locale: Locale): string | nu
     case "page": {
       const slug = slugIn(row.page, locale);
       return slug ? localePath(locale, routes.page(slug)) : null;
-    }
-    case "project": {
-      const slug = slugIn(row.project, locale);
-      return slug ? localePath(locale, routes.project(slug)) : null;
     }
     case "url":
       if (!row.url) return null;
@@ -112,15 +107,12 @@ async function loadMenuRows(where: SQL) {
       parentCategoryActive: parentCategories.isActive,
       pageSlug: pages.slug,
       pageStatus: pages.status,
-      projectSlug: projects.slug,
-      projectStatus: projects.status,
     })
     .from(menuItems)
     .innerJoin(menus, eq(menus.id, menuItems.menuId))
     .leftJoin(categories, eq(categories.id, menuItems.categoryId))
     .leftJoin(parentCategories, eq(parentCategories.id, categories.parentId))
     .leftJoin(pages, eq(pages.id, menuItems.pageId))
-    .leftJoin(projects, eq(projects.id, menuItems.projectId))
     .where(where)
     .orderBy(asc(menus.sortOrder), asc(menuItems.sortOrder), asc(menuItems.createdAt));
 
@@ -143,9 +135,6 @@ async function loadMenuRows(where: SQL) {
           }
         : null,
       page: row.pageSlug ? { slug: row.pageSlug, visible: row.pageStatus === "published" } : null,
-      project: row.projectSlug
-        ? { slug: row.projectSlug, visible: row.projectStatus === "published" }
-        : null,
     } satisfies MenuSourceRow,
   }));
 }

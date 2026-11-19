@@ -36,9 +36,3 @@ export function toPublicImage(
     blurDataURL: row.lqip,
   };
 }
-
-export function splitProductName(name: string): { model: string; type: string | null } {
-  const [model, ...rest] = name.split(/\s+[–-]\s+/);
-  const type = rest.join(" – ").trim();
-  return { model: model.trim(), type: type || null };
-}

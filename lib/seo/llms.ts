@@ -84,19 +84,7 @@ export async function getLlmsSource(): Promise<LlmsSource> {
         path: routes.category(pickLocale(row.slug, locale)),
       })),
     ],
-    sections: [
-      {
-        title: dict.content.projects.title,
-        path: routes.projects(),
-        note: dict.content.projects.description,
-      },
-      { title: dict.content.blog.title, path: routes.blog(), note: dict.content.blog.description },
-      {
-        title: dict.content.vacancies.title,
-        path: routes.vacancies(),
-        note: dict.content.vacancies.description,
-      },
-    ],
+    sections: [{ title: dict.blog.title, path: routes.blog(), note: dict.blog.description }],
     pages: pageRows.map((row) => ({
       title: pickLocale(row.title, locale),
       path: routes.page(pickLocale(row.slug, locale)),

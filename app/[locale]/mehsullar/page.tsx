@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
-import { Breadcrumbs } from "@/components/site/breadcrumbs";
-import { CategoryChips } from "@/components/site/catalog/category-chips";
-import { fill, ListingGrid } from "@/components/site/catalog/listing-grid";
-import { CtaBand } from "@/components/site/cta-band";
+import { button } from "@/components/site/button";
 import { JsonLdScript } from "@/components/site/json-ld";
+import { PageHeading } from "@/components/site/page-heading";
+import { ProductGrid } from "@/components/site/product-card";
 import { env } from "@/lib/env";
 import { localePath } from "@/lib/i18n/config";
+import { fill } from "@/lib/i18n/format";
 import { getRequestDictionary } from "@/lib/i18n/server";
-import { getPageLinks } from "@/lib/public/home";
-import { getCatalogueListing, listingPageSize, parsePageParam } from "@/lib/public/listing";
+import { getCatalogueListing, parsePageParam } from "@/lib/public/listing";
 import { staticPaths } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
 import { collectionPageJsonLd } from "@/lib/seo/json-ld";
@@ -23,78 +23,77 @@ export async function generateMetadata({
   await connection();
   const [query, { locale, dict }] = await Promise.all([searchParams, getRequestDictionary()]);
   const page = parsePageParam(query.page);
-  const listing = await getCatalogueListing(locale, page);
-  if (!listing) notFound();
   const suffix = fill(dict.catalog.pageSuffix, { page });
   return pageMetadata({
     locale,
     title: paginatedText(dict.catalog.title, page, suffix),
     description: paginatedText(dict.catalog.description, page, suffix),
     paths: paginatedPaths(staticPaths(routes.catalogue()), page),
-    eyebrow: dict.seo.eyebrow.catalog,
   });
 }
 
-async function CatalogueContent({
-  searchParams,
-}: Pick<PageProps<"/[locale]/mehsullar">, "searchParams">) {
+export default async function CataloguePage({ searchParams }: PageProps<"/[locale]/mehsullar">) {
   await connection();
   const [query, { locale, dict }] = await Promise.all([searchParams, getRequestDictionary()]);
   const page = parsePageParam(query.page);
-  const [listing, links] = await Promise.all([
-    getCatalogueListing(locale, page),
-    getPageLinks(locale),
-  ]);
+  const listing = await getCatalogueListing(locale, page);
   if (!listing) notFound();
-  const basePath = localePath(locale, routes.catalogue());
-  const pageItems = listing.items.slice((page - 1) * listingPageSize);
+  const path = localePath(locale, routes.catalogue());
 
   return (
     <>
+      <PageHeading
+        title={dict.catalog.title}
+        breadcrumbLabel={dict.common.breadcrumb}
+        breadcrumbs={[
+          { label: dict.common.home, href: localePath(locale) },
+          { label: dict.catalog.title, href: path },
+        ]}
+      >
+        {listing.categories.length ? (
+          <nav aria-label={dict.catalog.categories} className="mt-6">
+            <ul className="flex flex-wrap gap-2">
+              {listing.categories.map((category) => (
+                <li key={category.id}>
+                  <Link href={category.href} className={button({ variant: "outline" })}>
+                    {category.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        ) : null}
+      </PageHeading>
+      <div className="container-page py-section">
+        {listing.items.length ? (
+          <>
+            <p className="mb-6 text-meta text-muted">
+              {fill(dict.catalog.count, { shown: listing.shown, total: listing.total })}
+            </p>
+            <ProductGrid products={listing.items} />
+            {listing.page < listing.pageCount ? (
+              <Link
+                href={`${path}?page=${listing.page + 1}`}
+                className={button({ className: "mt-8" })}
+              >
+                {dict.catalog.loadMore}
+              </Link>
+            ) : null}
+          </>
+        ) : (
+          <p>{dict.catalog.empty}</p>
+        )}
+      </div>
       <JsonLdScript
         data={collectionPageJsonLd({
           name: dict.catalog.title,
           description: dict.catalog.description,
-          url: page > 1 ? `${basePath}?page=${page}` : basePath,
+          url: path,
           locale,
           siteUrl: env.NEXT_PUBLIC_SITE_URL,
-          items: pageItems.map((item) => ({
-            name: [item.model, item.type].filter(Boolean).join(" – "),
-            url: item.href,
-          })),
+          items: listing.items.map((item) => ({ name: item.name, url: item.href })),
         })}
       />
-      <div className="container-page pt-15">
-        <Breadcrumbs
-          label={dict.common.breadcrumb}
-          items={[
-            { label: dict.common.home, href: localePath(locale) },
-            { label: dict.catalog.title },
-          ]}
-        />
-        <h1 className="mt-2.5 text-h1">{dict.catalog.title}</h1>
-        <div className="mt-10">
-          <CategoryChips
-            label={dict.catalog.categoriesLabel}
-            first={{ name: dict.common.allProducts, href: basePath, active: true, back: false }}
-            chips={listing.categories}
-          />
-        </div>
-        <ListingGrid
-          items={listing.items}
-          total={listing.total}
-          shown={listing.shown}
-          page={listing.page}
-          pageCount={listing.pageCount}
-          basePath={basePath}
-          dict={dict}
-        />
-      </div>
-      <CtaBand dict={dict} quoteHref={links.quote ?? null} />
     </>
   );
-}
-
-export default function CataloguePage(props: PageProps<"/[locale]/mehsullar">) {
-  return <CatalogueContent searchParams={props.searchParams} />;
 }

@@ -39,7 +39,7 @@ export type CategoryListing = ListingProducts & {
     id: string;
     name: string;
     slug: Localized;
-    description: { az: RichTextDoc; ru?: RichTextDoc | null; en?: RichTextDoc | null } | null;
+    description: Localized<RichTextDoc> | null;
     seoTitle: string | null;
     seoDescription: string | null;
   };

@@ -4,12 +4,8 @@ export const routes = {
   categories: () => "/kateqoriyalar",
   category: (slug: string) => `/mehsullar/${slug}`,
   product: (slug: string) => `/mehsul/${slug}`,
-  projects: () => "/layiheler",
-  project: (slug: string) => `/layiheler/${slug}`,
   blog: () => "/bloq",
   post: (slug: string) => `/bloq/${slug}`,
-  vacancies: () => "/vakansiyalar",
-  vacancy: (slug: string) => `/vakansiyalar/${slug}`,
   page: (slug: string) => `/${slug}`,
   media: (key: string) => `/media/${key}`,
 };

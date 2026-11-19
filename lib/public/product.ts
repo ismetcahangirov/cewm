@@ -8,9 +8,11 @@ import { publicTags } from "@/lib/cache/tags";
 import { pickRichText, type RichTextDoc } from "@/lib/content/rich-text";
 import { getDb } from "@/lib/db";
 import {
+  brands,
   categories,
   media,
   productCategories,
+  productDocuments,
   productImages,
   productRelations,
   products,
@@ -26,26 +28,31 @@ import {
   visibleProduct,
   type ProductCardItem,
 } from "./catalog";
-import { splitProductName, toPublicImage, type PublicImage } from "./images";
+import { toPublicImage, type PublicImage } from "./images";
 import { slugMatches, slugRank } from "./slug";
 
-export type ProductSpecRow = { label: string; value: string };
+export type ProductSpecRow = { label: string; value: string; unit: string | null };
 
-export type ProductModel = { src: string; poster: PublicImage | null };
+export type ProductDocument = { title: string; href: string; size: number };
+
+export type ProductVideo =
+  | { kind: "file"; src: string; type: string; poster: PublicImage | null }
+  | { kind: "link"; url: string; poster: PublicImage | null };
 
 export type ProductDetail = {
   id: string;
   slug: Localized;
   name: string;
-  model: string;
-  type: string | null;
   sku: string | null;
+  brand: { name: string; url: string | null } | null;
   shortDescription: RichTextDoc | null;
   description: RichTextDoc | null;
+  benefits: string[];
   specs: ProductSpecRow[];
   images: PublicImage[];
+  documents: ProductDocument[];
+  video: ProductVideo | null;
   category: { id: string; name: string; href: string } | null;
-  model3d: ProductModel | null;
   seoTitle: string | null;
   seoDescription: string | null;
 };
@@ -89,7 +96,7 @@ async function productCategoryRows(productId: string) {
 
 export async function findProduct(locale: Locale, slug: string): Promise<ProductDetail | null> {
   const poster = alias(media, "poster");
-  const modelFile = alias(media, "model_file");
+  const videoFile = alias(media, "video_file");
   const [row] = await getDb()
     .select({
       id: products.id,
@@ -98,10 +105,15 @@ export async function findProduct(locale: Locale, slug: string): Promise<Product
       sku: products.sku,
       shortDescription: products.shortDescription,
       description: products.description,
+      benefits: products.benefits,
       specs: products.specs,
+      videoUrl: products.videoUrl,
       seoTitle: products.seoTitle,
       seoDescription: products.seoDescription,
-      modelKey: modelFile.key,
+      brandName: brands.name,
+      brandUrl: brands.websiteUrl,
+      videoKey: videoFile.key,
+      videoType: videoFile.mimeType,
       poster: {
         key: poster.key,
         width: poster.width,
@@ -111,14 +123,15 @@ export async function findProduct(locale: Locale, slug: string): Promise<Product
       },
     })
     .from(products)
-    .leftJoin(modelFile, eq(modelFile.id, products.modelId))
-    .leftJoin(poster, eq(poster.id, products.modelPosterId))
+    .leftJoin(brands, eq(brands.id, products.brandId))
+    .leftJoin(videoFile, eq(videoFile.id, products.videoId))
+    .leftJoin(poster, eq(poster.id, products.videoPosterId))
     .where(and(visibleProduct, slugMatches(products.slug, locale, slug)))
     .orderBy(slugRank(products.slug, locale, slug))
     .limit(1);
   if (!row) return null;
 
-  const [categoryRows, imageRows] = await Promise.all([
+  const [categoryRows, imageRows, documentRows] = await Promise.all([
     productCategoryRows(row.id),
     getDb()
       .select(imageColumns)
@@ -126,40 +139,57 @@ export async function findProduct(locale: Locale, slug: string): Promise<Product
       .innerJoin(media, eq(media.id, productImages.mediaId))
       .where(eq(productImages.productId, row.id))
       .orderBy(asc(productImages.position)),
+    getDb()
+      .select({ title: productDocuments.title, key: media.key, size: media.size })
+      .from(productDocuments)
+      .innerJoin(media, eq(media.id, productDocuments.mediaId))
+      .where(eq(productDocuments.productId, row.id))
+      .orderBy(asc(productDocuments.position)),
   ]);
   if (categoryRows.linked.length && !categoryRows.visible.length) return null;
 
   const name = pickLocale(row.name, locale);
-  const { model, type } = splitProductName(name);
   const images = imageRows.flatMap((image) => toPublicImage(image, locale, name) ?? []);
   const [category] = categoryRows.visible;
+  const videoPoster = toPublicImage(row.poster, locale, name);
 
   return {
     id: row.id,
     slug: row.slug,
     name,
-    model,
-    type,
     sku: row.sku?.trim() || null,
+    brand: row.brandName ? { name: row.brandName, url: row.brandUrl } : null,
     shortDescription: pickRichText(row.shortDescription, locale),
     description: pickRichText(row.description, locale),
+    benefits: row.benefits.map((benefit) => pickLocale(benefit, locale).trim()).filter(Boolean),
     specs: row.specs.flatMap((spec) => {
-      const label = pickLocale(spec.key, locale).trim();
+      const label = pickLocale(spec.label, locale).trim();
       const value = pickLocale(spec.value, locale).trim();
-      return label && value ? [{ label, value }] : [];
+      const unit = spec.unit ? pickLocale(spec.unit, locale).trim() || null : null;
+      return label && value ? [{ label, value, unit }] : [];
     }),
     images,
+    documents: documentRows.map((document) => ({
+      title: pickLocale(document.title, locale),
+      href: routes.media(document.key),
+      size: document.size,
+    })),
+    video:
+      row.videoKey && row.videoType
+        ? {
+            kind: "file",
+            src: routes.media(row.videoKey),
+            type: row.videoType,
+            poster: videoPoster,
+          }
+        : row.videoUrl
+          ? { kind: "link", url: row.videoUrl, poster: videoPoster }
+          : null,
     category: category
       ? {
           id: category.id,
           name: pickLocale(category.name, locale),
           href: categoryHref(category.slug, locale),
-        }
-      : null,
-    model3d: row.modelKey
-      ? {
-          src: routes.media(row.modelKey),
-          poster: toPublicImage(row.poster, locale, name) ?? images[0] ?? null,
         }
       : null,
     seoTitle: pickExact(row.seoTitle, locale),

@@ -7,11 +7,14 @@ import { publicTags } from "@/lib/cache/tags";
 import { getDb } from "@/lib/db";
 import { products } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
-import { pickLocale } from "@/lib/i18n/localized";
 
 import { productCards, visibleProduct } from "./catalog";
 
-export type QuoteProduct = { id: string; name: string; image: { src: string; alt: string } | null };
+export type ConsultationProduct = {
+  id: string;
+  name: string;
+  image: { src: string; alt: string } | null;
+};
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -22,7 +25,10 @@ export function parseProductIds(value: string | string[] | undefined): string[] 
     .slice(0, 20);
 }
 
-export async function getQuoteProducts(ids: string[], locale: Locale): Promise<QuoteProduct[]> {
+export async function getConsultationProducts(
+  ids: string[],
+  locale: Locale,
+): Promise<ConsultationProduct[]> {
   "use cache";
   cacheTag(publicTags.catalog);
   cacheLife("hours");
@@ -34,9 +40,9 @@ export async function getQuoteProducts(ids: string[], locale: Locale): Promise<Q
   const order = new Map(ids.map((id, index) => [id, index]));
   rows.sort((a, b) => (order.get(a.id) ?? 0) - (order.get(b.id) ?? 0));
   const cards = await productCards(rows, locale);
-  return cards.map((card, index) => ({
+  return cards.map((card) => ({
     id: card.id,
-    name: pickLocale(rows[index].name, locale),
+    name: card.name,
     image: card.image ? { src: card.image.src, alt: card.image.alt } : null,
   }));
 }

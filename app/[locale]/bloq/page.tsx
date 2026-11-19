@@ -1,100 +1,97 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
+import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
-import { Breadcrumbs } from "@/components/site/breadcrumbs";
-import { fill } from "@/components/site/catalog/listing-grid";
-import { JsonLdScript } from "@/components/site/json-ld";
-import { pill } from "@/components/site/pill";
-import { PostCard } from "@/components/site/post-card";
-import { env } from "@/lib/env";
+import { button } from "@/components/site/button";
+import { PageHeading } from "@/components/site/page-heading";
 import { localePath } from "@/lib/i18n/config";
+import { fill } from "@/lib/i18n/format";
 import { getRequestDictionary } from "@/lib/i18n/server";
-import { getPostPage, postsPerPage } from "@/lib/public/content";
+import { formatPostDate, getPostPage, postsPerPage } from "@/lib/public/content";
+import { parsePageParam } from "@/lib/public/listing";
 import { staticPaths } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
-import { collectionPageJsonLd } from "@/lib/seo/json-ld";
-import { pageMetadata, paginatedPaths, paginatedText } from "@/lib/seo/metadata";
-
-function pageNumber(value: string | string[] | undefined): number {
-  const raw = Array.isArray(value) ? value[0] : value;
-  const parsed = Number.parseInt(raw ?? "", 10);
-  return Number.isFinite(parsed) && parsed > 0 ? Math.min(parsed, 200) : 1;
-}
+import { pageMetadata, paginatedPaths } from "@/lib/seo/metadata";
 
 export async function generateMetadata({
   searchParams,
 }: PageProps<"/[locale]/bloq">): Promise<Metadata> {
-  await connection();
   const [query, { locale, dict }] = await Promise.all([searchParams, getRequestDictionary()]);
-  const page = pageNumber(query.page);
-  const suffix = fill(dict.catalog.pageSuffix, { page });
+  const page = parsePageParam(query.page);
   return pageMetadata({
     locale,
-    title: paginatedText(dict.content.blog.title, page, suffix),
-    description: paginatedText(dict.content.blog.description, page, suffix),
+    title: dict.blog.title,
+    description: dict.blog.description,
     paths: paginatedPaths(staticPaths(routes.blog()), page),
-    eyebrow: dict.seo.eyebrow.blog,
   });
 }
 
-async function BlogContent({ searchParams }: Pick<PageProps<"/[locale]/bloq">, "searchParams">) {
+export default async function BlogPage({ searchParams }: PageProps<"/[locale]/bloq">) {
   await connection();
   const [query, { locale, dict }] = await Promise.all([searchParams, getRequestDictionary()]);
-  const page = pageNumber(query.page);
+  const page = parsePageParam(query.page);
   const { items, total } = await getPostPage(locale, page);
-  const text = dict.content.blog;
-  const base = localePath(locale, routes.blog());
-  const hasMore = items.length < total && items.length >= page * postsPerPage;
+  if (page > 1 && (page - 1) * postsPerPage >= total) notFound();
+  const path = localePath(locale, routes.blog());
 
   return (
     <>
-      <JsonLdScript
-        data={collectionPageJsonLd({
-          name: text.title,
-          description: text.description,
-          url: base,
-          locale,
-          siteUrl: env.NEXT_PUBLIC_SITE_URL,
-          items: items.map((post) => ({ name: post.title, url: post.href })),
-        })}
+      <PageHeading
+        title={dict.blog.title}
+        breadcrumbLabel={dict.common.breadcrumb}
+        breadcrumbs={[
+          { label: dict.common.home, href: localePath(locale) },
+          { label: dict.blog.title, href: path },
+        ]}
       />
-      <div className="container-page pt-15 pb-section">
-        <Breadcrumbs
-          label={dict.common.breadcrumb}
-          items={[{ label: dict.common.home, href: localePath(locale) }, { label: text.title }]}
-        />
-        <h1 className="mt-2.5 text-h1">{text.title}</h1>
-        {items.length > 0 ? (
+      <div className="container-page py-section">
+        {items.length ? (
           <>
-            <ul className="mt-10 grid grid-cols-1 gap-x-7.5 gap-y-16 sm:grid-cols-2 lg:grid-cols-3">
+            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {items.map((post) => (
-                <li key={post.id}>
-                  <PostCard post={post} locale={locale} readLabel={text.read} />
+                <li key={post.id} className="flex flex-col border border-line">
+                  {post.image ? (
+                    <Image
+                      src={post.image.src}
+                      alt={post.image.alt}
+                      width={post.image.width}
+                      height={post.image.height}
+                      sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+                      className="aspect-video w-full object-cover"
+                    />
+                  ) : null}
+                  <div className="flex flex-col gap-2 p-4">
+                    <time dateTime={post.publishedAt} className="text-meta text-muted">
+                      {formatPostDate(post.publishedAt, locale)}
+                    </time>
+                    <Link
+                      href={post.href}
+                      className="text-card font-semibold text-navy hover:text-cyan"
+                    >
+                      {post.title}
+                    </Link>
+                    {post.excerpt ? <p className="text-small">{post.excerpt}</p> : null}
+                  </div>
                 </li>
               ))}
             </ul>
-            {hasMore && (
-              <div className="mt-16 flex flex-col items-center gap-4">
+            {items.length < total ? (
+              <div className="mt-8 flex flex-col items-start gap-2">
                 <p className="text-meta text-muted">
-                  {text.shown
-                    .replace("{shown}", String(items.length))
-                    .replace("{total}", String(total))}
+                  {fill(dict.blog.shown, { shown: items.length, total })}
                 </p>
-                <Link href={`${base}?page=${page + 1}`} className={pill({ variant: "outline" })}>
-                  {text.loadMore}
+                <Link href={`${path}?page=${page + 1}`} className={button()}>
+                  {dict.blog.loadMore}
                 </Link>
               </div>
-            )}
+            ) : null}
           </>
         ) : (
-          <p className="mt-10 max-w-3xl text-base text-muted">{text.empty}</p>
+          <p>{dict.blog.empty}</p>
         )}
       </div>
     </>
   );
-}
-
-export default function BlogPage(props: PageProps<"/[locale]/bloq">) {
-  return <BlogContent searchParams={props.searchParams} />;
 }

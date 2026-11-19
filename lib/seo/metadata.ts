@@ -2,8 +2,6 @@ import type { Metadata } from "next";
 
 import { defaultLocale, locales, type Locale } from "@/lib/i18n/config";
 
-import { ogImageSize, ogImageUrl } from "./og";
-
 export type MetadataImage = {
   src: string;
   width?: number | null;
@@ -17,7 +15,6 @@ export type PageMetadataInput = {
   description?: string | null;
   paths: Record<Locale, string>;
   image?: MetadataImage | null;
-  eyebrow: string;
   absoluteTitle?: boolean;
   type?: "website" | "article";
   noIndex?: boolean;
@@ -27,26 +24,20 @@ export const openGraphLocales: Record<Locale, string> = {
   az: "az_AZ",
   ru: "ru_RU",
   en: "en_US",
+  de: "de_DE",
 };
 
-export const siteName = "Mebline";
+export const siteName = "CEWM";
 
 type SocialImage = { src: string; width: number | null; height: number | null; alt: string };
 
-function socialImage(input: PageMetadataInput): SocialImage {
-  if (input.image) {
-    return {
-      src: input.image.src,
-      width: input.image.width ?? null,
-      height: input.image.height ?? null,
-      alt: input.image.alt?.trim() || input.title,
-    };
-  }
+function socialImage(input: PageMetadataInput): SocialImage | null {
+  if (!input.image) return null;
   return {
-    src: ogImageUrl({ eyebrow: input.eyebrow, title: input.title }),
-    width: ogImageSize.width,
-    height: ogImageSize.height,
-    alt: input.title,
+    src: input.image.src,
+    width: input.image.width ?? null,
+    height: input.image.height ?? null,
+    alt: input.image.alt?.trim() || input.title,
   };
 }
 
@@ -71,19 +62,25 @@ export function pageMetadata(input: PageMetadataInput): Metadata {
         .filter((code) => code !== input.locale)
         .map((code) => openGraphLocales[code]),
       siteName,
-      images: [
-        {
-          url: image.src,
-          alt: image.alt,
-          ...(image.width && image.height ? { width: image.width, height: image.height } : {}),
-        },
-      ],
+      ...(image
+        ? {
+            images: [
+              {
+                url: image.src,
+                alt: image.alt,
+                ...(image.width && image.height
+                  ? { width: image.width, height: image.height }
+                  : {}),
+              },
+            ],
+          }
+        : {}),
     },
     twitter: {
-      card: "summary_large_image",
+      card: image ? "summary_large_image" : "summary",
       title: input.title,
       description,
-      images: [{ url: image.src, alt: image.alt }],
+      ...(image ? { images: [{ url: image.src, alt: image.alt }] } : {}),
     },
     robots: input.noIndex ? { index: false, follow: true } : undefined,
   };

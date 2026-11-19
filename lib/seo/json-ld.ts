@@ -1,16 +1,14 @@
-import { localePath, type Locale } from "@/lib/i18n/config";
+import { localePath, locales, type Locale } from "@/lib/i18n/config";
 import { pickLocale } from "@/lib/i18n/localized";
 import type { SiteSettings } from "@/lib/public/settings";
 
 export type JsonLd = { "@context"?: string; "@type": string } & Record<string, unknown>;
 
-const defaultName = "Mebline";
+const defaultName = "CEWM";
 
 function absolute(path: string, siteUrl: string): string {
   return new URL(path, siteUrl).toString();
 }
-
-const brandLogo = "/brand/logo.png";
 
 export function organizationJsonLd(
   settings: SiteSettings,
@@ -29,7 +27,8 @@ export function organizationJsonLd(
     name,
     url: absolute(localePath(locale, "/"), siteUrl),
   };
-  data.logo = absolute(brandLogo, siteUrl);
+  const logo = settings.logoLight ?? settings.logoDark;
+  if (logo) data.logo = absolute(logo.src, siteUrl);
   if (mainPhone) data.telephone = mainPhone.number;
   if (mainEmail) data.email = mainEmail;
   if (address) {
@@ -43,7 +42,7 @@ export function organizationJsonLd(
       name: pickLocale(phone.label, locale),
       contactType: "customer service",
       areaServed: "AZ",
-      availableLanguage: ["az", "ru", "en"],
+      availableLanguage: [...locales],
       ...(mainEmail ? { email: mainEmail } : {}),
     }));
   }
@@ -61,7 +60,7 @@ export function localBusinessJsonLd(
   const [mainEmail] = settings.emails;
   const data: JsonLd = {
     "@context": "https://schema.org",
-    "@type": "FurnitureStore",
+    "@type": "LocalBusiness",
     "@id": `${absolute("/", siteUrl)}#store`,
     name: settings.legalName?.trim() || defaultName,
     url: absolute(localePath(locale, "/"), siteUrl),
@@ -69,7 +68,8 @@ export function localBusinessJsonLd(
     parentOrganization: { "@id": `${absolute("/", siteUrl)}#organization` },
     areaServed: { "@type": "Country", name: "Azerbaijan" },
   };
-  data.image = absolute(brandLogo, siteUrl);
+  const logo = settings.logoLight ?? settings.logoDark;
+  if (logo) data.image = absolute(logo.src, siteUrl);
   if (mainPhone) data.telephone = mainPhone.number;
   if (mainEmail) data.email = mainEmail;
   if (settings.mapUrl) data.hasMap = settings.mapUrl;
@@ -191,52 +191,6 @@ export function blogPostingJsonLd(input: {
   };
 }
 
-const jobEmploymentTypes = {
-  "full-time": "FULL_TIME",
-  "part-time": "PART_TIME",
-  contract: "CONTRACTOR",
-  internship: "INTERN",
-} as const;
-
-export function jobPostingJsonLd(input: {
-  title: string;
-  description: string;
-  url: string;
-  datePosted: string;
-  validThrough: string | null;
-  employmentType: keyof typeof jobEmploymentTypes;
-  location: string | null;
-  locale: Locale;
-  siteUrl: string;
-  organizationName: string;
-}): JsonLd {
-  return {
-    "@context": "https://schema.org",
-    "@type": "JobPosting",
-    title: input.title,
-    description: input.description,
-    url: absolute(input.url, input.siteUrl),
-    datePosted: input.datePosted,
-    ...(input.validThrough ? { validThrough: `${input.validThrough}T23:59:59+04:00` } : {}),
-    employmentType: jobEmploymentTypes[input.employmentType],
-    inLanguage: input.locale,
-    hiringOrganization: {
-      "@type": "Organization",
-      "@id": `${absolute("/", input.siteUrl)}#organization`,
-      name: input.organizationName,
-      sameAs: absolute("/", input.siteUrl),
-    },
-    jobLocation: {
-      "@type": "Place",
-      address: {
-        "@type": "PostalAddress",
-        addressLocality: input.location ?? "Baku",
-        addressCountry: "AZ",
-      },
-    },
-  };
-}
-
 export type ProductJsonLdInput = {
   name: string;
   url: string;
@@ -244,6 +198,8 @@ export type ProductJsonLdInput = {
   description: string | null;
   category: string | null;
   sku: string | null;
+  brand: string | null;
+  specs: { name: string; value: string }[];
 };
 
 export function productJsonLd(input: ProductJsonLdInput, siteUrl: string): JsonLd {
@@ -254,40 +210,23 @@ export function productJsonLd(input: ProductJsonLdInput, siteUrl: string): JsonL
     "@id": `${url}#product`,
     name: input.name,
     url,
-    brand: { "@type": "Brand", name: defaultName },
-    manufacturer: {
-      "@type": "Organization",
-      "@id": `${absolute("/", siteUrl)}#organization`,
-      name: defaultName,
+    offers: {
+      "@type": "Offer",
+      availability: "https://schema.org/InStock",
+      seller: { "@id": `${absolute("/", siteUrl)}#organization` },
     },
   };
+  if (input.brand) data.brand = { "@type": "Brand", name: input.brand };
+  if (input.specs.length) {
+    data.additionalProperty = input.specs.map((spec) => ({
+      "@type": "PropertyValue",
+      name: spec.name,
+      value: spec.value,
+    }));
+  }
   if (input.images.length) data.image = input.images.map((src) => absolute(src, siteUrl));
   if (input.description) data.description = input.description;
   if (input.category) data.category = input.category;
   if (input.sku) data.sku = input.sku;
-  return data;
-}
-
-export type ProjectJsonLdInput = {
-  name: string;
-  url: string;
-  locale: Locale;
-  images: string[];
-  description: string | null;
-  client: string | null;
-};
-
-export function projectJsonLd(input: ProjectJsonLdInput, siteUrl: string): JsonLd {
-  const data: JsonLd = {
-    "@context": "https://schema.org",
-    "@type": "CreativeWork",
-    name: input.name,
-    url: absolute(input.url, siteUrl),
-    inLanguage: input.locale,
-    creator: { "@id": `${absolute("/", siteUrl)}#organization`, name: defaultName },
-  };
-  if (input.images.length) data.image = input.images.map((src) => absolute(src, siteUrl));
-  if (input.description) data.description = input.description;
-  if (input.client) data.sourceOrganization = { "@type": "Organization", name: input.client };
   return data;
 }

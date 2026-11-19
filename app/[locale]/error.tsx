@@ -2,9 +2,10 @@
 
 import { useParams } from "next/navigation";
 
-import { pill } from "@/components/site/pill";
+import { button } from "@/components/site/button";
+import { isLocale, localePath, type Locale } from "@/lib/i18n/config";
 
-const copy = {
+const copy: Record<Locale, { title: string; body: string; retry: string; home: string }> = {
   az: {
     title: "Səhifəni açmaq alınmadı",
     body: "Bir az sonra yenidən cəhd edin və ya bizə zəng edin.",
@@ -23,9 +24,13 @@ const copy = {
     retry: "Try again",
     home: "Home page",
   },
-} as const;
-
-type Code = keyof typeof copy;
+  de: {
+    title: "Die Seite konnte nicht geöffnet werden",
+    body: "Bitte versuchen Sie es gleich noch einmal oder rufen Sie uns an.",
+    retry: "Erneut versuchen",
+    home: "Startseite",
+  },
+};
 
 export default function ErrorPage({
   reset,
@@ -34,17 +39,17 @@ export default function ErrorPage({
   reset: () => void;
 }) {
   const { locale } = useParams<{ locale: string }>();
-  const code: Code = locale === "ru" || locale === "en" ? locale : "az";
+  const code: Locale = isLocale(locale) ? locale : "az";
   const text = copy[code];
   return (
     <div className="container-page py-section">
-      <h1 className="text-statement">{text.title}</h1>
+      <h1 className="text-h1">{text.title}</h1>
       <p className="mt-6 max-w-prose">{text.body}</p>
       <div className="mt-10 flex flex-wrap gap-4">
-        <button type="button" onClick={reset} className={pill({ variant: "filled" })}>
+        <button type="button" onClick={reset} className={button()}>
           {text.retry}
         </button>
-        <a href={code === "az" ? "/" : `/${code}`} className={pill({ variant: "outline" })}>
+        <a href={localePath(code)} className={button({ variant: "outline" })}>
           {text.home}
         </a>
       </div>

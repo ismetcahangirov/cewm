@@ -96,7 +96,7 @@ export function LanguageMenu({
       {open && (
         <ul
           id="language-menu"
-          className="absolute top-full right-0 min-w-44 bg-white py-2 text-black shadow-header motion-safe:animate-fade-in"
+          className="motion-safe:animate-fade-in absolute top-full right-0 min-w-44 bg-white py-2 text-black shadow-header"
         >
           {locales.map((code) => (
             <li key={code}>

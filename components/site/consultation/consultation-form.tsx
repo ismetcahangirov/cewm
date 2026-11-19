@@ -5,13 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { useId, useState, type FormEvent, type ReactNode } from "react";
 
-import { pill } from "@/components/site/pill";
+import { button } from "@/components/site/button";
 import { cx } from "@/lib/cx";
 import type { Locale } from "@/lib/i18n/config";
 import { formatPhoneInput } from "@/lib/phone";
-import { quoteHoneypotField } from "@/lib/validation/quote-honeypot";
+import { consultationHoneypotField } from "@/lib/validation/consultation-honeypot";
 
-export type QuoteFormLabels = {
+export type ConsultationFormLabels = {
   name: string;
   phone: string;
   phoneHint: string;
@@ -36,7 +36,7 @@ export type QuoteFormLabels = {
   honeypot: string;
 };
 
-export type QuoteFormProduct = {
+export type ConsultationFormProduct = {
   id: string;
   name: string;
   image: { src: string; alt: string } | null;
@@ -48,9 +48,9 @@ type Values = Record<Field, string>;
 
 const empty: Values = { name: "", phone: "", email: "", company: "", message: "" };
 
-const loadQuote = () => import("./submit-quote");
+const loadConsultation = () => import("./submit-consultation");
 
-function fieldMessage(field: string, labels: QuoteFormLabels): string {
+function fieldMessage(field: string, labels: ConsultationFormLabels): string {
   if (field === "name") return labels.errorName;
   if (field === "phone") return labels.errorPhone;
   if (field === "email") return labels.errorEmail;
@@ -106,15 +106,15 @@ const fieldClass =
 
 const inputClass = `${fieldClass} h-15`;
 
-export function QuoteForm({
+export function ConsultationForm({
   locale,
   labels,
   initialProducts,
   productsHref,
 }: {
   locale: Locale;
-  labels: QuoteFormLabels;
-  initialProducts: QuoteFormProduct[];
+  labels: ConsultationFormLabels;
+  initialProducts: ConsultationFormProduct[];
   productsHref: string;
 }) {
   const uid = useId();
@@ -138,16 +138,16 @@ export function QuoteForm({
       ...values,
       productIds: products.map((product) => product.id),
       locale,
-      [quoteHoneypotField]: honeypot,
+      [consultationHoneypotField]: honeypot,
     };
-    let quote: Awaited<ReturnType<typeof loadQuote>>;
+    let quote: Awaited<ReturnType<typeof loadConsultation>>;
     try {
-      quote = await loadQuote();
+      quote = await loadConsultation();
     } catch {
       setFormError(labels.errorGeneric);
       return;
     }
-    const parsed = quote.validateQuote(payload);
+    const parsed = quote.validateConsultation(payload);
     if (!parsed.success) {
       const next: Partial<Record<Field, string>> = {};
       for (const issue of parsed.error.issues) {
@@ -160,7 +160,7 @@ export function QuoteForm({
       return;
     }
     setStatus("sending");
-    const result = await quote.submitQuote(payload);
+    const result = await quote.submitConsultation(payload);
     if (!("error" in result) || !result.error) {
       setStatus("sent");
       return;
@@ -215,7 +215,7 @@ export function QuoteForm({
     <form
       noValidate
       onSubmit={onSubmit}
-      onFocus={() => void loadQuote().catch(() => undefined)}
+      onFocus={() => void loadConsultation().catch(() => undefined)}
       className="flex flex-col gap-7.5"
     >
       {products.length > 0 && (
@@ -356,7 +356,7 @@ export function QuoteForm({
         <label htmlFor={`${uid}-website`}>{labels.honeypot}</label>
         <input
           id={`${uid}-website`}
-          name={quoteHoneypotField}
+          name={consultationHoneypotField}
           type="text"
           tabIndex={-1}
           autoComplete="off"
@@ -375,7 +375,7 @@ export function QuoteForm({
         type="submit"
         disabled={isLoading}
         aria-busy={isLoading || undefined}
-        className={cx(pill({ variant: "filled" }), "self-start disabled:opacity-50 max-sm:w-full")}
+        className={cx(button(), "self-start disabled:opacity-50 max-sm:w-full")}
       >
         {isLoading && (
           <SpinnerIcon aria-hidden="true" className="size-4 motion-safe:animate-spin" />
