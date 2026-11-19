@@ -32,6 +32,18 @@ export type SettingsHero = {
   filmId: string | null;
 };
 
+export const aiCrawlerPolicies = ["open", "search-only", "closed"] as const;
+
+export type AiCrawlerPolicy = (typeof aiCrawlerPolicies)[number];
+
+export type SettingsSeo = {
+  googleVerification?: string;
+  yandexVerification?: string;
+  bingVerification?: string;
+  aiCrawlers?: AiCrawlerPolicy;
+  indexNowKey?: string;
+};
+
 export type SettingsTextOverrides = Record<string, Partial<Record<Locale, string>>>;
 
 export const homeSectionKeys = ["categories", "products", "brands", "clients", "posts"] as const;
@@ -103,6 +115,7 @@ export const settings = pgTable(
     seoDescription: localized("seo_description"),
     ogImageId: uuid("og_image_id").references(() => media.id, { onDelete: "set null" }),
     textOverrides: jsonb("text_overrides").$type<SettingsTextOverrides>().notNull().default({}),
+    seo: jsonb("seo").$type<SettingsSeo>().notNull().default({}),
     searchIndexing: boolean("search_indexing").notNull().default(true),
     catalogueFileId: uuid("catalogue_file_id").references(() => media.id, {
       onDelete: "set null",

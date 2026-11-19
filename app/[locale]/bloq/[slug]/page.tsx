@@ -12,10 +12,13 @@ import { env } from "@/lib/env";
 import { localePath } from "@/lib/i18n/config";
 import { getRequestDictionary } from "@/lib/i18n/server";
 import { formatPostDate, getPostBySlug, getRelatedPosts } from "@/lib/public/content";
+import { getSiteSettings } from "@/lib/public/settings";
 import { localizedPaths, redirectToCanonicalSlug } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
 import { blogPostingJsonLd } from "@/lib/seo/json-ld";
+import { entityInfo } from "@/lib/seo/corpus";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { markdownHref } from "@/lib/seo/rewrites";
 
 export async function generateMetadata({
   params,
@@ -25,6 +28,7 @@ export async function generateMetadata({
   const post = await getPostBySlug(locale, slug);
   if (!post) notFound();
   redirectToCanonicalSlug(post.slug, locale, slug, routes.post);
+  const info = await entityInfo("post", post.id);
   return pageMetadata({
     locale,
     title: post.seoTitle ?? post.title,
@@ -34,8 +38,12 @@ export async function generateMetadata({
       post.excerpt ??
       (summarize(richTextToPlain(post.content)) || dict.blog.description),
     paths: localizedPaths(post.slug, routes.post),
-    image: post.image,
+    availableLocales: info.locales,
+    og: { kind: "post", slug },
+    markdownPath: markdownHref(localePath(locale, routes.post(slug))),
     type: "article",
+    publishedTime: post.publishedAt,
+    modifiedTime: info.updatedAt,
   });
 }
 
@@ -45,7 +53,11 @@ export default async function PostPage({ params }: PageProps<"/[locale]/bloq/[sl
   const post = await getPostBySlug(locale, slug);
   if (!post) notFound();
   redirectToCanonicalSlug(post.slug, locale, slug, routes.post);
-  const related = await getRelatedPosts(locale, post.id);
+  const [related, info, settings] = await Promise.all([
+    getRelatedPosts(locale, post.id),
+    entityInfo("post", post.id),
+    getSiteSettings(),
+  ]);
 
   return (
     <>
@@ -102,6 +114,8 @@ export default async function PostPage({ params }: PageProps<"/[locale]/bloq/[sl
           url: post.href,
           image: post.image?.src ?? null,
           datePublished: post.publishedAt,
+          dateModified: info.updatedAt,
+          logo: (settings.logoLight ?? settings.logoDark)?.src ?? null,
           locale,
           siteUrl: env.NEXT_PUBLIC_SITE_URL,
           publisherName: dict.meta.siteName,

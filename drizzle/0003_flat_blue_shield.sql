@@ -1,0 +1,1 @@
+ALTER TABLE "settings" ADD COLUMN "seo" jsonb DEFAULT '{}'::jsonb NOT NULL;

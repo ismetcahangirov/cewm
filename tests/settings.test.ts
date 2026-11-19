@@ -301,15 +301,20 @@ describe("public settings and structured data", () => {
     expect((await put(input())).status).toBe(200);
     const before = organizationJsonLd(await getSiteSettings(), "az", siteUrl);
     expect(before).toMatchObject({
-      "@type": "Organization",
+      "@type": ["Organization", "LocalBusiness"],
       name: "CEWM",
       url: "https://cewm.az/",
       telephone: "+994125265423",
       email: "office@cewm.az",
       sameAs: ["https://www.instagram.com/cewm.az", "https://www.facebook.com/cewm.az"],
-      address: { "@type": "PostalAddress", streetAddress: "Ağ Şəhər, Bakı", addressCountry: "AZ" },
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: "Ağ Şəhər",
+        addressLocality: "Bakı",
+        addressCountry: "AZ",
+      },
     });
-    expect(before.logo).toMatch(/^https:\/\/cewm\.az\/media\/tests\//);
+    expect((before.logo as { url: string }).url).toMatch(/^https:\/\/cewm\.az\/media\/tests\//);
 
     const changed = input({
       phones: [{ label: { az: "Satış", ru: "Продажи" }, number: "070 111 22 33" }],
@@ -321,7 +326,7 @@ describe("public settings and structured data", () => {
     expect(after.contactPoint).toEqual([
       expect.objectContaining({ telephone: "+994701112233", name: "Продажи" }),
     ]);
-    expect(after.address).toMatchObject({ streetAddress: "Ağ Şəhər, Bakı" });
+    expect(after.address).toMatchObject({ streetAddress: "Ağ Şəhər", addressLocality: "Bakı" });
   });
 
   it("maps a settings row to serialisable public settings", () => {
@@ -347,6 +352,7 @@ describe("public settings and structured data", () => {
       catalogueFileId: null,
       textOverrides: {},
       searchIndexing: true,
+      seo: {},
       updatedAt: new Date(),
     };
     const mediaRow = {

@@ -4,9 +4,11 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
 import { ConsultationSection } from "@/components/site/consultation/consultation-section";
+import { JsonLdScript } from "@/components/site/json-ld";
 import { PageHeading } from "@/components/site/page-heading";
 import { RichText } from "@/components/site/rich-text";
 import { richTextToPlain, summarize } from "@/lib/content/rich-text";
+import { env } from "@/lib/env";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { pickLocale } from "@/lib/i18n/localized";
@@ -18,7 +20,12 @@ import { getPageBySlug, type PublicPage } from "@/lib/public/pages";
 import { getSiteSettings } from "@/lib/public/settings";
 import { localizedPaths, redirectToCanonicalSlug } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
+import { entityInfo, getCorpus } from "@/lib/seo/corpus";
+import { companyStatement } from "@/lib/seo/facts";
+import { aboutPageJsonLd, businessJsonLd, contactPageJsonLd } from "@/lib/seo/json-ld";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { markdownHref } from "@/lib/seo/rewrites";
+import { describeEntity } from "@/lib/seo/text";
 
 function fallbackDescription(page: PublicPage, dict: Dictionary): string {
   if (page.kind === "contact") return dict.contact.intro;
@@ -34,13 +41,22 @@ export async function generateMetadata({
   const page = await getPageBySlug(locale, slug);
   if (!page) notFound();
   redirectToCanonicalSlug(page.slug, locale, slug, routes.page);
+  const info = await entityInfo("page", page.id);
   return pageMetadata({
     locale,
     title: page.seoTitle ?? page.title,
     absoluteTitle: Boolean(page.seoTitle),
-    description: page.seoDescription ?? fallbackDescription(page, dict),
+    description: describeEntity({
+      locale,
+      name: page.title,
+      admin: page.seoDescription,
+      summary: fallbackDescription(page, dict),
+      fallback: dict.meta.description,
+    }),
     paths: localizedPaths(page.slug, routes.page),
-    image: page.cover,
+    availableLocales: info.locales,
+    og: { kind: "page", slug },
+    markdownPath: markdownHref(localePath(locale, routes.page(slug))),
   });
 }
 
@@ -171,9 +187,44 @@ export default async function CmsPage({ params }: PageProps<"/[locale]/[slug]">)
   if (!page) notFound();
   redirectToCanonicalSlug(page.slug, locale, slug, routes.page);
   const path = localePath(locale, routes.page(slug));
+  const corpus = page.kind === "contact" || page.kind === "about" ? await getCorpus() : null;
 
   return (
     <>
+      {corpus && page.kind === "contact" ? (
+        <JsonLdScript
+          data={[
+            ...businessJsonLd(corpus.settings, locale, env.NEXT_PUBLIC_SITE_URL, {
+              description: companyStatement(corpus, locale, dict),
+              brands: corpus.brands,
+            }),
+            contactPageJsonLd({
+              name: page.title,
+              description: fallbackDescription(page, dict),
+              url: path,
+              locale,
+              siteUrl: env.NEXT_PUBLIC_SITE_URL,
+            }),
+          ]}
+        />
+      ) : null}
+      {corpus && page.kind === "about" ? (
+        <JsonLdScript
+          data={[
+            ...businessJsonLd(corpus.settings, locale, env.NEXT_PUBLIC_SITE_URL, {
+              description: companyStatement(corpus, locale, dict),
+              brands: corpus.brands,
+            }),
+            aboutPageJsonLd({
+              name: page.title,
+              description: fallbackDescription(page, dict),
+              url: path,
+              locale,
+              siteUrl: env.NEXT_PUBLIC_SITE_URL,
+            }),
+          ]}
+        />
+      ) : null}
       <PageHeading
         title={page.title}
         breadcrumbLabel={dict.common.breadcrumb}

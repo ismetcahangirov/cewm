@@ -1,185 +1,118 @@
-import "server-only";
-
-import { and, asc, eq, inArray, isNull, lte, sql } from "drizzle-orm";
 import type { MetadataRoute } from "next";
-import { cacheLife, cacheTag } from "next/cache";
 
-import { publicTags } from "@/lib/cache/tags";
-import { getDb } from "@/lib/db";
-import {
-  categories,
-  media,
-  pages,
-  posts,
-  productCategories,
-  productImages,
-  products,
-  settings,
-} from "@/lib/db/schema";
-import { defaultLocale, localePath, locales } from "@/lib/i18n/config";
+import { defaultLocale, localePath, locales, type Locale } from "@/lib/i18n/config";
 import { pickLocale, type Localized } from "@/lib/i18n/localized";
-import { visibleCategoryIds } from "@/lib/public/product";
 import { routes } from "@/lib/routes";
 
-export type SitemapItem = { slug: Localized; updatedAt: string; images?: string[] };
-
-export type SitemapSource = {
-  settingsUpdatedAt: string | null;
-  categories: SitemapItem[];
-  products: SitemapItem[];
-  pages: SitemapItem[];
-  posts: SitemapItem[];
-};
+import { hasLocale, type Corpus, type CorpusImage } from "./model";
 
 const maxImagesPerUrl = 10;
 
-export async function querySitemapSource(): Promise<SitemapSource> {
-  const db = getDb();
-  const [settingsRows, categoryRows, productRows, links, imageRows, pageRows, postRows] =
-    await Promise.all([
-      db.select({ updatedAt: settings.updatedAt }).from(settings),
-      db
-        .select({
-          id: categories.id,
-          parentId: categories.parentId,
-          isActive: categories.isActive,
-          slug: categories.slug,
-          updatedAt: categories.updatedAt,
-        })
-        .from(categories)
-        .orderBy(asc(categories.sortOrder), asc(categories.createdAt)),
-      db
-        .select({ id: products.id, slug: products.slug, updatedAt: products.updatedAt })
-        .from(products)
-        .where(and(eq(products.status, "published"), isNull(products.deletedAt)))
-        .orderBy(asc(products.sortOrder), asc(products.createdAt)),
-      db
-        .select({
-          productId: productCategories.productId,
-          categoryId: productCategories.categoryId,
-        })
-        .from(productCategories),
-      db
-        .select({ productId: productImages.productId, key: media.key })
-        .from(productImages)
-        .innerJoin(media, eq(media.id, productImages.mediaId))
-        .innerJoin(products, eq(products.id, productImages.productId))
-        .where(
-          and(
-            eq(products.status, "published"),
-            isNull(products.deletedAt),
-            inArray(media.mimeType, ["image/jpeg", "image/png", "image/webp"]),
-          ),
-        )
-        .orderBy(asc(productImages.position)),
-      db
-        .select({ slug: pages.slug, updatedAt: pages.updatedAt })
-        .from(pages)
-        .where(eq(pages.status, "published"))
-        .orderBy(asc(pages.createdAt)),
-      db
-        .select({ slug: posts.slug, updatedAt: posts.updatedAt })
-        .from(posts)
-        .where(and(eq(posts.status, "published"), lte(posts.publishedAt, sql`now()`)))
-        .orderBy(asc(posts.publishedAt)),
-    ]);
-
-  const visible = visibleCategoryIds(categoryRows);
-  const linksByProduct = new Map<string, string[]>();
-  for (const link of links) {
-    linksByProduct.set(link.productId, [
-      ...(linksByProduct.get(link.productId) ?? []),
-      link.categoryId,
-    ]);
-  }
-  const imagesByProduct = new Map<string, string[]>();
-  for (const image of imageRows) {
-    const list = imagesByProduct.get(image.productId) ?? [];
-    if (list.length < maxImagesPerUrl) list.push(routes.media(image.key));
-    imagesByProduct.set(image.productId, list);
-  }
-  const iso = (date: Date) => date.toISOString();
-
-  return {
-    settingsUpdatedAt: settingsRows[0] ? iso(settingsRows[0].updatedAt) : null,
-    categories: categoryRows
-      .filter((row) => visible.has(row.id))
-      .map((row) => ({ slug: row.slug, updatedAt: iso(row.updatedAt) })),
-    products: productRows
-      .filter((row) => {
-        const linked = linksByProduct.get(row.id);
-        return !linked || linked.some((id) => visible.has(id));
-      })
-      .map((row) => ({
-        slug: row.slug,
-        updatedAt: iso(row.updatedAt),
-        images: imagesByProduct.get(row.id) ?? [],
-      })),
-    pages: pageRows.map((row) => ({ slug: row.slug, updatedAt: iso(row.updatedAt) })),
-    posts: postRows.map((row) => ({ slug: row.slug, updatedAt: iso(row.updatedAt) })),
-  };
+export function blogLocales(corpus: Corpus): Locale[] {
+  return locales.filter((locale) => corpus.posts.some((post) => hasLocale(post.title, locale)));
 }
 
-export async function getSitemapSource(): Promise<SitemapSource> {
-  "use cache";
-  cacheTag(publicTags.catalog, publicTags.content, publicTags.settings);
-  cacheLife("hours");
-  return querySitemapSource();
-}
+type Entry = MetadataRoute.Sitemap[number];
 
 function latest(dates: (string | null | undefined)[]): string | undefined {
   const values = dates.filter((date): date is string => Boolean(date)).sort();
   return values.at(-1);
 }
 
-export function buildSitemap(source: SitemapSource, siteUrl: string): MetadataRoute.Sitemap {
+export type SitemapUrl = {
+  loc: string;
+  lastModified?: string;
+  languages: Record<string, string>;
+  images: string[];
+};
+
+function imagePaths(images: CorpusImage[] | undefined): string[] {
+  return (images ?? []).slice(0, maxImagesPerUrl).map((image) => routes.media(image.key));
+}
+
+export function buildSitemapUrls(corpus: Corpus, siteUrl: string): SitemapUrl[] {
   const absolute = (path: string) => new URL(path, siteUrl).toString();
 
   const entries = (
-    build: (locale: (typeof locales)[number]) => string,
+    build: (locale: Locale) => string,
     lastModified: string | undefined,
-    images?: string[],
-  ): MetadataRoute.Sitemap => {
-    const languages = Object.fromEntries([
-      ...locales.map((locale) => [locale, absolute(build(locale))]),
-      ["x-default", absolute(build(defaultLocale))],
-    ]);
-    return locales.map((locale) => ({
-      url: absolute(build(locale)),
+    available: readonly Locale[] = locales,
+    images: string[] = [],
+  ): SitemapUrl[] => {
+    const present = locales.filter((locale) => available.includes(locale));
+    const languages: Record<string, string> = Object.fromEntries(
+      present.map((locale) => [locale, absolute(build(locale))]),
+    );
+    languages["x-default"] = absolute(build(defaultLocale));
+    return present.map((locale) => ({
+      loc: absolute(build(locale)),
       ...(lastModified ? { lastModified } : {}),
-      alternates: { languages },
-      ...(images?.length ? { images: images.map(absolute) } : {}),
+      languages,
+      images: images.map(absolute),
     }));
   };
 
-  const fromItems = (items: SitemapItem[], route: (slug: string) => string) =>
+  const fromItems = <T extends { slug: Localized; updatedAt: string }>(
+    items: T[],
+    title: (item: T) => Localized,
+    route: (slug: string) => string,
+    images?: (item: T) => CorpusImage[] | undefined,
+  ) =>
     items.flatMap((item) =>
       entries(
         (locale) => localePath(locale, route(pickLocale(item.slug, locale))),
         item.updatedAt,
-        item.images,
+        locales.filter((locale) => hasLocale(title(item), locale)),
+        imagePaths(images?.(item)),
       ),
     );
 
   const catalogUpdated = latest([
-    ...source.categories.map((item) => item.updatedAt),
-    ...source.products.map((item) => item.updatedAt),
+    ...corpus.categories.map((item) => item.updatedAt),
+    ...corpus.products.map((item) => item.updatedAt),
   ]);
-  const postsUpdated = latest(source.posts.map((item) => item.updatedAt));
-  const homeUpdated = latest([source.settingsUpdatedAt, catalogUpdated, postsUpdated]);
+  const postsUpdated = latest(corpus.posts.map((item) => item.updatedAt));
+  const homeUpdated = latest([corpus.settingsUpdatedAt, catalogUpdated, postsUpdated]);
 
   return [
     ...entries((locale) => localePath(locale, routes.home()), homeUpdated),
     ...entries((locale) => localePath(locale, routes.catalogue()), catalogUpdated),
-    ...(source.categories.length
+    ...(corpus.categories.length
       ? entries((locale) => localePath(locale, routes.categories()), catalogUpdated)
       : []),
-    ...fromItems(source.categories, routes.category),
-    ...fromItems(source.products, routes.product),
-    ...fromItems(source.pages, routes.page),
-    ...(source.posts.length
-      ? entries((locale) => localePath(locale, routes.blog()), postsUpdated)
-      : []),
-    ...fromItems(source.posts, routes.post),
+    ...fromItems(
+      corpus.categories,
+      (item) => item.name,
+      routes.category,
+      (item) => (item.image ? [item.image] : undefined),
+    ),
+    ...fromItems(
+      corpus.products,
+      (item) => item.name,
+      routes.product,
+      (item) => item.images,
+    ),
+    ...fromItems(
+      corpus.pages,
+      (item) => item.title,
+      routes.page,
+      (item) => (item.cover ? [item.cover] : undefined),
+    ),
+    ...entries((locale) => localePath(locale, routes.blog()), postsUpdated, blogLocales(corpus)),
+    ...fromItems(
+      corpus.posts,
+      (item) => item.title,
+      routes.post,
+      (item) => (item.cover ? [item.cover] : undefined),
+    ),
   ];
+}
+
+export function buildSitemap(corpus: Corpus, siteUrl: string): MetadataRoute.Sitemap {
+  return buildSitemapUrls(corpus, siteUrl).map((url): Entry => ({
+    url: url.loc,
+    ...(url.lastModified ? { lastModified: url.lastModified } : {}),
+    alternates: { languages: url.languages },
+    ...(url.images.length ? { images: url.images } : {}),
+  }));
 }

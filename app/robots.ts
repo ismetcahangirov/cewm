@@ -6,6 +6,6 @@ import { buildRobots } from "@/lib/seo/robots";
 
 export default async function robots(): Promise<MetadataRoute.Robots> {
   await connection();
-  const { searchIndexing } = await getSiteSettings();
-  return buildRobots(searchIndexing);
+  const { searchIndexing, seo } = await getSiteSettings();
+  return buildRobots(searchIndexing, seo.aiCrawlers);
 }

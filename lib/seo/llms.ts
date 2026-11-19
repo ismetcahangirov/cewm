@@ -1,106 +1,142 @@
-import "server-only";
-
-import { and, asc, eq, isNull } from "drizzle-orm";
-import { cacheLife, cacheTag } from "next/cache";
-
-import { publicTags } from "@/lib/cache/tags";
-import { getDb } from "@/lib/db";
-import { categories, pages } from "@/lib/db/schema";
-import { defaultLocale, localePath, locales, type Locale } from "@/lib/i18n/config";
-import { getDictionary } from "@/lib/i18n/dictionaries";
-import { pickExact, pickLocale } from "@/lib/i18n/localized";
-import { getSiteSettings } from "@/lib/public/settings";
+import { localePath, locales, type Locale } from "@/lib/i18n/config";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { routes } from "@/lib/routes";
 
-export type LlmsLink = { title: string; path: string; note?: string | null };
+import { languageName } from "./config";
+import { companyFactBlock, companyName, companyStatement, contactFacts, factLabels } from "./facts";
+import {
+  categoryMarkdown,
+  categoryUrl,
+  pageMarkdown,
+  pageUrl,
+  postMarkdown,
+  postUrl,
+  productMarkdown,
+  productUrl,
+} from "./markdown";
+import { hasLocale, localizedText, summaryText, type Corpus } from "./model";
 
-export type LlmsSource = {
-  name: string;
-  summary: string;
-  legalName: string | null;
-  catalogue: LlmsLink[];
-  sections: LlmsLink[];
-  pages: LlmsLink[];
-  contact: { label: string; value: string }[];
-  locales: { locale: Locale; path: string }[];
-};
+export type LlmsContext = { corpus: Corpus; locale: Locale; dict: Dictionary; siteUrl: string };
 
-function list(links: LlmsLink[], siteUrl: string): string[] {
-  return links.map((link) => {
-    const url = new URL(link.path, siteUrl).toString();
-    return link.note ? `- [${link.title}](${url}): ${link.note}` : `- [${link.title}](${url})`;
-  });
+export function llmsPath(locale: Locale, full = false): string {
+  return localePath(locale, full ? "/llms-full.txt" : "/llms.txt");
 }
 
-export function buildLlmsTxt(source: LlmsSource, siteUrl: string): string {
-  const lines = [`# ${source.name}`, "", `> ${source.summary}`];
-  if (source.legalName && source.legalName !== source.name) lines.push("", source.legalName);
-  const blocks: [string, string[]][] = [
-    ["Catalogue", list(source.catalogue, siteUrl)],
-    ["Sections", list(source.sections, siteUrl)],
-    ["Pages", list(source.pages, siteUrl)],
-    ["Contact", source.contact.map((item) => `- ${item.label}: ${item.value}`)],
-    [
-      "Languages",
-      source.locales.map((item) => `- ${item.locale}: ${new URL(item.path, siteUrl).toString()}`),
-    ],
+function link(title: string, target: string, note?: string): string {
+  return note ? `- [${title}](${target}): ${note}` : `- [${title}](${target})`;
+}
+
+function visible(context: LlmsContext) {
+  const { corpus, locale } = context;
+  return {
+    categories: corpus.categories.filter((item) => hasLocale(item.name, locale)),
+    products: corpus.products.filter((item) => hasLocale(item.name, locale)),
+    pages: corpus.pages.filter((item) => hasLocale(item.title, locale)),
+    posts: corpus.posts.filter((item) => hasLocale(item.title, locale)),
+  };
+}
+
+function header(context: LlmsContext): string[] {
+  const { corpus, locale, dict } = context;
+  const company = companyFactBlock(corpus, locale, dict);
+  return [
+    `# ${companyName(corpus)}`,
+    "",
+    `> ${companyStatement(corpus, locale, dict)}`,
+    "",
+    ...company.facts.map((fact) => `- ${fact.label}: ${fact.value}`),
   ];
-  for (const [heading, items] of blocks) {
-    if (items.length) lines.push("", `## ${heading}`, "", ...items);
+}
+
+export function buildLlmsTxt(context: LlmsContext): string {
+  const { corpus, locale, dict, siteUrl } = context;
+  const absolute = (path: string) => new URL(path, siteUrl).toString();
+  const items = visible(context);
+  const labels = factLabels[locale];
+  const lines = header(context);
+
+  const roots = items.categories.filter((category) => !category.parentId);
+  if (roots.length) {
+    lines.push("", `## ${dict.catalog.categories}`, "");
+    for (const category of roots) {
+      const count = items.products.filter((product) =>
+        product.categoryIds.includes(category.id),
+      ).length;
+      const summary = summaryText(category.description, null, locale, 140);
+      const note = [summary, `${labels.machinesCount}: ${count}`].filter(Boolean).join(" ");
+      lines.push(link(localizedText(category.name, locale), categoryUrl(context, category), note));
+    }
+  }
+
+  if (items.products.length) {
+    lines.push("", `## ${labels.machines}`, "");
+    for (const product of items.products) {
+      const summary = summaryText(product.shortDescription, product.description, locale, 150);
+      const note = [product.brand, summary].filter(Boolean).join(". ");
+      lines.push(
+        link(localizedText(product.name, locale), productUrl(context, product), note || undefined),
+      );
+    }
+  }
+
+  if (items.pages.length || items.posts.length) {
+    lines.push("", `## ${dict.meta.siteName}`, "");
+    for (const page of items.pages)
+      lines.push(link(localizedText(page.title, locale), pageUrl(context, page)));
+    if (items.posts.length)
+      lines.push(
+        link(dict.blog.title, absolute(localePath(locale, routes.blog())), dict.blog.description),
+      );
+    for (const post of items.posts)
+      lines.push(link(localizedText(post.title, locale), postUrl(context, post)));
+  }
+
+  lines.push("", `## ${labels.languages}`, "");
+  for (const code of locales) {
+    lines.push(link(languageName(code, locale), absolute(llmsPath(code))));
+  }
+
+  lines.push(
+    "",
+    "## Optional",
+    "",
+    link(`${companyName(corpus)}: full text`, absolute(llmsPath(locale, true))),
+  );
+  lines.push(link("Sitemap", absolute("/sitemap.xml")));
+  if (corpus.settings.catalogueFile) {
+    lines.push(link(dict.common.catalogue, absolute(corpus.settings.catalogueFile.src)));
   }
   return `${lines.join("\n")}\n`;
 }
 
-export async function getLlmsSource(): Promise<LlmsSource> {
-  "use cache";
-  cacheTag(publicTags.catalog, publicTags.content, publicTags.settings);
-  cacheLife("hours");
-  const locale = defaultLocale;
-  const db = getDb();
-  const [dict, settings, categoryRows, pageRows] = await Promise.all([
-    getDictionary(locale),
-    getSiteSettings(),
-    db
-      .select({ slug: categories.slug, name: categories.name })
-      .from(categories)
-      .where(and(isNull(categories.parentId), eq(categories.isActive, true)))
-      .orderBy(asc(categories.sortOrder), asc(categories.createdAt)),
-    db
-      .select({ slug: pages.slug, title: pages.title })
-      .from(pages)
-      .where(eq(pages.status, "published"))
-      .orderBy(asc(pages.createdAt)),
-  ]);
-  const address = settings.address ? pickLocale(settings.address, locale) : "";
-  const hours = settings.workingHours ? pickLocale(settings.workingHours, locale) : "";
-  return {
-    name: dict.meta.siteName,
-    summary: pickExact(settings.seoDescription, locale) ?? dict.meta.description,
-    legalName: settings.legalName,
-    catalogue: [
-      { title: dict.common.allProducts, path: routes.catalogue() },
-      ...categoryRows.map((row) => ({
-        title: pickLocale(row.name, locale),
-        path: routes.category(pickLocale(row.slug, locale)),
-      })),
-    ],
-    sections: [{ title: dict.blog.title, path: routes.blog(), note: dict.blog.description }],
-    pages: pageRows.map((row) => ({
-      title: pickLocale(row.title, locale),
-      path: routes.page(pickLocale(row.slug, locale)),
-    })),
-    contact: [
-      ...settings.phones.map((phone) => ({
-        label: pickLocale(phone.label, locale) || dict.contact.phone,
-        value: phone.number,
-      })),
-      ...settings.emails.map((email) => ({ label: dict.contact.email, value: email })),
-      ...(address ? [{ label: dict.contact.address, value: address }] : []),
-      ...(hours ? [{ label: dict.contact.hours, value: hours }] : []),
-    ],
-    locales: locales.map((item) => ({
-      locale: item,
-      path: localePath(item, routes.home()),
-    })),
-  };
+export function buildLlmsFullTxt(context: LlmsContext): string {
+  const { corpus, locale, dict } = context;
+  const items = visible(context);
+  const labels = factLabels[locale];
+  const lines = header(context);
+  const contact = contactFacts(corpus, locale, dict);
+  if (!contact.length) lines.push("");
+
+  const roots = items.categories.filter((category) => !category.parentId);
+  if (roots.length) {
+    lines.push("", `## ${dict.catalog.categories}`, "");
+    for (const category of roots) lines.push(categoryMarkdown(context, category, { level: 3 }), "");
+  }
+  if (items.products.length) {
+    lines.push(`## ${labels.machines}`, "");
+    for (const product of items.products)
+      lines.push(productMarkdown(context, product, { level: 3 }), "");
+  }
+  if (items.pages.length) {
+    lines.push(`## ${dict.meta.siteName}`, "");
+    for (const page of items.pages) lines.push(pageMarkdown(context, page, { level: 3 }), "");
+  }
+  if (items.posts.length) {
+    lines.push(`## ${dict.blog.title}`, "");
+    for (const post of items.posts) lines.push(postMarkdown(context, post, { level: 3 }), "");
+  }
+  return `${lines
+    .join("\n")
+    .replace(/\n{3,}/g, "\n\n")
+    .trim()}\n`;
 }

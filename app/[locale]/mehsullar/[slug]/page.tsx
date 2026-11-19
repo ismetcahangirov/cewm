@@ -17,7 +17,10 @@ import { getCategoryListing, parsePageParam } from "@/lib/public/listing";
 import { localizedPaths, redirectToCanonicalSlug } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
 import { collectionPageJsonLd } from "@/lib/seo/json-ld";
+import { entityInfo } from "@/lib/seo/corpus";
 import { pageMetadata, paginatedPaths, paginatedText } from "@/lib/seo/metadata";
+import { markdownHref } from "@/lib/seo/rewrites";
+import { describeEntity } from "@/lib/seo/text";
 
 export async function generateMetadata({
   params,
@@ -41,16 +44,23 @@ export async function generateMetadata({
   );
   const { category } = listing;
   const suffix = fill(dict.catalog.pageSuffix, { page });
-  const description =
-    category.seoDescription ??
-    (summarize(richTextToPlain(pickRichText(category.description, locale))) ||
-      fill(dict.catalog.categoryDescription, { name: category.name }));
+  const info = await entityInfo("category", category.id);
+  const description = describeEntity({
+    locale,
+    name: category.name,
+    admin: category.seoDescription,
+    summary: summarize(richTextToPlain(pickRichText(category.description, locale))),
+    fallback: fill(dict.catalog.categoryDescription, { name: category.name }),
+  });
   return pageMetadata({
     locale,
     title: paginatedText(category.seoTitle ?? category.name, page, suffix),
     absoluteTitle: Boolean(category.seoTitle),
     description: paginatedText(description, page, suffix),
     paths: paginatedPaths(localizedPaths(category.slug, routes.category), page),
+    availableLocales: info.locales,
+    og: { kind: "category", slug },
+    markdownPath: markdownHref(localePath(locale, routes.category(slug))),
   });
 }
 
@@ -131,7 +141,11 @@ export default async function CategoryPage({
           url: path,
           locale,
           siteUrl: env.NEXT_PUBLIC_SITE_URL,
-          items: listing.items.map((item) => ({ name: item.name, url: item.href })),
+          items: listing.items.map((item) => ({
+            name: item.name,
+            url: item.href,
+            image: item.image?.src ?? null,
+          })),
         })}
       />
     </>

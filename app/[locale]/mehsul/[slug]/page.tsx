@@ -17,7 +17,10 @@ import { getProductBySlug, getRelatedProducts } from "@/lib/public/product";
 import { localizedPaths, redirectToCanonicalSlug } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
 import { productJsonLd } from "@/lib/seo/json-ld";
+import { entityInfo } from "@/lib/seo/corpus";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { markdownHref } from "@/lib/seo/rewrites";
+import { describeEntity } from "@/lib/seo/text";
 import { formatFileSize } from "@/lib/validation/media";
 
 export async function generateMetadata({
@@ -28,17 +31,23 @@ export async function generateMetadata({
   const product = await getProductBySlug(locale, slug);
   if (!product) notFound();
   redirectToCanonicalSlug(product.slug, locale, slug, routes.product);
-  const description =
-    product.seoDescription ??
-    (summarize(richTextToPlain(product.shortDescription ?? product.description)) ||
-      fill(dict.product.description, { name: product.name }));
+  const info = await entityInfo("product", product.id);
+  const description = describeEntity({
+    locale,
+    name: product.name,
+    admin: product.seoDescription,
+    summary: summarize(richTextToPlain(product.shortDescription ?? product.description)),
+    fallback: fill(dict.product.description, { name: product.name }),
+  });
   return pageMetadata({
     locale,
     title: product.seoTitle ?? product.name,
     absoluteTitle: Boolean(product.seoTitle),
     description,
     paths: localizedPaths(product.slug, routes.product),
-    image: product.images[0] ?? null,
+    availableLocales: info.locales,
+    og: { kind: "product", slug },
+    markdownPath: markdownHref(localePath(locale, routes.product(slug))),
   });
 }
 
@@ -259,7 +268,12 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
             brand: product.brand?.name ?? null,
             specs: product.specs.map((spec) => ({
               name: spec.label,
-              value: spec.unit ? `${spec.value} ${spec.unit}` : spec.value,
+              value: spec.value,
+              unit: spec.unit,
+            })),
+            documents: product.documents.map((document) => ({
+              name: document.title,
+              url: document.href,
             })),
           },
           env.NEXT_PUBLIC_SITE_URL,

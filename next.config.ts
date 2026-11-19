@@ -16,13 +16,18 @@ const nextConfig: NextConfig = {
     ],
   },
   outputFileTracingIncludes: {
-    "/og.png": ["./assets/fonts/*.ttf"],
+    "/og/[locale]/[kind]/[file]": ["./assets/fonts/og/*.ttf"],
   },
   async headers() {
     const noindex = [{ key: "X-Robots-Tag", value: "noindex, nofollow" }];
     return [
       { source: "/admin/:path*", headers: noindex },
       { source: "/api/:path*", headers: noindex },
+      { source: "/md/:path*", headers: noindex },
+      {
+        source: "/((?!_next/|api/|admin/|media/|og/|md/).*)",
+        headers: [{ key: "Link", value: '</llms.txt>; rel="describedby"; type="text/plain"' }],
+      },
     ];
   },
   turbopack: {

@@ -38,8 +38,12 @@ import {
 import { getSiteSettings } from "@/lib/public/settings";
 import { staticPaths } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
+import { companyStatement } from "@/lib/seo/facts";
 import { businessJsonLd, websiteJsonLd } from "@/lib/seo/json-ld";
+import { homeOfferCatalog } from "@/lib/seo/catalog-links";
+import { getCorpus } from "@/lib/seo/corpus";
 import { pageMetadata } from "@/lib/seo/metadata";
+import { markdownHref } from "@/lib/seo/rewrites";
 
 const chapterWindows = [
   { key: "exterior", from: 0.19, to: 0.27, placement: "bottom" },
@@ -60,13 +64,8 @@ export async function generateMetadata(): Promise<Metadata> {
     absoluteTitle: true,
     description: pickExact(settings.seoDescription, locale) ?? dict.meta.description,
     paths: staticPaths(routes.home()),
-    image: settings.ogImage?.width
-      ? {
-          src: settings.ogImage.src,
-          width: settings.ogImage.width,
-          height: settings.ogImage.height,
-        }
-      : null,
+    og: { kind: "home" },
+    markdownPath: markdownHref(localePath(locale, routes.home())),
   });
 }
 
@@ -343,11 +342,12 @@ function fallbackHero(dict: Dictionary): HomeHero {
 export default async function HomePage() {
   await connection();
   const { locale, dict } = await getRequestDictionary();
-  const [hero, sections, settings, requestHeaders] = await Promise.all([
+  const [hero, sections, settings, requestHeaders, corpus] = await Promise.all([
     getHero(locale),
     getHomeSections(locale),
     getSiteSettings(),
     headers(),
+    getCorpus(),
   ]);
   const saveData = requestHeaders.get("save-data")?.toLowerCase() === "on";
   const chapters: HeroChapter[] = chapterWindows.map((window) => ({
@@ -359,8 +359,12 @@ export default async function HomePage() {
     <>
       <JsonLdScript
         data={[
-          ...businessJsonLd(settings, locale, env.NEXT_PUBLIC_SITE_URL),
-          websiteJsonLd(settings, locale, env.NEXT_PUBLIC_SITE_URL),
+          ...businessJsonLd(settings, locale, env.NEXT_PUBLIC_SITE_URL, {
+            description: companyStatement(corpus, locale, dict),
+            brands: corpus.brands,
+            hasOfferCatalog: homeOfferCatalog(corpus, locale),
+          }),
+          websiteJsonLd({ locale, siteUrl: env.NEXT_PUBLIC_SITE_URL, name: settings.legalName }),
         ]}
       />
       <HeroFilm

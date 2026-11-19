@@ -16,6 +16,7 @@ import { staticPaths } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
 import { collectionPageJsonLd } from "@/lib/seo/json-ld";
 import { pageMetadata, paginatedPaths, paginatedText } from "@/lib/seo/metadata";
+import { markdownHref } from "@/lib/seo/rewrites";
 
 export async function generateMetadata({
   searchParams,
@@ -29,6 +30,8 @@ export async function generateMetadata({
     title: paginatedText(dict.catalog.title, page, suffix),
     description: paginatedText(dict.catalog.description, page, suffix),
     paths: paginatedPaths(staticPaths(routes.catalogue()), page),
+    og: { kind: "catalogue" },
+    markdownPath: markdownHref(localePath(locale, routes.catalogue())),
   });
 }
 

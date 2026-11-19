@@ -6,7 +6,13 @@ import { cacheLife, cacheTag } from "next/cache";
 import type { SettingsRow } from "@/lib/admin/settings";
 import { publicTags } from "@/lib/cache/tags";
 import { getDb } from "@/lib/db";
-import { media, settings, type SettingsPhone, type SettingsSocial } from "@/lib/db/schema";
+import {
+  media,
+  settings,
+  type SettingsPhone,
+  type SettingsSeo,
+  type SettingsSocial,
+} from "@/lib/db/schema";
 import type { Localized } from "@/lib/i18n/localized";
 import { routes } from "@/lib/routes";
 
@@ -39,6 +45,7 @@ export type SiteSettings = {
   seoTitle: Localized | null;
   seoDescription: Localized | null;
   searchIndexing: boolean;
+  seo: SettingsSeo;
 };
 
 function image(row: MediaRow | undefined): SiteImage | null {
@@ -75,6 +82,7 @@ export function toSiteSettings(row: SettingsRow | null, mediaRows: MediaRow[]): 
     seoTitle: row?.seoTitle ?? null,
     seoDescription: row?.seoDescription ?? null,
     searchIndexing: row?.searchIndexing ?? true,
+    seo: row?.seo ?? {},
   };
 }
 

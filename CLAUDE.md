@@ -208,24 +208,25 @@ pnpm auth:owner --email you@example.com --name "Your Name"   # prints a set-pass
 pnpm dev                        # http://localhost:3020/admin
 ```
 
-| Command                        | What it does                                                                             |
-| ------------------------------ | ---------------------------------------------------------------------------------------- |
-| `pnpm dev`                     | Development server (Turbopack) on port 3020                                              |
-| `pnpm build`                   | Production build, `output: "standalone"`                                                 |
-| `pnpm start`                   | Runs `.next/standalone/server.js` (set `PORT=3020`)                                      |
-| `pnpm lint`                    | ESLint, zero warnings allowed                                                            |
-| `pnpm typecheck`               | Generates route types, then `tsc --noEmit`                                               |
-| `pnpm format` / `format:check` | Prettier (with the Tailwind class sorter)                                                |
-| `pnpm test`                    | Vitest; needs the database, storage and Mailpit from compose                             |
-| `pnpm db:generate`             | Generates a SQL migration in `drizzle/` from `lib/db/schema`                             |
-| `pnpm db:migrate`              | Applies pending migrations to `DATABASE_URL`                                             |
-| `pnpm db:seed`                 | Idempotent seed (`lib/db/seed.ts`)                                                       |
-| `pnpm db:studio`               | Drizzle Studio                                                                           |
-| `pnpm auth:owner`              | Creates or promotes an owner and prints a set-password link                              |
-| `pnpm storage:cors [origin]`   | Lets the browser upload to the bucket from the app origin                                |
-| `pnpm migrate:wp --from <dir>` | Imports the WordPress crawl (`--dry-run`, `--update`), writes `reports/import-report.md` |
-| `pnpm check:redirects`         | `--base <url> --from <dir>`: every old address must be one 301 to a 200 page             |
-| `docker build -t cewm .`       | Production image; `GET /api/health` answers 200                                          |
+| Command                        | What it does                                                                              |
+| ------------------------------ | ----------------------------------------------------------------------------------------- |
+| `pnpm dev`                     | Development server (Turbopack) on port 3020                                               |
+| `pnpm build`                   | Production build, `output: "standalone"`                                                  |
+| `pnpm start`                   | Runs `.next/standalone/server.js` (set `PORT=3020`)                                       |
+| `pnpm lint`                    | ESLint, zero warnings allowed                                                             |
+| `pnpm typecheck`               | Generates route types, then `tsc --noEmit`                                                |
+| `pnpm format` / `format:check` | Prettier (with the Tailwind class sorter)                                                 |
+| `pnpm test`                    | Vitest; needs the database, storage and Mailpit from compose                              |
+| `pnpm db:generate`             | Generates a SQL migration in `drizzle/` from `lib/db/schema`                              |
+| `pnpm db:migrate`              | Applies pending migrations to `DATABASE_URL`                                              |
+| `pnpm db:seed`                 | Idempotent seed (`lib/db/seed.ts`)                                                        |
+| `pnpm db:studio`               | Drizzle Studio                                                                            |
+| `pnpm auth:owner`              | Creates or promotes an owner and prints a set-password link                               |
+| `pnpm storage:cors [origin]`   | Lets the browser upload to the bucket from the app origin                                 |
+| `pnpm migrate:wp --from <dir>` | Imports the WordPress crawl (`--dry-run`, `--update`), writes `reports/import-report.md`  |
+| `pnpm check:redirects`         | `--base <url> --from <dir>`: every old address must be one 301 to a 200 page              |
+| `pnpm check:seo`               | `--base <url>`: crawls the built site; fails on SEO and GEO defects (see the launch list) |
+| `docker build -t cewm .`       | Production image; `GET /api/health` answers 200                                           |
 
 Do not run `pnpm build` while your own `pnpm dev` runs in the same folder: both
 use `.next`. Stop your dev server by its PID, never every `node.exe`.
@@ -237,32 +238,32 @@ drop).
 
 ### Where things live
 
-| Path                              | What                                                                                 |
-| --------------------------------- | ------------------------------------------------------------------------------------ |
-| `app/[locale]`                    | Public site, one root layout per locale; `az` served without a prefix                |
-| `app/[locale]/mehsullar`          | Catalogue and category pages (`/mehsullar`, `/mehsullar/<category>`)                 |
-| `app/[locale]/mehsul/[slug]`      | Product (machine) page                                                               |
-| `app/[locale]/kateqoriyalar`      | Category index                                                                       |
-| `app/[locale]/bloq`               | Blog list and posts                                                                  |
-| `app/[locale]/[slug]`             | CMS pages; `pages.kind` picks a template (contact, consultation, brands, …)          |
-| `proxy.ts`                        | Locale routing, admin guard, legacy redirects, trailing slashes                      |
-| `app/admin`                       | Admin panel (own root layout, the only place the Redux store is mounted)             |
-| `app/api/admin/**`                | Admin route handlers, each wrapped in `adminRoute()`                                 |
-| `app/api/consultation-requests`   | Public consultation form endpoint (rate limited, emails the sales inbox)             |
-| `components/site`                 | Public components (header, footer, product card, consultation form, rich text)       |
-| `components/admin`                | Admin building blocks (see below)                                                    |
-| `components/ui`                   | shadcn/ui primitives                                                                 |
-| `components/icons`                | Inline SVG icon components for the public site                                       |
-| `lib/public/*`                    | Cached public readers (`"use cache"` + `cacheTag`)                                   |
-| `lib/admin/*`                     | Server-side admin services (queries and mutations)                                   |
-| `lib/validation/*`                | zod schemas and DTO types shared by forms and route handlers                         |
-| `lib/api/*`                       | RTK Query endpoints on `baseApi`; `lib/api/server.ts` has `adminRoute`               |
-| `lib/i18n`                        | Locales, `localePath`, `pickLocale`, public dictionaries (`dictionaries/*.json`)     |
-| `lib/admin/i18n`                  | Admin interface translations: Azerbaijani text is the key, `ru`/`en`/`de` per module |
-| `lib/db/schema`                   | Drizzle schema; `lib/db/seed.ts` the seed                                            |
-| `lib/cache`                       | Cache tags (`tags.ts`) and `revalidatePublic()`                                      |
-| `lib/seo`                         | Metadata, JSON-LD, sitemap and `llms.txt` builders                                   |
-| `lib/env.ts`, `lib/env.server.ts` | Validated environment                                                                |
+| Path                              | What                                                                                                                                    |
+| --------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `app/[locale]`                    | Public site, one root layout per locale; `az` served without a prefix                                                                   |
+| `app/[locale]/mehsullar`          | Catalogue and category pages (`/mehsullar`, `/mehsullar/<category>`)                                                                    |
+| `app/[locale]/mehsul/[slug]`      | Product (machine) page                                                                                                                  |
+| `app/[locale]/kateqoriyalar`      | Category index                                                                                                                          |
+| `app/[locale]/bloq`               | Blog list and posts                                                                                                                     |
+| `app/[locale]/[slug]`             | CMS pages; `pages.kind` picks a template (contact, consultation, brands, …)                                                             |
+| `proxy.ts`                        | Locale routing, admin guard, legacy redirects, trailing slashes                                                                         |
+| `app/admin`                       | Admin panel (own root layout, the only place the Redux store is mounted)                                                                |
+| `app/api/admin/**`                | Admin route handlers, each wrapped in `adminRoute()`                                                                                    |
+| `app/api/consultation-requests`   | Public consultation form endpoint (rate limited, emails the sales inbox)                                                                |
+| `components/site`                 | Public components (header, footer, product card, consultation form, rich text)                                                          |
+| `components/admin`                | Admin building blocks (see below)                                                                                                       |
+| `components/ui`                   | shadcn/ui primitives                                                                                                                    |
+| `components/icons`                | Inline SVG icon components for the public site                                                                                          |
+| `lib/public/*`                    | Cached public readers (`"use cache"` + `cacheTag`)                                                                                      |
+| `lib/admin/*`                     | Server-side admin services (queries and mutations)                                                                                      |
+| `lib/validation/*`                | zod schemas and DTO types shared by forms and route handlers                                                                            |
+| `lib/api/*`                       | RTK Query endpoints on `baseApi`; `lib/api/server.ts` has `adminRoute`                                                                  |
+| `lib/i18n`                        | Locales, `localePath`, `pickLocale`, public dictionaries (`dictionaries/*.json`)                                                        |
+| `lib/admin/i18n`                  | Admin interface translations: Azerbaijani text is the key, `ru`/`en`/`de` per module                                                    |
+| `lib/db/schema`                   | Drizzle schema; `lib/db/seed.ts` the seed                                                                                               |
+| `lib/cache`                       | Cache tags (`tags.ts`) and `revalidatePublic()`                                                                                         |
+| `lib/seo`                         | Metadata, JSON-LD, sitemap, robots, `llms` files, Markdown alternates, OG cards, fact blocks, IndexNow (`docs/seo-launch-checklist.md`) |
+| `lib/env.ts`, `lib/env.server.ts` | Validated environment                                                                                                                   |
 
 Data model (one table per row): `products` (machines; translatable name, slug,
 short description, rich body, `benefits`, `specs` rows of label/value/unit,

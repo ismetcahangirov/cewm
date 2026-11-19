@@ -19,6 +19,7 @@ import * as requests from "./messages/requests";
 import * as users from "./messages/users";
 import * as auth from "./messages/auth";
 import * as localization from "./messages/localization";
+import * as seo from "./messages/seo";
 
 export const ru = {
   ...common.ru,
@@ -41,6 +42,7 @@ export const ru = {
   ...users.ru,
   ...auth.ru,
   ...localization.ru,
+  ...seo.ru,
 };
 
 export type MessageKey = keyof typeof ru;
@@ -66,6 +68,7 @@ export const en: Record<MessageKey, string> = {
   ...users.en,
   ...auth.en,
   ...localization.en,
+  ...seo.en,
 };
 
 export const de: Record<MessageKey, string> = {
@@ -89,6 +92,7 @@ export const de: Record<MessageKey, string> = {
   ...users.de,
   ...auth.de,
   ...localization.de,
+  ...seo.de,
 };
 
 export const { translate, translateMessage } = createTranslator({ ru, en, de });
