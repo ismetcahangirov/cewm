@@ -3,7 +3,7 @@
 import { ArrowRightIcon, CloseIcon, DangerIcon } from "@/components/icons/iconsax";
 import Image from "next/image";
 import Link from "next/link";
-import { useId, useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type FormEvent, type ReactNode } from "react";
 
 import { button } from "@/components/site/button";
 import { cx } from "@/lib/cx";
@@ -24,6 +24,7 @@ export type ConsultationFormLabels = {
   submit: string;
   sending: string;
   required: string;
+  requiredNote: string;
   errorName: string;
   errorPhone: string;
   errorEmail: string;
@@ -126,6 +127,11 @@ export function ConsultationForm({
   const [formError, setFormError] = useState<string | null>(null);
   const [status, setStatus] = useState<"idle" | "sending" | "sent">("idle");
   const isLoading = status === "sending";
+  const successRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (status === "sent") successRef.current?.focus();
+  }, [status]);
 
   const update = (field: Field, value: string) => {
     setValues((current) => ({ ...current, [field]: value }));
@@ -192,7 +198,12 @@ export function ConsultationForm({
 
   if (status === "sent") {
     return (
-      <div role="status" className="flex flex-col items-start gap-4">
+      <div
+        ref={successRef}
+        tabIndex={-1}
+        role="status"
+        className="flex flex-col items-start gap-4 outline-none"
+      >
         <p className="text-ink text-h3">{labels.successTitle}</p>
         <p>{labels.successBody}</p>
         <Link
@@ -219,6 +230,7 @@ export function ConsultationForm({
       onFocus={() => void loadConsultation().catch(() => undefined)}
       className="flex flex-col gap-6"
     >
+      <p className="text-ink-muted text-small">{labels.requiredNote}</p>
       {products.length > 0 && (
         <fieldset>
           <legend className="text-ink text-small">{labels.products}</legend>

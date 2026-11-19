@@ -2,7 +2,7 @@ import { connection } from "next/server";
 
 import { getSiteSettings } from "@/lib/public/settings";
 
-export async function GET(request: Request) {
+export async function GET() {
   await connection();
   const { favicon } = await getSiteSettings();
   if (!favicon) {
@@ -11,5 +11,8 @@ export async function GET(request: Request) {
       headers: { "Cache-Control": "public, max-age=3600" },
     });
   }
-  return Response.redirect(new URL(favicon.src, request.url), 307);
+  return new Response(null, {
+    status: 307,
+    headers: { Location: favicon.src, "Cache-Control": "public, max-age=3600" },
+  });
 }

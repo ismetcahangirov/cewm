@@ -236,6 +236,9 @@ html.lenis body {
   .row-preview {
     display: none;
   }
+  .row-lead:has(.row-thumb) .row-index {
+    display: none;
+  }
   .row-title {
     color: var(--color-ink);
   }
@@ -323,14 +326,14 @@ html.lenis body {
 
 .card-stack[data-stacked] .card-stack-list {
   position: relative;
-  display: block;
+  display: grid;
   width: min(26rem, 40%);
-  height: min(34rem, 70svh);
+  padding-bottom: calc((var(--n) - 1) * 28px);
 }
 
 .card-stack[data-stacked] .card-stack-card {
-  position: absolute;
-  inset: 0 auto auto 0;
+  grid-area: 1 / 1;
+  align-self: start;
   width: 100%;
   background: color-mix(in oklab, var(--color-navy) 72%, transparent);
   transform: translateY(110svh) rotate(var(--tilt));

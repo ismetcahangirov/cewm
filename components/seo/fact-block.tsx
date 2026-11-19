@@ -1,23 +1,47 @@
+import { cx } from "@/lib/cx";
 import type { FactBlock } from "@/lib/seo/facts";
 
-export function FactBlockView({ block, className }: { block: FactBlock; className?: string }) {
+export function FactBlockView({
+  block,
+  className,
+  lang,
+}: {
+  block: FactBlock;
+  className?: string;
+  lang?: string;
+}) {
   const headingId = `${block.id}-heading`;
   return (
-    <section aria-labelledby={headingId} className={className}>
-      <h2 id={headingId} className="text-h4">
+    <section
+      aria-labelledby={headingId}
+      className={cx("gap-x-column grid gap-y-6 lg:grid-cols-12", className)}
+    >
+      <h2 id={headingId} className="text-safe text-h4 lg:col-span-4">
         {block.heading}
       </h2>
-      <p className="mt-3 max-w-3xl text-lead">{block.answer}</p>
-      {block.facts.length ? (
-        <dl className="mt-6 grid max-w-3xl gap-x-8 gap-y-2 text-small sm:grid-cols-[minmax(0,14rem)_1fr]">
-          {block.facts.map((fact) => (
-            <div key={`${fact.label}-${fact.value}`} className="contents">
-              <dt className="text-ink-muted">{fact.label}</dt>
-              <dd>{fact.value}</dd>
-            </div>
-          ))}
-        </dl>
-      ) : null}
+      <div className="lg:col-span-8">
+        <p lang={lang} className="text-lead">
+          {block.answer}
+        </p>
+        {block.facts.length ? (
+          <dl className="gap-x-column mt-8 grid border-t border-line md:grid-cols-2">
+            {block.facts.map((fact) => (
+              <div
+                key={`${fact.label}-${fact.value}`}
+                className={cx(
+                  "flex flex-col gap-1 border-b border-line py-3",
+                  fact.value.length > 60 && "md:col-span-2",
+                )}
+              >
+                <dt className="text-grey text-small">{fact.label}</dt>
+                <dd lang={lang} className="text-safe">
+                  {fact.value}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        ) : null}
+      </div>
     </section>
   );
 }

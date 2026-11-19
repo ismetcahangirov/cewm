@@ -22,6 +22,10 @@ function groupDelay(element: HTMLElement) {
   element.style.setProperty("--reveal-delay", `${Math.min(Math.max(index, 0), 4) * 120}ms`);
 }
 
+function hydrated(element: HTMLElement) {
+  return Object.keys(element).some((key) => key.startsWith("__reactFiber$"));
+}
+
 function reveal(element: HTMLElement) {
   if (element.hasAttribute("data-line-reveal")) indexLines(element);
   groupDelay(element);
@@ -34,16 +38,31 @@ export function startReveal(root: ParentNode = document) {
   );
   if (reducedMotion()) return () => undefined;
 
+  const waiting = new Set<HTMLElement>();
+  let frame = 0;
+  const flush = () => {
+    frame = 0;
+    for (const element of waiting) {
+      if (!hydrated(element)) continue;
+      waiting.delete(element);
+      reveal(element);
+    }
+    if (waiting.size) frame = requestAnimationFrame(flush);
+  };
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
         if (!entry.isIntersecting) continue;
-        reveal(entry.target as HTMLElement);
         observer.unobserve(entry.target);
+        waiting.add(entry.target as HTMLElement);
       }
+      if (waiting.size && !frame) flush();
     },
     { rootMargin: "0px 0px -10% 0px", threshold: 0 },
   );
   for (const element of elements) observer.observe(element);
-  return () => observer.disconnect();
+  return () => {
+    observer.disconnect();
+    cancelAnimationFrame(frame);
+  };
 }

@@ -6,6 +6,7 @@ import { connection } from "next/server";
 import type { ReactNode } from "react";
 
 import { HeroFilm } from "@/components/home/hero-film";
+import { FactBlockView } from "@/components/seo/fact-block";
 import type { HeroChapter } from "@/components/home/hero-film-player";
 import { ArrowRightIcon } from "@/components/icons/iconsax";
 import { previewImage } from "@/components/motion/preview-image";
@@ -35,10 +36,11 @@ import {
   type HomeHero,
   type HomeSection,
 } from "@/lib/public/home";
+import { getLogoTones } from "@/lib/public/logo-tone";
 import { getSiteSettings } from "@/lib/public/settings";
 import { staticPaths } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
-import { companyStatement } from "@/lib/seo/facts";
+import { companyFactBlock, companyStatement } from "@/lib/seo/facts";
 import { businessJsonLd, websiteJsonLd } from "@/lib/seo/json-ld";
 import { homeOfferCatalog } from "@/lib/seo/catalog-links";
 import { getCorpus } from "@/lib/seo/corpus";
@@ -51,6 +53,8 @@ const chapterWindows = [
   { key: "living", from: 0.56, to: 0.77, placement: "bottom" },
   { key: "kitchen", from: 0.83, to: 1.01, placement: "top" },
 ] as const satisfies Pick<HeroChapter, "key" | "from" | "to" | "placement">[];
+
+export const instant = false;
 
 export async function generateMetadata(): Promise<Metadata> {
   await connection();
@@ -150,6 +154,9 @@ async function BuiltInSection({
     case "brands": {
       const brands = await getBrands(locale);
       if (!brands.length) return null;
+      const tones = await getLogoTones(
+        brands.flatMap((brand) => (brand.image ? [brand.image.src] : [])),
+      );
       return (
         <SectionShell
           id={id}
@@ -162,14 +169,21 @@ async function BuiltInSection({
               const body = (
                 <>
                   {brand.image ? (
-                    <Image
-                      src={brand.image.src}
-                      alt={brand.image.alt}
-                      width={brand.image.width}
-                      height={brand.image.height}
-                      sizes="240px"
-                      className="h-12 w-auto object-contain object-left"
-                    />
+                    <span
+                      className={cx(
+                        "flex h-20 items-center self-start",
+                        tones[brand.image.src] === "light" && "rounded-xs bg-navy px-5",
+                      )}
+                    >
+                      <Image
+                        src={brand.image.src}
+                        alt={brand.image.alt}
+                        width={brand.image.width}
+                        height={brand.image.height}
+                        sizes="240px"
+                        className="h-12 w-auto object-contain object-left"
+                      />
+                    </span>
                   ) : (
                     <span className="text-h3">{brand.name}</span>
                   )}
@@ -382,6 +396,12 @@ export default async function HomePage() {
             <BuiltInSection key={section.key} section={section} locale={locale} dict={dict} />
           ),
         )}
+      <div className="container-page py-section">
+        <FactBlockView
+          block={companyFactBlock(corpus, locale, dict)}
+          className="border-t border-line pt-12 lg:pt-16"
+        />
+      </div>
       <ConsultationSection locale={locale} dict={dict} />
     </>
   );

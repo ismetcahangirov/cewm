@@ -5,7 +5,7 @@ import { cacheLife, cacheTag } from "next/cache";
 
 import { publicTags } from "@/lib/cache/tags";
 import { getDb } from "@/lib/db";
-import { categories, productCategories, products } from "@/lib/db/schema";
+import { brands, categories, productCategories, products } from "@/lib/db/schema";
 import type { Locale } from "@/lib/i18n/config";
 import { pickExact, type Localized } from "@/lib/i18n/localized";
 import type { RichTextDoc } from "@/lib/content/rich-text";
@@ -24,7 +24,11 @@ const maxListingPage = 500;
 
 export type ListingChip = { id: string; name: string; href: string; imageSrc: string | null };
 
+export type BrandFacet = { slug: string; name: string; count: number };
+
 export type ListingProducts = {
+  brands: BrandFacet[];
+  brand: string | null;
   items: ProductCardItem[];
   total: number;
   shown: number;
@@ -53,6 +57,11 @@ export function parsePageParam(value: string | string[] | undefined): number {
   if (!raw || !/^\d+$/.test(raw)) return 1;
   const page = Number(raw);
   return page >= 1 ? Math.min(page, maxListingPage) : 1;
+}
+
+export function parseBrandParam(value: string | string[] | undefined): string | null {
+  const raw = Array.isArray(value) ? value[0] : value;
+  return raw && /^[a-z0-9-]{1,80}$/.test(raw) ? raw : null;
 }
 
 export function pageCount(total: number): number {
@@ -102,6 +111,7 @@ async function listProducts(
   categoryIds: string[] | null,
   visibleIds: Set<string>,
   page: number,
+  brandSlug: string | null = null,
 ): Promise<ListingProducts> {
   const inCategories = (ids: string[]) =>
     exists(
@@ -126,7 +136,24 @@ async function listProducts(
         ),
         inCategories([...visibleIds]),
       );
-  const where = and(visibleProduct, scope);
+  const facetRows = await getDb()
+    .select({
+      id: brands.id,
+      slug: brands.slug,
+      name: brands.name,
+      count: sql<number>`count(*)::int`,
+    })
+    .from(products)
+    .innerJoin(brands, eq(brands.id, products.brandId))
+    .where(and(visibleProduct, scope, eq(brands.isActive, true)))
+    .groupBy(brands.id, brands.slug, brands.name, brands.sortOrder)
+    .orderBy(asc(brands.sortOrder), asc(brands.name));
+  const selected = facetRows.find((row) => row.slug === brandSlug) ?? null;
+  const where = and(
+    visibleProduct,
+    scope,
+    selected ? eq(products.brandId, selected.id) : undefined,
+  );
 
   const [countRow] = await getDb()
     .select({ total: sql<number>`count(*)::int` })
@@ -146,6 +173,8 @@ async function listProducts(
     )
     .limit(shown);
   return {
+    brands: facetRows.map(({ slug, name, count }) => ({ slug, name, count })),
+    brand: selected?.slug ?? null,
     items: await productCards(rows, locale),
     total,
     shown,
@@ -167,6 +196,7 @@ export async function queryCategoryListing(
   locale: Locale,
   slug: string,
   page: number,
+  brandSlug: string | null = null,
 ): Promise<CategoryListing | null> {
   const tree = await getCategoryTree(locale);
   const [row] = await getDb()
@@ -186,7 +216,13 @@ export async function queryCategoryListing(
   const node = findNode(tree, row.id);
   if (!node) return null;
   const parent = findParent(tree, row.id);
-  const listing = await listProducts(locale, subtreeIds(node), visibleCategoryIds(tree), page);
+  const listing = await listProducts(
+    locale,
+    subtreeIds(node),
+    visibleCategoryIds(tree),
+    page,
+    brandSlug,
+  );
   return {
     ...listing,
     category: {
@@ -218,10 +254,11 @@ export async function getCategoryListing(
   locale: Locale,
   slug: string,
   page: number,
+  brandSlug: string | null = null,
 ): Promise<CategoryListing | null> {
   "use cache";
   cacheTag(publicTags.catalog);
   cacheLife("hours");
-  const listing = await queryCategoryListing(locale, slug, page);
+  const listing = await queryCategoryListing(locale, slug, page, brandSlug);
   return listing && page > listing.pageCount ? null : listing;
 }

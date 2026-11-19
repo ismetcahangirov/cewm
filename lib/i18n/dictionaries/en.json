@@ -32,7 +32,8 @@
     "openMap": "Open in maps",
     "whatsapp": "Message us on WhatsApp",
     "call": "{name}: call",
-    "write": "{name}: send an email"
+    "write": "{name}: send an email",
+    "office": "Office"
   },
   "footer": {
     "contacts": "Contact",
@@ -84,7 +85,17 @@
     "loadMore": "Show more",
     "empty": "There are no products in this section yet.",
     "pageSuffix": "Page {page}",
-    "categoryDescription": "{name}: woodworking machinery in the CEWM catalogue."
+    "categoryDescription": "{name}: woodworking machinery in the CEWM catalogue.",
+    "eyebrow": "Catalogue",
+    "summary": "Products: {products} · Areas: {areas}",
+    "areasTitle": "Machine areas",
+    "brandFilter": "Brand",
+    "allBrands": "All brands",
+    "areaCount": "Products: {count}",
+    "openArea": "Open this area",
+    "otherTitle": "Other products",
+    "emptyTitle": "There are no products in this area yet",
+    "emptyBody": "Tell us which equipment you need and we will suggest suitable options."
   },
   "product": {
     "brand": "Brand",
@@ -98,7 +109,26 @@
     "video": "Video",
     "gallery": "Photos",
     "related": "Related products",
-    "description": "{name} in the CEWM catalogue. Request a consultation on price and technical details."
+    "description": "{name} in the CEWM catalogue. Request a consultation on price and technical details.",
+    "category": "Category",
+    "requestQuote": "Request a quote",
+    "specCount": "Table ({count})",
+    "documentCount": "PDF ({count})",
+    "overview": "Overview",
+    "technicalEyebrow": "Technical data",
+    "specsCaption": "{name}: technical specifications",
+    "fallbackNotice": "This page has not been translated into English yet; the text below is in Azerbaijani.",
+    "galleryLabel": "{name}: photos",
+    "galleryOpen": "Enlarge photo",
+    "galleryClose": "Close",
+    "galleryPrevious": "Previous photo",
+    "galleryNext": "Next photo",
+    "galleryPosition": "{current} / {total}",
+    "videoTitle": "{name}: video",
+    "videoPlay": "Play the video",
+    "videoOpen": "Open the video in a new window",
+    "quoteTitle": "Get a quote for this product",
+    "quoteIntro": "The product is already in the form. Leave your contact details and our specialist will get in touch."
   },
   "blog": {
     "title": "Blog",
@@ -107,12 +137,15 @@
     "empty": "No posts yet.",
     "related": "More posts",
     "loadMore": "Show more",
-    "shown": "{shown} of {total} posts"
+    "shown": "{shown} of {total} posts",
+    "emptyBody": "Posts will appear here once they are published.",
+    "back": "All posts"
   },
   "brands": {
     "title": "Brands",
     "visit": "Brand website",
-    "empty": "The list will be added soon."
+    "empty": "The list will be added soon.",
+    "products": "In the catalogue: {count}"
   },
   "clients": {
     "title": "Clients",
@@ -142,7 +175,10 @@
     "successTitle": "Your request has been received",
     "successBody": "Thank you. Our specialist will contact you soon.",
     "successLink": "Browse products",
-    "honeypot": "Leave this field empty"
+    "honeypot": "Leave this field empty",
+    "requiredNote": "Fields marked * are required.",
+    "formLabel": "Request form",
+    "direct": "Or call us directly"
   },
   "locales": {
     "az": "Azərbaycanca",
@@ -159,6 +195,10 @@
   "error": {
     "title": "Something went wrong",
     "body": "The page could not be loaded. Please try again in a moment.",
-    "retry": "Try again"
+    "retry": "Try again",
+    "eyebrow": "Error"
+  },
+  "pages": {
+    "contents": "On this page"
   }
 }

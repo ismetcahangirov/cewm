@@ -1,58 +1,30 @@
 "use client";
 
-import { useParams } from "next/navigation";
-
 import { button } from "@/components/site/button";
-import { isLocale, localePath, type Locale } from "@/lib/i18n/config";
+import { useErrorTexts } from "@/components/site/error-texts";
 
-const copy: Record<Locale, { title: string; body: string; retry: string; home: string }> = {
-  az: {
-    title: "Səhifəni açmaq alınmadı",
-    body: "Bir az sonra yenidən cəhd edin və ya bizə zəng edin.",
-    retry: "Yenidən cəhd et",
-    home: "Ana səhifə",
-  },
-  ru: {
-    title: "Не удалось открыть страницу",
-    body: "Попробуйте ещё раз немного позже или позвоните нам.",
-    retry: "Попробовать снова",
-    home: "Главная",
-  },
-  en: {
-    title: "The page could not be opened",
-    body: "Please try again in a moment or give us a call.",
-    retry: "Try again",
-    home: "Home page",
-  },
-  de: {
-    title: "Die Seite konnte nicht geöffnet werden",
-    body: "Bitte versuchen Sie es gleich noch einmal oder rufen Sie uns an.",
-    retry: "Erneut versuchen",
-    home: "Startseite",
-  },
-};
-
-export default function ErrorPage({
-  reset,
-}: {
-  error: Error & { digest?: string };
-  reset: () => void;
-}) {
-  const { locale } = useParams<{ locale: string }>();
-  const code: Locale = isLocale(locale) ? locale : "az";
-  const text = copy[code];
+export default function ErrorPage({ retry }: { error: unknown; retry: () => void }) {
+  const text = useErrorTexts();
+  if (!text) return null;
   return (
-    <div className="container-page py-section">
-      <h1 className="text-h1">{text.title}</h1>
-      <p className="mt-6 max-w-prose">{text.body}</p>
-      <div className="mt-10 flex flex-wrap gap-4">
-        <button type="button" onClick={reset} className={button()}>
-          {text.retry}
-        </button>
-        <a href={localePath(code)} className={button({ variant: "outline" })}>
-          {text.home}
-        </a>
+    <section aria-labelledby="error-title" className="container-page py-section">
+      <div className="gap-x-column grid gap-y-8 lg:grid-cols-12">
+        <p className="text-label text-cyan-ink uppercase lg:col-span-3 lg:pt-3">{text.eyebrow}</p>
+        <div className="lg:col-span-8">
+          <h1 id="error-title" className="text-h1">
+            {text.title}
+          </h1>
+          <p className="text-ink-muted mt-6 text-lead">{text.body}</p>
+          <div className="mt-10 flex flex-wrap gap-4">
+            <button type="button" onClick={retry} className={button()}>
+              {text.retry}
+            </button>
+            <a href={text.homeHref} className={button({ variant: "outline" })}>
+              {text.home}
+            </a>
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   );
 }
