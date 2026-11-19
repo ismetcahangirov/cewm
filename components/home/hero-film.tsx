@@ -31,7 +31,7 @@ function longestSegment(text: string): number {
 }
 
 function displaySize(text: string, words: number): string {
-  const cap = words <= 3 ? "var(--text-display)" : "var(--text-h1)";
+  const cap = words <= 2 ? "var(--text-display)" : "var(--text-h1)";
   return `min(${cap}, calc(100cqi / ${(longestSegment(text) * charWidth).toFixed(2)}))`;
 }
 
@@ -77,6 +77,7 @@ export function HeroFilm({
 }) {
   const [groupA, groupB] = splitHeadline(hero.headline);
   const wordCount = hero.headline.split(/\s+/).filter(Boolean).length;
+  const fontSize = displaySize(hero.headline, wordCount);
   const film = hero.film;
 
   return (
@@ -94,19 +95,11 @@ export function HeroFilm({
           <div aria-hidden="true" className="hero-scrim-bottom" />
           <div className="hero-copy container-page">
             <h1 id="hero-title" className="hero-title">
-              <span
-                data-hero-a=""
-                className="hero-title-a"
-                style={{ fontSize: displaySize(groupA, wordCount) } as CSSProperties}
-              >
+              <span data-hero-a="" className="hero-title-a" style={{ fontSize } as CSSProperties}>
                 {groupA}
               </span>{" "}
               {groupB ? (
-                <span
-                  data-hero-b=""
-                  className="hero-title-b"
-                  style={{ fontSize: displaySize(groupB, wordCount) } as CSSProperties}
-                >
+                <span data-hero-b="" className="hero-title-b" style={{ fontSize } as CSSProperties}>
                   {groupB}
                 </span>
               ) : null}
@@ -135,7 +128,7 @@ export function HeroFilm({
                 data-to={chapter.to}
                 className={chapter.placement === "top" ? "hero-chapter is-top" : "hero-chapter"}
               >
-                <p className="text-label text-cyan uppercase">
+                <p className="text-label text-white uppercase">
                   <span className="tabular">{String(index + 1).padStart(2, "0")}</span>{" "}
                   {chapter.label}
                 </p>

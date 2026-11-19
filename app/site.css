@@ -254,8 +254,8 @@
   top: 0;
   background: linear-gradient(
     to bottom,
-    color-mix(in oklab, var(--color-navy-deep) 80%, transparent) 0%,
-    color-mix(in oklab, var(--color-navy-deep) 70%, transparent) 45%,
+    color-mix(in oklab, var(--color-navy-deep) 88%, transparent) 0%,
+    color-mix(in oklab, var(--color-navy-deep) 80%, transparent) 45%,
     transparent 100%
   );
 }
@@ -264,8 +264,8 @@
   bottom: 0;
   background: linear-gradient(
     to top,
-    color-mix(in oklab, var(--color-navy-deep) 80%, transparent) 0%,
-    color-mix(in oklab, var(--color-navy-deep) 70%, transparent) 45%,
+    color-mix(in oklab, var(--color-navy-deep) 88%, transparent) 0%,
+    color-mix(in oklab, var(--color-navy-deep) 80%, transparent) 45%,
     transparent 100%
   );
 }
@@ -369,7 +369,7 @@
   display: grid;
   gap: var(--spacing-column);
   padding-block: 3rem;
-  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
 }
 
 .hero-film[data-hero-static] .hero-chapter {
@@ -396,7 +396,7 @@
     display: grid;
     gap: var(--spacing-column);
     padding-block: 3rem;
-    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
   }
   .hero-chapter {
     position: static;

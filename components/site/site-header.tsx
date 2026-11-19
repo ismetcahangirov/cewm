@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { connection } from "next/server";
 
 import { localePath, locales, type Locale } from "@/lib/i18n/config";
@@ -37,14 +38,18 @@ export async function SiteHeader({ locale, dict }: { locale: Locale; dict: Dicti
     Locale,
     string
   >;
+  const light = settings.logoLight;
   const logo =
-    settings.logoLight?.width && settings.logoLight.height
-      ? {
-          src: settings.logoLight.src,
-          width: settings.logoLight.width,
-          height: settings.logoLight.height,
-        }
-      : null;
+    light?.width && light.height ? (
+      <Image
+        src={light.src}
+        alt={dict.meta.siteName}
+        width={light.width}
+        height={light.height}
+        sizes="200px"
+        className="h-10 w-auto md:h-12"
+      />
+    ) : null;
 
   return (
     <HeaderBar

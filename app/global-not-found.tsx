@@ -8,6 +8,8 @@ import { localeFromHeader, localeHeader } from "@/lib/i18n/request-locale";
 
 import "./site.css";
 
+export const instant = false;
+
 async function requestLocale() {
   return localeFromHeader((await headers()).get(localeHeader));
 }

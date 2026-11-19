@@ -1,9 +1,15 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
+import {
+  useCallback,
+  useEffect,
+  useRef,
+  useState,
+  type CSSProperties,
+  type ReactNode,
+} from "react";
 
 import {
   ArrowRightIcon,
@@ -131,7 +137,7 @@ export function HeaderBar({
   locale: Locale;
   home: string;
   items: HeaderLink[];
-  logo: { src: string; width: number; height: number } | null;
+  logo: ReactNode;
   siteName: string;
   contact: { href: string; label: string } | null;
   names: Record<Locale, string>;
@@ -152,18 +158,7 @@ export function HeaderBar({
     menuButtonRef.current?.focus();
   }, []);
 
-  const brand = logo ? (
-    <Image
-      src={logo.src}
-      alt={siteName}
-      width={logo.width}
-      height={logo.height}
-      sizes="200px"
-      className="h-10 w-auto md:h-12"
-    />
-  ) : (
-    <span className="text-h4 font-semibold tracking-tight">{siteName}</span>
-  );
+  const brand = logo ?? <span className="text-h4 font-semibold">{siteName}</span>;
 
   return (
     <header

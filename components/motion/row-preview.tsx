@@ -1,6 +1,5 @@
 "use client";
 
-import { getImageProps } from "next/image";
 import Link from "next/link";
 import { useEffect, useRef, useState, type CSSProperties } from "react";
 
@@ -8,7 +7,13 @@ import { ArrowRightIcon, ExportSquareIcon } from "@/components/icons/iconsax";
 import { cx } from "@/lib/cx";
 import { reducedMotion, subscribe } from "@/lib/motion/loop";
 
-export type PreviewImage = { src: string; width: number; height: number; alt: string };
+export type PreviewImage = {
+  src: string;
+  srcSet?: string;
+  sizes?: string;
+  width: number;
+  height: number;
+};
 
 export type PreviewRow = {
   id: string;
@@ -20,16 +25,6 @@ export type PreviewRow = {
 };
 
 const followMs = 80;
-
-function previewProps(image: PreviewImage) {
-  return getImageProps({
-    src: image.src,
-    width: image.width,
-    height: image.height,
-    alt: "",
-    sizes: "320px",
-  }).props;
-}
 
 export function RowPreview({ rows, label }: { rows: PreviewRow[]; label?: string }) {
   const listRef = useRef<HTMLUListElement>(null);
@@ -95,12 +90,7 @@ export function RowPreview({ rows, label }: { rows: PreviewRow[]; label?: string
               {row.image ? (
                 <span className="row-thumb bg-mist relative size-16 overflow-clip rounded-xs">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    {...previewProps(row.image)}
-                    alt=""
-                    loading="lazy"
-                    className="size-full object-cover"
-                  />
+                  <img {...row.image} alt="" loading="lazy" className="size-full object-cover" />
                 </span>
               ) : (
                 <span className="text-label text-grey tabular">
@@ -142,7 +132,7 @@ export function RowPreview({ rows, label }: { rows: PreviewRow[]; label?: string
                 style={{ "--enter-delay": switching ? "200ms" : "0ms" } as CSSProperties}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img {...previewProps(row.image)} alt="" className="size-full object-cover" />
+                <img {...row.image} alt="" className="size-full object-cover" />
               </span>
             ) : null,
           )}

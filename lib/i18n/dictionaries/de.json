@@ -38,7 +38,7 @@
     "contacts": "Kontakt",
     "followUs": "Folgen Sie uns",
     "rights": "Alle Rechte vorbehalten.",
-    "navigation": "Navigation",
+    "navigation": "Menü",
     "brands": "Marken"
   },
   "home": {
@@ -51,9 +51,9 @@
     "productsEyebrow": "Maschinen",
     "brandsEyebrow": "Partner",
     "clientsEyebrow": "Kunden",
-    "postsEyebrow": "Blog",
+    "postsEyebrow": "Beiträge",
     "consultationEyebrow": "Anfrage",
-    "statementEyebrow": "CEWM",
+    "statementEyebrow": "Über uns",
     "statement": "CEWM ist der HOMAG-Partner in Aserbaidschan. Wir unterstützen Möbelhersteller und Holzbearbeitungsbetriebe bei der Auswahl von Maschinen für Zuschnitt, Kantenanleimen, CNC-Bearbeitung, Bohren, Montage und Verpackung.",
     "chapters": {
       "exterior": {

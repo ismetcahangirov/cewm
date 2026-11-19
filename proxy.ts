@@ -8,6 +8,8 @@ import { isLegacySitemap, normalizeLegacyPath, sitemapPath } from "@/lib/legacy-
 import { publicPathExists } from "@/lib/public/exists";
 import { legacyRedirects } from "@/lib/redirects/legacy";
 
+const unmatchedPath = "/_/not-found";
+
 const prefixed = locales.filter((locale) => locale !== defaultLocale);
 
 function isUnder(pathname: string, base: string): boolean {
@@ -58,7 +60,9 @@ async function routeLocale(request: NextRequest): Promise<NextResponse> {
   const url = request.nextUrl.clone();
   if (!prefixedLocale) url.pathname = `/${defaultLocale}${pathname === "/" ? "" : pathname}`;
   if (!(await publicPathExists(locale, segments))) {
-    return NextResponse.rewrite(url, { status: 404, request: { headers } });
+    const missing = request.nextUrl.clone();
+    missing.pathname = `/${locale}${unmatchedPath}`;
+    return NextResponse.rewrite(missing, { status: 404, request: { headers } });
   }
   if (prefixedLocale) return NextResponse.next({ request: { headers } });
   return NextResponse.rewrite(url, { request: { headers } });

@@ -8,6 +8,7 @@ import type { ReactNode } from "react";
 import { HeroFilm } from "@/components/home/hero-film";
 import type { HeroChapter } from "@/components/home/hero-film-player";
 import { ArrowRightIcon } from "@/components/icons/iconsax";
+import { previewImage } from "@/components/motion/preview-image";
 import { RowPreview } from "@/components/motion/row-preview";
 import { PanelPush } from "@/components/motion/scenes";
 import { LineReveal, Reveal, WordReveal } from "@/components/motion/text";
@@ -121,7 +122,7 @@ async function BuiltInSection({
               id: category.id,
               href: category.href,
               title: category.name,
-              image: category.image,
+              image: previewImage(category.image),
             }))}
           />
           <Link

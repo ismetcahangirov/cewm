@@ -87,7 +87,8 @@ describe("proxy: admin pages", () => {
 
   it("does not treat /administrator as part of the admin panel", async () => {
     const response = await send("/administrator");
-    expect(response.headers.get("x-middleware-rewrite")).toBe(`${origin}/az/administrator`);
+    expect(response.status).toBe(404);
+    expect(response.headers.get("x-middleware-rewrite")).toBe(`${origin}/az/_/not-found`);
   });
 });
 
@@ -161,9 +162,9 @@ describe("proxy: legacy redirects", () => {
       .delete(redirects)
       .where(inArray(redirects.fromPath, [row.fromPath]));
     invalidateLegacyRedirects();
-    expect((await send(row.fromPath)).headers.get("x-middleware-rewrite")).toBe(
-      `${origin}/az${row.fromPath}`,
-    );
+    const after = await send(row.fromPath);
+    expect(after.status).toBe(404);
+    expect(after.headers.get("x-middleware-rewrite")).toBe(`${origin}/az/_/not-found`);
   });
 });
 

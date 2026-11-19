@@ -153,12 +153,12 @@ describe("public 404s", () => {
   it("answers a missing page with a 404 rewrite that carries the locale", async () => {
     const missing = await proxy(new NextRequest(`${origin}/de/missing-${run}`));
     expect(missing.status).toBe(404);
-    expect(missing.headers.get("x-middleware-rewrite")).toBe(`${origin}/de/missing-${run}`);
+    expect(missing.headers.get("x-middleware-rewrite")).toBe(`${origin}/de/_/not-found`);
     expect(missing.headers.get(`x-middleware-request-${localeHeader}`)).toBe("de");
 
     const unprefixed = await proxy(new NextRequest(`${origin}/missing-${run}`));
     expect(unprefixed.status).toBe(404);
-    expect(unprefixed.headers.get("x-middleware-rewrite")).toBe(`${origin}/az/missing-${run}`);
+    expect(unprefixed.headers.get("x-middleware-rewrite")).toBe(`${origin}/az/_/not-found`);
     expect(unprefixed.headers.get(`x-middleware-request-${localeHeader}`)).toBe("az");
 
     const found = await proxy(new NextRequest(`${origin}/${pageSlug.az}`));
