@@ -56,7 +56,7 @@ export function LocaleTabs({
 
   return (
     <Tabs value={active} onValueChange={(value) => setActive(value as Locale)}>
-      <TabsList aria-label={t("Məzmun dili")}>
+      <TabsList aria-label={t("Məzmun dili")} className="max-w-full overflow-x-auto">
         {locales.map((locale) => (
           <TabsTrigger
             key={locale}

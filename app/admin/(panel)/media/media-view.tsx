@@ -443,7 +443,7 @@ export function MediaView() {
               ))}
             </SelectContent>
           </Select>
-          <label className="flex h-11 items-center gap-2 px-1 text-meta md:h-10">
+          <label className="flex h-11 items-center gap-2 px-1 text-meta lg:h-10">
             <Switch
               checked={unused}
               onCheckedChange={(checked) => {

@@ -180,7 +180,7 @@ export function DragHandle({
       aria-label={label}
       title={t("Sürüşdürərək yerini dəyişin")}
       className={cn(
-        "flex size-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-sm text-muted-foreground hover:bg-secondary active:cursor-grabbing md:size-9",
+        "flex size-11 shrink-0 cursor-grab touch-none items-center justify-center rounded-sm text-muted-foreground hover:bg-secondary active:cursor-grabbing lg:size-9",
         className,
       )}
       {...props}
