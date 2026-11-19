@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import { frameBudget } from "@/lib/motion/frame-budget";
 import {
   clamp,
   documentTop,
@@ -199,6 +200,7 @@ function runFilm(
   let pinActive = false;
   const written = { a: Number.NaN, cta: Number.NaN, top: Number.NaN, bottom: Number.NaN };
   const stats = { drawMs: [] as number[], decodeMs: [] as number[] };
+  const smoothness = frameBudget();
 
   const tau = smoothScroller() ? 60 : 100;
 
@@ -332,7 +334,7 @@ function runFilm(
     const near = frames.get(base);
     const next = frames.get(base + 1);
     const started = performance.now();
-    if (near && next && fraction >= settled) {
+    if (near && next && fraction >= settled && smoothness.rich) {
       paint(near, travel(base, position), 1);
       paint(next, travel(base + 1, position), fraction);
     } else if (near && fraction < settled) {
@@ -420,6 +422,7 @@ function runFilm(
     const target = frameAt(film);
     current += (target - current) * (1 - Math.exp(-dt / tau));
     if (Math.abs(target - current) < settled) current = target;
+    if (pinned && Math.abs(current - drawnAt) >= settled) smoothness.record(dt);
     seek(current, performance.now());
     render(current);
   }
@@ -535,6 +538,7 @@ function runFilm(
   document.addEventListener("visibilitychange", onVisibility);
   (window as Window & { __heroFilm?: unknown }).__heroFilm = {
     stats,
+    smoothness,
     tier: tierName,
     budget,
     frames: () => ({

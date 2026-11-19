@@ -180,6 +180,14 @@ code; the scroll-driven hero film is loaded on the home page only. The numbers
 above are for a local production build; the live site is measured with
 PageSpeed Insights after deploy, where the target is LCP under 2.5 s.
 
+Measured 2026-11-19 on AC power, 5 runs per page, Lighthouse `benchmarkIndex`
+2233 to 2540: performance median 94 to 96, LCP 2.71 to 2.96 s, CLS 0; first-load
+JS (scripts in the HTML, gzip, `noModule` polyfills excluded) 149.6 KB on a
+category page to 157.5 KB on the home page. Measure on AC power with nothing
+else building: on battery this laptop's 4x CPU scroll traces are about four
+times slower, and a `benchmarkIndex` far below 2300 means the run measured the
+machine, not the page.
+
 Animations run on the compositor only (`transform`, `opacity`) and respect
 `prefers-reduced-motion`.
 

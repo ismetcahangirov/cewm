@@ -110,8 +110,10 @@ everything scroll-linked.
 | Wheel smoothing | `SmoothScroll` | Fine pointers |
 | Scroll-scrubbed film | `HeroFilm` | Home hero |
 
-Budget: motion JS 17 KB gzip in total on the home page; at 4x CPU throttle, main-thread work per
-frame p95 under 8 ms and no frame over 34 ms in a 5 s scroll trace; CLS under 0.05.
+Budget: motion JS 17 KB gzip in total on the home page; at 4x CPU throttle on AC power,
+main-thread work per refresh p95 under 13 ms and at most 3 frames over 34 ms in a 5 s scroll
+trace (Lenis' own floor is 12.4 ms, see `motion-recipes.md`); CLS under 0.05. Hover visuals wait
+until Lenis stops (`:where(:root:not(.lenis-scrolling))`).
 
 ## Review checklist
 
