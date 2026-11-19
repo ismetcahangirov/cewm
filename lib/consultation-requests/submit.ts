@@ -26,8 +26,13 @@ export function hashClientIp(ip: string): string {
   return createHmac("sha256", serverEnv().BETTER_AUTH_SECRET).update(ip).digest("hex");
 }
 
-export async function recentRequestCount(ipHash: string): Promise<number> {
-  const [row] = await getDb()
+type Executor = Pick<ReturnType<typeof getDb>, "select">;
+
+export async function recentRequestCount(
+  ipHash: string,
+  executor: Executor = getDb(),
+): Promise<number> {
+  const [row] = await executor
     .select({ value: count() })
     .from(consultationRequests)
     .where(
@@ -63,12 +68,12 @@ export async function submitConsultationRequest(
   ip: string | null,
 ): Promise<SubmitResult> {
   const ipHash = ip ? hashClientIp(ip) : null;
-  if (ipHash && (await recentRequestCount(ipHash)) >= consultationRateLimit.requests) {
-    return { status: "rate-limited" };
-  }
-
   const attached = await attachableProducts(values.productIds);
   const id = await getDb().transaction(async (tx) => {
+    if (ipHash) {
+      await tx.execute(sql`select pg_advisory_xact_lock(hashtextextended(${ipHash}, 0))`);
+      if ((await recentRequestCount(ipHash, tx)) >= consultationRateLimit.requests) return null;
+    }
     const [row] = await tx
       .insert(consultationRequests)
       .values({
@@ -93,6 +98,7 @@ export async function submitConsultationRequest(
     }
     return row.id;
   });
+  if (!id) return { status: "rate-limited" };
 
   try {
     const env = serverEnv();
