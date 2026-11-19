@@ -95,6 +95,7 @@ export const contactPersons = pgTable(
     photoId: uuid("photo_id").references(() => media.id, { onDelete: "set null" }),
     sortOrder: integer("sort_order").notNull().default(0),
     isActive: boolean("is_active").notNull().default(true),
+    legacyKey: legacyKey(),
     ...timestamps,
   },
   (t) => [index("contact_persons_order_idx").on(t.isActive, t.sortOrder)],

@@ -20,13 +20,14 @@ import { SeoFields } from "@/components/admin/seo-fields";
 import { useUnsavedChangesGuard } from "@/components/admin/unsaved-changes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/lib/admin/format";
+import { formText } from "@/lib/admin/form-values";
 import type { MessageKey } from "@/lib/admin/i18n";
 import { useT } from "@/lib/admin/i18n/use-t";
 import { useUpdateSettingsMutation } from "@/lib/api/settings";
 import { locales, type Locale } from "@/lib/i18n/config";
-import type { Localized } from "@/lib/i18n/localized";
 import { formatAzerbaijaniPhone } from "@/lib/phone";
 import type { MediaDto } from "@/lib/validation/media";
 import {
@@ -37,9 +38,7 @@ import {
 
 import { EmailRows, PhoneRows, SocialRows } from "./settings-lists";
 
-function text(value: Localized | null) {
-  return { az: value?.az ?? "", ru: value?.ru ?? "", en: value?.en ?? "" };
-}
+const text = formText;
 
 function toFormValues(settings: SettingsDto): SettingsInput {
   return {
@@ -64,6 +63,7 @@ function toFormValues(settings: SettingsDto): SettingsInput {
     legalName: settings.legalName ?? "",
     consultationNotifyEmail: settings.consultationNotifyEmail ?? "",
     catalogueFileId: settings.catalogueFileId,
+    searchIndexing: settings.searchIndexing,
   };
 }
 
@@ -287,6 +287,23 @@ export function SettingsForm({ settings }: { settings: SettingsDto }) {
               </FormSection>
 
               <FormSection title={t("Axtarış sistemləri")}>
+                <FormField
+                  control={form.control}
+                  name="searchIndexing"
+                  label={t("Saytı axtarış sistemlərinə göstər")}
+                  description={t(
+                    "Söndürülsə, axtarış sistemlərinə saytı indekslətməmək bildirilir. Sayt hazır olana qədər söndürmək olar.",
+                  )}
+                  render={({ field, id, describedBy }) => (
+                    <Switch
+                      id={id}
+                      checked={field.value ?? true}
+                      onCheckedChange={field.onChange}
+                      onBlur={field.onBlur}
+                      aria-describedby={describedBy}
+                    />
+                  )}
+                />
                 <p className="text-meta text-muted-foreground">
                   {t("Öz SEO mətni olmayan səhifələr üçün standart başlıq və təsvir.")}
                 </p>

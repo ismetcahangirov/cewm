@@ -13,6 +13,10 @@ export const brandInputSchema = z.object({
     .union([z.literal(""), uuid("Loqo düzgün deyil.")])
     .nullish()
     .transform((value) => value || null),
+  imageId: z
+    .union([z.literal(""), uuid("Şəkil düzgün deyil.")])
+    .nullish()
+    .transform((value) => value || null),
   description: localizedOptional(2000),
   websiteUrl: webUrlSchema,
   isActive: z.boolean(),
@@ -32,6 +36,7 @@ export type BrandDto = {
   isActive: boolean;
   productCount: number;
   logo: MediaDto | null;
+  image: MediaDto | null;
 };
 
 export type BrandOptionDto = Pick<BrandDto, "id" | "name">;

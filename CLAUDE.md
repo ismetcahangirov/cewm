@@ -290,7 +290,12 @@ forged request with anything but 401. Shared admin building blocks live in
 `components/admin` (data table, form fields, confirm dialog, image and media
 pickers, media upload, locale tabs, rich text editor, sortable lists, SEO
 fields); the sidebar entries are in `lib/admin/navigation.ts`. The admin
-interface language follows the content language switch in the header. Every
+interface language is the language switch in the header; it is saved per user
+(`users.admin_locale`) and also sets the default tab of the language tabs.
+Settings, redirects, site texts and users are owner-only (routes, pages and
+sidebar). Ready-made public texts (the dictionaries in `lib/i18n/dictionaries`)
+are editable per language under Site texts (`settings.text_overrides`, merged in
+`getDictionary`). Every
 Azerbaijani string in the admin must be a key in `lib/admin/i18n/messages/*`
 with `ru`, `en` and `de` values; `tests/admin-i18n-coverage.test.ts` enforces it.
 

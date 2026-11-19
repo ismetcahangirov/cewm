@@ -37,7 +37,13 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { formatDateTime } from "@/lib/admin/format";
-import { filledLocales, formRichText, formText, hasLocaleError } from "@/lib/admin/form-values";
+import {
+  copyEmptyFromDefault,
+  filledLocales,
+  formRichText,
+  formText,
+  hasLocaleError,
+} from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import {
   useBulkProductsMutation,
@@ -113,6 +119,7 @@ function toFormValues(product: ProductDetailDto | null): ProductInput {
       label: text(spec.label),
       value: text(spec.value),
       unit: text(spec.unit),
+      group: text(spec.group),
     })),
     images: product.images.map((image) => ({ mediaId: image.mediaId, alt: text(image.alt) })),
     documents: product.documents.map((document) => ({
@@ -315,7 +322,13 @@ export function ProductForm({
           main={
             <>
               <FormSection title={t("Əsas məlumat")}>
-                <LocaleTabs invalid={textInvalid} filled={filledLocales(name)}>
+                <LocaleTabs
+                  onCopyFromDefault={(locale) =>
+                    copyEmptyFromDefault(form, ["name", "shortDescription", "description"], locale)
+                  }
+                  invalid={textInvalid}
+                  filled={filledLocales(name)}
+                >
                   {(locale) => (
                     <>
                       <FormField

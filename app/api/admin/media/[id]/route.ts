@@ -1,4 +1,4 @@
-import { deleteMedia, updateMediaAlt } from "@/lib/admin/media";
+import { deleteMedia, updateMediaText } from "@/lib/admin/media";
 import { adminRoute, jsonError, readId, readJson } from "@/lib/api/server";
 import { revalidatePublic } from "@/lib/cache/revalidate";
 import { updateMediaSchema } from "@/lib/validation/media";
@@ -12,7 +12,7 @@ export const PATCH = adminRoute<Context>(async (request, { params }) => {
   if ("response" in target) return target.response;
   const body = await readJson(request, updateMediaSchema);
   if ("response" in body) return body.response;
-  const updated = await updateMediaAlt(target.id, body.data.alt);
+  const updated = await updateMediaText(target.id, body.data);
   if (!updated) return jsonError(404, "not-found", missing);
   revalidatePublic("catalog");
   return Response.json(updated);

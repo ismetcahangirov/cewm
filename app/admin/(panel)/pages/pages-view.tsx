@@ -1,5 +1,7 @@
 "use client";
 
+import { LocaleCompleteness } from "@/components/admin/locale-tabs";
+import { filledLocales } from "@/lib/admin/form-values";
 import { createColumnHelper } from "@tanstack/react-table";
 import { Ellipsis, ExternalLink, Pencil, Plus, Trash2 } from "lucide-react";
 import Link from "next/link";
@@ -94,6 +96,12 @@ export function PagesView() {
           meta: { label: t("Növ"), mobile: "detail", className: "whitespace-nowrap" },
           cell: ({ row }) =>
             t.message(row.original.kind ? pageKindLabels[row.original.kind] : freePageLabel),
+        }),
+        column.display({
+          id: "locales",
+          header: t("Dillər"),
+          meta: { label: t("Dillər"), mobile: "detail" },
+          cell: ({ row }) => <LocaleCompleteness filled={filledLocales(row.original.title)} />,
         }),
         column.accessor("status", {
           header: t("Status"),

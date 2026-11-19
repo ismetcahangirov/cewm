@@ -32,7 +32,7 @@ const kindLabels: Record<MediaKind, string> = {
   document: "PDF",
 };
 
-function putWithProgress(
+export function putWithProgress(
   url: string,
   file: File,
   headers: Record<string, string>,

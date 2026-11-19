@@ -86,6 +86,7 @@ export function PhoneRows() {
         filled={{
           ru: phones.every((phone) => phone.label?.ru),
           en: phones.every((phone) => phone.label?.en),
+          de: phones.every((phone) => phone.label?.de),
         }}
       >
         {(locale) => (

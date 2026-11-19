@@ -1,4 +1,5 @@
 import { inArray } from "drizzle-orm";
+import { readFileSync } from "node:fs";
 import { pathToFileURL } from "node:url";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
@@ -9,6 +10,7 @@ import {
   adminRoutes as routes,
   call,
   createUser as createTestUser,
+  loadRoute,
   removeUsers,
   request,
   sessionCookie as login,
@@ -96,6 +98,72 @@ describe("roles", () => {
     expect(page.rows.map((row) => row.email)).toEqual([editor.email, owner.email]);
   });
 });
+
+const ownerOnlyRoutes = [
+  "/api/admin/settings",
+  "/api/admin/site-texts",
+  "/api/admin/redirects",
+  "/api/admin/redirects/[id]",
+  "/api/admin/users",
+  "/api/admin/users/[id]",
+  "/api/admin/users/[id]/invite",
+];
+
+describe("owner-only areas", () => {
+  for (const path of ownerOnlyRoutes) {
+    it(`${path} answers 403 to an editor on every method`, async () => {
+      const handlers = await loadRoute(path);
+      const methods = Object.entries(handlers).filter(([, value]) => typeof value === "function");
+      expect(methods.length).toBeGreaterThan(0);
+      for (const [method, handler] of methods) {
+        const response = await (handler as Handler)(
+          request(path, { method, cookie: editor.cookie, body: method === "GET" ? undefined : {} }),
+          { params: Promise.resolve({ id: "missing" }) },
+        );
+        expect(response.status, `${method} ${path}`).toBe(403);
+      }
+    });
+  }
+
+  it("lets the owner read the settings and the site texts", async () => {
+    for (const path of ["/api/admin/settings", "/api/admin/site-texts"]) {
+      const response = await call(path, "GET", { cookie: owner.cookie });
+      expect(response.status, path).toBe(200);
+    }
+  });
+});
+
+describe("admin route handlers", () => {
+  it("validate every request body with zod and never read it unchecked", () => {
+    const unchecked = routes.filter((route) => {
+      const source = readFileSync(route.file, "utf8");
+      const takesBody = /export const (POST|PUT|PATCH)/.test(source);
+      const readsRaw = /request\.json\(|\.formData\(/.test(source);
+      return readsRaw || (takesBody && !/readJson\(/.test(source) && !bodyless.has(route.path));
+    });
+    expect(unchecked.map((route) => route.path)).toEqual([]);
+  });
+
+  it("let a signed-in user remember the interface language", async () => {
+    const saved = await call("/api/admin/profile", "PATCH", {
+      cookie: editor.cookie,
+      body: { adminLocale: "de" },
+    });
+    expect(saved.status).toBe(200);
+    const [row] = await getDb()
+      .select({ adminLocale: users.adminLocale })
+      .from(users)
+      .where(inArray(users.id, [editor.id]));
+    expect(row?.adminLocale).toBe("de");
+    const rejected = await call("/api/admin/profile", "PATCH", {
+      cookie: editor.cookie,
+      body: { adminLocale: "fr" },
+    });
+    expect(rejected.status).toBe(400);
+  });
+});
+
+const bodyless = new Set(["/api/admin/products/[id]/duplicate", "/api/admin/users/[id]/invite"]);
 
 describe("users API validation", () => {
   it("rejects an invalid invite with field messages", async () => {

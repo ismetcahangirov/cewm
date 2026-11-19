@@ -1,5 +1,7 @@
 "use client";
 
+import { LocaleCompleteness } from "@/components/admin/locale-tabs";
+import { filledLocales } from "@/lib/admin/form-values";
 import {
   closestCenter,
   DndContext,
@@ -151,6 +153,9 @@ function CategoryRowContent({
           {t("{count} məhsul", { count: node.productCount })}
           {hasChildren ? ` · ${t("alt kateqoriyaları var")}` : ""}
         </span>
+      </div>
+      <div className="max-md:hidden">
+        <LocaleCompleteness filled={filledLocales(node.name)} />
       </div>
       {node.isActive ? null : (
         <Badge variant="outline" className="max-sm:hidden">

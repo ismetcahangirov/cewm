@@ -34,7 +34,13 @@ import {
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/lib/admin/format";
-import { filledLocales, formRichText, formText, hasLocaleError } from "@/lib/admin/form-values";
+import {
+  copyEmptyFromDefault,
+  filledLocales,
+  formRichText,
+  formText,
+  hasLocaleError,
+} from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import {
   useCreatePostMutation,
@@ -205,7 +211,13 @@ export function PostForm({ post }: { post: PostDetailDto | null }) {
         <FormLayout
           main={
             <FormSection title={t("Məzmun")}>
-              <LocaleTabs invalid={textInvalid} filled={filledLocales(title)}>
+              <LocaleTabs
+                onCopyFromDefault={(locale) =>
+                  copyEmptyFromDefault(form, ["title", "excerpt", "content"], locale)
+                }
+                invalid={textInvalid}
+                filled={filledLocales(title)}
+              >
                 {(locale) => (
                   <>
                     <FormField

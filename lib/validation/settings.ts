@@ -160,6 +160,7 @@ export const settingsInputSchema = z.object({
   legalName: legalNameWithoutMmc,
   consultationNotifyEmail: optionalEmail,
   catalogueFileId: uuid().nullable(),
+  searchIndexing: z.boolean().optional().default(true),
 });
 
 export type SettingsInput = z.input<typeof settingsInputSchema>;
@@ -184,5 +185,6 @@ export type SettingsDto = {
   seoDescription: Localized | null;
   legalName: string | null;
   consultationNotifyEmail: string | null;
+  searchIndexing: boolean;
   updatedAt: string | null;
 };

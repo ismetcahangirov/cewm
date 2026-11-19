@@ -19,7 +19,12 @@ import {
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
-import { filledLocales, formText, hasLocaleError } from "@/lib/admin/form-values";
+import {
+  copyEmptyFromDefault,
+  filledLocales,
+  formText,
+  hasLocaleError,
+} from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import { useCreateBrandMutation, useUpdateBrandMutation } from "@/lib/api/brands";
 import { locales, type Locale } from "@/lib/i18n/config";
@@ -31,6 +36,7 @@ export function BrandDialog({ brand, onClose }: { brand: BrandDto | null; onClos
   const t = useT();
   const [error, setError] = useState<string | null>(null);
   const [logo, setLogo] = useState<MediaDto | null>(brand?.logo ?? null);
+  const [image, setImage] = useState<MediaDto | null>(brand?.image ?? null);
   const [createBrand] = useCreateBrandMutation();
   const [updateBrand] = useUpdateBrandMutation();
   const form = useZodForm(brandInputSchema, {
@@ -38,6 +44,7 @@ export function BrandDialog({ brand, onClose }: { brand: BrandDto | null; onClos
       name: brand?.name ?? "",
       slug: brand?.slug ?? "",
       logoId: brand?.logo?.id ?? "",
+      imageId: brand?.image?.id ?? "",
       description: formText(brand?.description),
       websiteUrl: brand?.websiteUrl ?? "",
       isActive: brand?.isActive ?? true,
@@ -142,7 +149,34 @@ export function BrandDialog({ brand, onClose }: { brand: BrandDto | null; onClos
               />
             )}
           />
-          <LocaleTabs invalid={invalid} filled={filledLocales(description)} required={false}>
+          <FormField
+            control={form.control}
+            name="imageId"
+            label={t("Brend şəkli")}
+            description={t(
+              "İstəyə bağlıdır. Şəklin təsviri hər dil üçün Media bölməsində yazılır.",
+            )}
+            render={({ field, id, invalid, describedBy }) => (
+              <ImagePicker
+                id={id}
+                label={t("Şəkil")}
+                value={image}
+                invalid={invalid}
+                describedBy={describedBy}
+                onChange={(media) => {
+                  setImage(media);
+                  field.onChange(media?.id ?? "");
+                  field.onBlur();
+                }}
+              />
+            )}
+          />
+          <LocaleTabs
+            onCopyFromDefault={(locale) => copyEmptyFromDefault(form, ["description"], locale)}
+            invalid={invalid}
+            filled={filledLocales(description)}
+            required={false}
+          >
             {(locale) => (
               <FormField
                 control={form.control}

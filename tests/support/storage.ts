@@ -3,6 +3,7 @@ import {
   DeleteObjectCommand,
   HeadBucketCommand,
   HeadObjectCommand,
+  PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
 
@@ -40,4 +41,10 @@ export async function objectExists(key: string): Promise<boolean> {
 
 export async function removeObject(key: string): Promise<void> {
   await client().send(new DeleteObjectCommand({ Bucket: bucket(), Key: key }));
+}
+
+export async function putObject(key: string, body: Buffer, contentType: string): Promise<void> {
+  await client().send(
+    new PutObjectCommand({ Bucket: bucket(), Key: key, Body: body, ContentType: contentType }),
+  );
 }

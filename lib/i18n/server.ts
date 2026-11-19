@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { locale as rootLocale } from "next/root-params";
 
 import { isLocale, type Locale } from "./config";
@@ -12,5 +13,6 @@ export async function getLocale(): Promise<Locale> {
 
 export async function getRequestDictionary(): Promise<{ locale: Locale; dict: Dictionary }> {
   const locale = await getLocale();
+  await connection();
   return { locale, dict: await getDictionary(locale) };
 }

@@ -116,6 +116,11 @@ function LogoCard({
         ) : (
           <span className="min-w-0 flex-1 truncate text-muted-foreground">{t("Keçid yoxdur")}</span>
         )}
+        {/^\[.*\]$/.test(logo.name.trim()) ? (
+          <Badge variant="outline" className="border-error text-error">
+            {t("Ad yazılmalıdır")}
+          </Badge>
+        ) : null}
         {logo.isActive ? null : <Badge variant="outline">{t("Gizli")}</Badge>}
       </div>
     </div>

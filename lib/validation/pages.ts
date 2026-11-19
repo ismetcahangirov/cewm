@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { locales } from "@/lib/i18n/config";
 import type { RichTextDoc } from "@/lib/content/rich-text";
 import type { Localized } from "@/lib/i18n/localized";
 
@@ -66,7 +67,7 @@ export const pageInputSchema = z
     seoDescription: localizedOptional(320),
   })
   .superRefine((value, context) => {
-    for (const locale of ["az", "ru", "en"] as const) {
+    for (const locale of locales) {
       const slug = value.slug[locale];
       if (slug && (reservedPageSlugs as readonly string[]).includes(slug)) {
         context.addIssue({ code: "custom", path: ["slug", locale], message: reservedMessage });

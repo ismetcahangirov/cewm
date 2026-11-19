@@ -1,6 +1,7 @@
 import "server-only";
 
 import { asc, eq, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
 
 import type { DomainError } from "@/lib/api/server";
 import { getDb } from "@/lib/db";
@@ -18,12 +19,14 @@ const productCount = sql<number>`(select count(*) from ${products} p
   where p.brand_id = brands.id and p.deleted_at is null)::int`;
 
 export async function listBrands(): Promise<BrandDto[]> {
+  const photo = alias(media, "brand_photo");
   const rows = await getDb()
-    .select({ brand: brands, logo: media, productCount })
+    .select({ brand: brands, logo: media, photo, productCount })
     .from(brands)
     .leftJoin(media, eq(media.id, brands.logoId))
+    .leftJoin(photo, eq(photo.id, brands.imageId))
     .orderBy(asc(brands.sortOrder), asc(brands.createdAt));
-  return rows.map(({ brand, logo, productCount: count }) => ({
+  return rows.map(({ brand, logo, photo: image, productCount: count }) => ({
     id: brand.id,
     name: brand.name,
     slug: brand.slug,
@@ -33,6 +36,7 @@ export async function listBrands(): Promise<BrandDto[]> {
     isActive: brand.isActive,
     productCount: count,
     logo: logo ? toMediaDto(logo) : null,
+    image: image ? toMediaDto(image) : null,
   }));
 }
 
@@ -55,7 +59,8 @@ function slugConflict(error: unknown): DomainError | null {
 export async function createBrand(
   values: BrandValues,
 ): Promise<{ id: string } | { error: DomainError }> {
-  const error = await checkImage("logoId", values.logoId);
+  const error =
+    (await checkImage("logoId", values.logoId)) ?? (await checkImage("imageId", values.imageId));
   if (error) return { error };
   try {
     const [row] = await getDb()
@@ -75,7 +80,8 @@ export async function updateBrand(
   id: string,
   values: BrandValues,
 ): Promise<{ id: string } | { error: DomainError }> {
-  const error = await checkImage("logoId", values.logoId);
+  const error =
+    (await checkImage("logoId", values.logoId)) ?? (await checkImage("imageId", values.imageId));
   if (error) return { error };
   try {
     const updated = await getDb()

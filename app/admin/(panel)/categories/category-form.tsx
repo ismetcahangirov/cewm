@@ -33,7 +33,12 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { formatDateTime } from "@/lib/admin/format";
-import { filledLocales } from "@/lib/admin/form-values";
+import {
+  copyEmptyFromDefault,
+  filledLocales,
+  formRichText,
+  formText,
+} from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import { useCreateCategoryMutation, useUpdateCategoryMutation } from "@/lib/api/admin";
 import { richTextToPlain, type RichTextDoc } from "@/lib/content/rich-text";
@@ -54,19 +59,11 @@ import { DeleteCategoryDialog } from "./delete-category-dialog";
 const rootValue = "root";
 
 function toFormValues(category: CategoryDetailDto | null, parentId: string | null): CategoryInput {
-  const text = (value: { az: string; ru?: string | null; en?: string | null } | null) => ({
-    az: value?.az ?? "",
-    ru: value?.ru ?? "",
-    en: value?.en ?? "",
-  });
+  const text = formText;
   return {
     name: text(category?.name ?? null),
     slug: text(category?.slug ?? null),
-    description: {
-      az: category?.description?.az ?? null,
-      ru: category?.description?.ru ?? null,
-      en: category?.description?.en ?? null,
-    },
+    description: formRichText(category?.description),
     parentId: category ? category.parentId : parentId,
     imageId: category?.imageId ?? null,
     isActive: category?.isActive ?? true,
@@ -167,7 +164,13 @@ export function CategoryForm({
         <FormLayout
           main={
             <FormSection title={t("Əsas məlumat")}>
-              <LocaleTabs invalid={textInvalid} filled={filledLocales(name)}>
+              <LocaleTabs
+                onCopyFromDefault={(locale) =>
+                  copyEmptyFromDefault(form, ["name", "description"], locale)
+                }
+                invalid={textInvalid}
+                filled={filledLocales(name)}
+              >
                 {(locale) => (
                   <>
                     <FormField

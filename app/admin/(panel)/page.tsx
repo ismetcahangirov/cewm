@@ -239,9 +239,11 @@ export default async function DashboardPage() {
             <li>
               <ArrowLink href="/admin/media">{t("Media kitabxanası")}</ArrowLink>
             </li>
-            <li>
-              <ArrowLink href="/admin/settings">{t("Əlaqə məlumatları və SEO")}</ArrowLink>
-            </li>
+            {user.role === "owner" ? (
+              <li>
+                <ArrowLink href="/admin/settings">{t("Əlaqə məlumatları və SEO")}</ArrowLink>
+              </li>
+            ) : null}
           </ul>
         </section>
       </div>

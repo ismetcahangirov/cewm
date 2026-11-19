@@ -105,6 +105,7 @@ export type HomeBrand = {
   url: string | null;
   description: string | null;
   image: PublicImage | null;
+  photo: PublicImage | null;
 };
 
 const productLimit = 6;
@@ -338,12 +339,18 @@ export async function queryBrands(locale: Locale): Promise<HomeBrand[]> {
     .leftJoin(media, eq(media.id, brands.logoId))
     .where(eq(brands.isActive, true))
     .orderBy(asc(brands.sortOrder), asc(brands.createdAt), asc(brands.id));
+  const photos = await getDb()
+    .select({ brandId: brands.id, ...imageColumns })
+    .from(brands)
+    .innerJoin(media, eq(media.id, brands.imageId));
+  const photoByBrand = new Map(photos.map((row) => [row.brandId, row]));
   return rows.map((row) => ({
     id: row.id,
     name: row.name,
     url: row.url,
     description: row.description ? pickLocale(row.description, locale) || null : null,
     image: toPublicImage(row, locale, row.name),
+    photo: toPublicImage(photoByBrand.get(row.id), locale, row.name),
   }));
 }
 

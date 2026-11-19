@@ -8,6 +8,20 @@
       "when": 1795089475160,
       "tag": "0000_initial",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795091855743,
+      "tag": "0001_wild_revanche",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795094087542,
+      "tag": "0002_even_infant_terrible",
+      "breakpoints": true
     }
   ]
 }

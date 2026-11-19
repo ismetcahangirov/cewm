@@ -1,13 +1,11 @@
 import type { Metadata } from "next";
-import { cookies } from "next/headers";
 import { Suspense, type ReactNode } from "react";
 
 import { AdminLocaleSync } from "@/components/admin/admin-locale-sync";
 import { StoreProvider } from "@/components/providers/store-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
-import { defaultLocale, isLocale } from "@/lib/i18n/config";
-import { contentLocaleCookie } from "@/lib/store/editor-slice";
+import { getAdminLocale } from "@/lib/admin/i18n/server";
 
 import "../admin.css";
 
@@ -17,8 +15,7 @@ export const metadata: Metadata = {
 };
 
 async function RequestStore({ children }: { children: ReactNode }) {
-  const saved = (await cookies()).get(contentLocaleCookie)?.value;
-  const contentLocale = isLocale(saved) ? saved : defaultLocale;
+  const contentLocale = await getAdminLocale();
   return (
     <StoreProvider preloadedState={{ editor: { contentLocale } }}>
       <AdminLocaleSync />

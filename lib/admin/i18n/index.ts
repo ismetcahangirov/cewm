@@ -18,6 +18,7 @@ import * as redirects from "./messages/redirects";
 import * as requests from "./messages/requests";
 import * as users from "./messages/users";
 import * as auth from "./messages/auth";
+import * as localization from "./messages/localization";
 
 export const ru = {
   ...common.ru,
@@ -39,6 +40,7 @@ export const ru = {
   ...requests.ru,
   ...users.ru,
   ...auth.ru,
+  ...localization.ru,
 };
 
 export type MessageKey = keyof typeof ru;
@@ -63,6 +65,7 @@ export const en: Record<MessageKey, string> = {
   ...requests.en,
   ...users.en,
   ...auth.en,
+  ...localization.en,
 };
 
 export const de: Record<MessageKey, string> = {
@@ -85,6 +88,7 @@ export const de: Record<MessageKey, string> = {
   ...requests.de,
   ...users.de,
   ...auth.de,
+  ...localization.de,
 };
 
 export const { translate, translateMessage } = createTranslator({ ru, en, de });

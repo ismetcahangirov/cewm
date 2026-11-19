@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { filledLocales } from "@/lib/admin/form-values";
+import { copyEmptyFromDefault, filledLocales } from "@/lib/admin/form-values";
 import { useT } from "@/lib/admin/i18n/use-t";
 import type { Locale } from "@/lib/i18n/config";
 import { locales } from "@/lib/i18n/config";
@@ -288,7 +288,11 @@ export function MenuItemDialog({
               )}
             </p>
           ) : null}
-          <LocaleTabs invalid={invalid} filled={filledLocales(label)}>
+          <LocaleTabs
+            onCopyFromDefault={(locale) => copyEmptyFromDefault(form, ["label"], locale)}
+            invalid={invalid}
+            filled={filledLocales(label)}
+          >
             {(locale) => (
               <FormField
                 control={form.control}

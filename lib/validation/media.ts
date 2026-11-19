@@ -102,7 +102,14 @@ export const completeUploadSchema = z.object({
 
 export type CompleteUploadInput = z.input<typeof completeUploadSchema>;
 
-export const updateMediaSchema = z.object({ alt: localizedOptional(250) });
+export const updateMediaSchema = z.object({
+  alt: localizedOptional(250),
+  caption: localizedOptional(500).optional(),
+});
+
+export const replaceMediaSchema = z.object({ key: completeUploadSchema.shape.key });
+
+export type ReplaceMediaInput = z.input<typeof replaceMediaSchema>;
 
 export type UpdateMediaInput = z.input<typeof updateMediaSchema>;
 
@@ -123,6 +130,13 @@ export type MediaUsageKind = (typeof mediaUsageKinds)[number];
 
 export type MediaUsage = Record<MediaUsageKind, number>;
 
+export type MediaUsageItem = {
+  kind: MediaUsageKind;
+  id: string;
+  label: string | null;
+  href: string;
+};
+
 export type MediaDto = {
   id: string;
   key: string;
@@ -133,6 +147,7 @@ export type MediaDto = {
   size: number;
   alt: string | null;
   alts: Localized | null;
+  captions: Localized | null;
   createdAt: string;
 };
 
