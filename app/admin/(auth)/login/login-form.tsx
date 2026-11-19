@@ -69,7 +69,7 @@ export function LoginForm() {
       </Button>
       <Link
         href={adminPaths.forgotPassword}
-        className="inline-flex min-h-11 items-center self-start text-meta text-graphite underline-offset-4 hover:underline md:min-h-0"
+        className="inline-flex min-h-11 items-center self-start text-meta text-graphite underline-offset-4 hover:underline lg:min-h-0"
       >
         {t("Şifrəni unutmusunuz?")}
       </Link>

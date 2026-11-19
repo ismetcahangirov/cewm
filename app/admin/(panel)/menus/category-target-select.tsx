@@ -108,7 +108,7 @@ export function CategoryTargetSelect({
                   setSearch("");
                 }}
                 className={cn(
-                  "flex min-h-11 w-full items-center gap-3 rounded-sm px-2 text-left text-meta hover:bg-secondary md:min-h-9",
+                  "flex min-h-11 w-full items-center gap-3 rounded-sm px-2 text-left text-meta hover:bg-secondary lg:min-h-9",
                   option.depth && !term ? "pl-8" : null,
                 )}
               >

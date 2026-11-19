@@ -83,7 +83,7 @@ export function RequestsView({ role }: { role: UserRole }) {
           cell: ({ row }) => (
             <Link
               href={`/admin/requests/${row.original.id}`}
-              className="flex min-h-11 min-w-0 flex-col justify-center hover:underline md:min-h-0"
+              className="flex min-h-11 min-w-0 flex-col justify-center hover:underline lg:min-h-0"
             >
               <span
                 className={
@@ -107,7 +107,7 @@ export function RequestsView({ role }: { role: UserRole }) {
           cell: ({ row }) => (
             <a
               href={telHref(row.original.phone)}
-              className="inline-flex min-h-11 items-center hover:underline md:min-h-0"
+              className="inline-flex min-h-11 items-center hover:underline lg:min-h-0"
             >
               {formatAzerbaijaniPhone(row.original.phone)}
             </a>

@@ -71,7 +71,7 @@ export function PagesView() {
           cell: ({ row }) => (
             <Link
               href={`/admin/pages/${row.original.id}`}
-              className="block min-w-0 hover:underline"
+              className="flex min-h-11 min-w-0 flex-col justify-center hover:underline"
             >
               <span className="block truncate font-medium">{text(row.original.title)}</span>
               <span className="block truncate text-muted-foreground md:hidden">

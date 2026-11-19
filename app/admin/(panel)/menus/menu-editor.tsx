@@ -99,7 +99,7 @@ function MenuSwitcher({ menus, currentId }: { menus: MenuSummaryDto[]; currentId
                 href={`/admin/menus?menu=${menu.id}`}
                 aria-current={current ? "page" : undefined}
                 className={cn(
-                  "flex min-h-11 items-center rounded-sm px-3 text-meta font-medium text-graphite hover:text-foreground md:min-h-9",
+                  "flex min-h-11 items-center rounded-sm px-3 text-meta font-medium text-graphite hover:text-foreground lg:min-h-9",
                   current ? "bg-background text-foreground" : null,
                 )}
               >

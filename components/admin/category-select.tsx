@@ -91,7 +91,7 @@ export function CategoryMultiSelect({
               <li key={node.id}>
                 <label
                   className={cn(
-                    "flex min-h-11 cursor-pointer items-center gap-3 rounded-sm px-2 text-meta hover:bg-secondary md:min-h-9",
+                    "flex min-h-11 cursor-pointer items-center gap-3 rounded-sm px-2 text-meta hover:bg-secondary lg:min-h-9",
                     node.depth && !term ? "pl-8" : null,
                   )}
                 >

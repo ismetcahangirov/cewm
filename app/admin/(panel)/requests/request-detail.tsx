@@ -101,7 +101,7 @@ function ProductRow({ product }: { product: ConsultationRequestProductDto }) {
         {product.productId ? (
           <Link
             href={`/admin/products/${product.productId}`}
-            className="block min-h-11 content-center break-words hover:underline md:min-h-0"
+            className="block min-h-11 content-center break-words hover:underline lg:min-h-0"
           >
             {product.name}
           </Link>
@@ -207,7 +207,7 @@ function RequestView({ request, role }: { request: ConsultationRequestDetailDto;
                   <span className="flex flex-wrap items-center gap-2">
                     <a
                       href={telHref(request.phone)}
-                      className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap hover:underline md:min-h-0"
+                      className="inline-flex min-h-11 items-center gap-2 whitespace-nowrap hover:underline lg:min-h-0"
                     >
                       <Phone className="size-4" strokeWidth={1.5} aria-hidden="true" />
                       {formatAzerbaijaniPhone(request.phone)}
@@ -229,7 +229,7 @@ function RequestView({ request, role }: { request: ConsultationRequestDetailDto;
                   {request.email ? (
                     <a
                       href={mailtoHref(request.email, "CEWM: konsultasiya sorğunuz")}
-                      className="inline-flex min-h-11 items-center gap-2 break-all hover:underline md:min-h-0"
+                      className="inline-flex min-h-11 items-center gap-2 break-all hover:underline lg:min-h-0"
                     >
                       <Mail className="size-4 shrink-0" strokeWidth={1.5} aria-hidden="true" />
                       {request.email}

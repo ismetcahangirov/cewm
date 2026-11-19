@@ -28,7 +28,7 @@ export function ResetPasswordForm() {
         <FormAlert message={t("Link etibarsızdır və ya vaxtı keçib. Yeni link istəyin.")} />
         <Link
           href={adminPaths.forgotPassword}
-          className="inline-flex min-h-11 items-center self-start text-meta text-graphite underline-offset-4 hover:underline md:min-h-0"
+          className="inline-flex min-h-11 items-center self-start text-meta text-graphite underline-offset-4 hover:underline lg:min-h-0"
         >
           {t("Yeni link istə")}
         </Link>
