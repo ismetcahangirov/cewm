@@ -238,7 +238,11 @@ export function ProductsView({ role }: { role: UserRole }) {
         }),
         column.accessor("sku", {
           header: t("Model kodu"),
-          meta: { label: t("Model kodu"), mobile: "hidden", className: "whitespace-nowrap" },
+          meta: {
+            label: t("Model kodu"),
+            mobile: "hidden",
+            className: "whitespace-nowrap max-2xl:hidden",
+          },
           cell: ({ getValue }) => getValue<string | null>() ?? "—",
         }),
         column.display({
@@ -270,7 +274,7 @@ export function ProductsView({ role }: { role: UserRole }) {
         }),
         column.accessor("updatedAt", {
           header: t("Dəyişib"),
-          meta: { label: t("Dəyişib"), mobile: "hidden", className: "whitespace-nowrap" },
+          meta: { label: t("Dəyişib"), mobile: "hidden" },
           cell: ({ getValue }) => formatDateTime(getValue<string>(), t.locale),
         }),
       ]),

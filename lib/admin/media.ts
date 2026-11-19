@@ -73,7 +73,7 @@ function usageColumns(id: SQL, key: SQL) {
       or exists (select 1 from product_images pi where pi.product_id = p.id and pi.media_id = ${id})
       or exists (select 1 from product_documents pd where pd.product_id = p.id and pd.media_id = ${id}))::int`,
     categories: sql<number>`(select count(*) from categories c where c.image_id = ${id})::int`,
-    brands: sql<number>`(select count(*) from brands b where b.logo_id = ${id})::int`,
+    brands: sql<number>`(select count(*) from brands b where b.logo_id = ${id} or b.image_id = ${id})::int`,
     posts: sql<number>`(select count(*) from posts po where po.cover_id = ${id})::int`,
     pages: sql<number>`(select count(*) from pages pg where pg.cover_id = ${id})::int`,
     clients: sql<number>`(select count(*) from client_logos cl where cl.image_id = ${id})::int`,
@@ -352,7 +352,10 @@ export async function mediaUsageItems(id: string): Promise<MediaUsageItem[]> {
       .select({ id: categories.id, name: categories.name })
       .from(categories)
       .where(eq(categories.imageId, id)),
-    db.select({ id: brands.id, name: brands.name }).from(brands).where(eq(brands.logoId, id)),
+    db
+      .select({ id: brands.id, name: brands.name })
+      .from(brands)
+      .where(or(eq(brands.logoId, id), eq(brands.imageId, id))),
     db.select({ id: posts.id, name: posts.title }).from(posts).where(eq(posts.coverId, id)),
     db.select({ id: pages.id, name: pages.title }).from(pages).where(eq(pages.coverId, id)),
     db

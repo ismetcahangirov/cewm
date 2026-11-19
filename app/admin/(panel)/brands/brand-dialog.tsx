@@ -36,6 +36,7 @@ export function BrandDialog({ brand, onClose }: { brand: BrandDto | null; onClos
   const t = useT();
   const [error, setError] = useState<string | null>(null);
   const [logo, setLogo] = useState<MediaDto | null>(brand?.logo ?? null);
+  const [image, setImage] = useState<MediaDto | null>(brand?.image ?? null);
   const [createBrand] = useCreateBrandMutation();
   const [updateBrand] = useUpdateBrandMutation();
   const form = useZodForm(brandInputSchema, {
@@ -43,6 +44,7 @@ export function BrandDialog({ brand, onClose }: { brand: BrandDto | null; onClos
       name: brand?.name ?? "",
       slug: brand?.slug ?? "",
       logoId: brand?.logo?.id ?? "",
+      imageId: brand?.image?.id ?? "",
       description: formText(brand?.description),
       websiteUrl: brand?.websiteUrl ?? "",
       isActive: brand?.isActive ?? true,
@@ -141,6 +143,28 @@ export function BrandDialog({ brand, onClose }: { brand: BrandDto | null; onClos
                 describedBy={describedBy}
                 onChange={(media) => {
                   setLogo(media);
+                  field.onChange(media?.id ?? "");
+                  field.onBlur();
+                }}
+              />
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="imageId"
+            label={t("Brend şəkli")}
+            description={t(
+              "İstəyə bağlıdır. Şəklin təsviri hər dil üçün Media bölməsində yazılır.",
+            )}
+            render={({ field, id, invalid, describedBy }) => (
+              <ImagePicker
+                id={id}
+                label={t("Şəkil")}
+                value={image}
+                invalid={invalid}
+                describedBy={describedBy}
+                onChange={(media) => {
+                  setImage(media);
                   field.onChange(media?.id ?? "");
                   field.onBlur();
                 }}

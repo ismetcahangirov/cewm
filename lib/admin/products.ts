@@ -237,7 +237,7 @@ export async function getProduct(id: string): Promise<ProductDetailDto | null> {
     categoryIds: categoryRows.map((category) => category.id),
     brandId: row.brandId,
     benefits: row.benefits,
-    specs: row.specs,
+    specs: row.specs.map((spec) => ({ ...spec, group: spec.group ?? null })),
     images: imageRows.map((image) => ({
       mediaId: image.mediaId,
       alt: mediaById.get(image.mediaId)?.alt ?? { az: "" },

@@ -119,6 +119,7 @@ function toFormValues(product: ProductDetailDto | null): ProductInput {
       label: text(spec.label),
       value: text(spec.value),
       unit: text(spec.unit),
+      group: text(spec.group),
     })),
     images: product.images.map((image) => ({ mediaId: image.mediaId, alt: text(image.alt) })),
     documents: product.documents.map((document) => ({

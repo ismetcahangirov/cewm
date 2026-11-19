@@ -192,7 +192,7 @@ describe("product detail reader", () => {
       brand: { name: `Brand ${run}`, url: "https://example.com" },
       category: { id: ids.active, name: "aktiv" },
       benefits: ["Sürətli"],
-      specs: [{ label: "En", value: "1200", unit: "mm" }],
+      specs: [{ label: "En", value: "1200", unit: "mm", group: null }],
       documents: [{ title: "Broşür", href: `/media/test/${run}/brochure.pdf`, size: 1000 }],
       video: null,
     });
@@ -231,7 +231,7 @@ describe("product detail reader", () => {
     const ru = await getProductBySlug("ru", slug("main-ru"));
     expect(ru?.id).toBe(ids.main);
     expect(ru?.name).toBe("Main – Тестовый товар");
-    expect(ru?.specs[0]).toEqual({ label: "Ширина", value: "1200", unit: "мм" });
+    expect(ru?.specs[0]).toEqual({ label: "Ширина", value: "1200", unit: "мм", group: null });
     const legacy = await getProductBySlug("ru", slug("main"));
     expect(legacy?.slug.ru).toBe(slug("main-ru"));
     expect(await getProductBySlug("en", slug("main"))).not.toBeNull();

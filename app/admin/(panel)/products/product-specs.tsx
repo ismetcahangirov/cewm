@@ -13,7 +13,7 @@ import { productLimits, type ProductInput } from "@/lib/validation/products";
 
 const emptyText = { az: "", ru: "", en: "", de: "" };
 
-type Part = "label" | "value" | "unit";
+type Part = "label" | "value" | "unit" | "group";
 
 export function ProductSpecs() {
   const t = useT();
@@ -80,44 +80,63 @@ export function ProductSpecs() {
                   );
                 };
                 const params = { number: index + 1, locale: locale.toUpperCase() };
+                const heading = specs[index]?.group?.az?.trim() ?? "";
+                const startsGroup = heading !== (specs[index - 1]?.group?.az?.trim() ?? "");
                 return (
-                  <div className="flex items-start gap-1 p-2">
-                    <DragHandle
-                      label={t("{label}: yerini dəyiş", { label: labelOf(index) })}
-                      {...handle}
-                    />
-                    <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-[2fr_2fr_1fr]">
-                      {cell(
-                        "label",
-                        120,
-                        locale === "az"
-                          ? t("Göstərici, məs. Kəsmə uzunluğu")
-                          : (specs[index]?.label?.az ?? ""),
-                        t("Göstərici {number} ({locale})", params),
-                      )}
-                      {cell(
-                        "value",
-                        250,
-                        locale === "az" ? t("Dəyər, məs. 3200") : (specs[index]?.value?.az ?? ""),
-                        t("Dəyər {number} ({locale})", params),
-                      )}
-                      {cell(
-                        "unit",
-                        30,
-                        locale === "az" ? t("Vahid, məs. mm") : (specs[index]?.unit?.az ?? ""),
-                        t("Vahid {number} ({locale})", params),
-                      )}
+                  <div className="flex flex-col">
+                    {startsGroup && heading ? (
+                      <p className="border-b border-border bg-light px-3 py-1.5 text-meta font-medium">
+                        {heading}
+                      </p>
+                    ) : null}
+                    <div className="flex items-start gap-1 p-2">
+                      <DragHandle
+                        label={t("{label}: yerini dəyiş", { label: labelOf(index) })}
+                        {...handle}
+                      />
+                      <div className="grid min-w-0 flex-1 gap-2 sm:grid-cols-[2fr_2fr_1fr]">
+                        <div className="sm:col-span-3">
+                          {cell(
+                            "group",
+                            120,
+                            locale === "az"
+                              ? t("Qrup (istəyə bağlı), məs. Ölçülər")
+                              : (specs[index]?.group?.az ?? ""),
+                            t("Qrup {number} ({locale})", params),
+                          )}
+                        </div>
+                        {cell(
+                          "label",
+                          120,
+                          locale === "az"
+                            ? t("Göstərici, məs. Kəsmə uzunluğu")
+                            : (specs[index]?.label?.az ?? ""),
+                          t("Göstərici {number} ({locale})", params),
+                        )}
+                        {cell(
+                          "value",
+                          250,
+                          locale === "az" ? t("Dəyər, məs. 3200") : (specs[index]?.value?.az ?? ""),
+                          t("Dəyər {number} ({locale})", params),
+                        )}
+                        {cell(
+                          "unit",
+                          30,
+                          locale === "az" ? t("Vahid, məs. mm") : (specs[index]?.unit?.az ?? ""),
+                          t("Vahid {number} ({locale})", params),
+                        )}
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon-sm"
+                        aria-label={t("Göstərici {number}: sil", { number: index + 1 })}
+                        onClick={() => remove(index)}
+                        className="max-md:size-11"
+                      >
+                        <Trash2 strokeWidth={1.5} />
+                      </Button>
                     </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      size="icon-sm"
-                      aria-label={t("Göstərici {number}: sil", { number: index + 1 })}
-                      onClick={() => remove(index)}
-                      className="max-md:size-11"
-                    >
-                      <Trash2 strokeWidth={1.5} />
-                    </Button>
                   </div>
                 );
               }}
@@ -138,7 +157,12 @@ export function ProductSpecs() {
         className="self-start"
         disabled={fields.length >= productLimits.specs}
         onClick={() =>
-          append({ label: { ...emptyText }, value: { ...emptyText }, unit: { ...emptyText } })
+          append({
+            label: { ...emptyText },
+            value: { ...emptyText },
+            unit: { ...emptyText },
+            group: { ...emptyText },
+          })
         }
       >
         <Plus strokeWidth={1.5} />

@@ -31,7 +31,24 @@ import {
 import { toPublicImage, type PublicImage } from "./images";
 import { slugMatches, slugRank } from "./slug";
 
-export type ProductSpecRow = { label: string; value: string; unit: string | null };
+export type ProductSpecRow = {
+  label: string;
+  value: string;
+  unit: string | null;
+  group: string | null;
+};
+
+export type ProductSpecGroup = { heading: string | null; rows: ProductSpecRow[] };
+
+export function groupSpecs(rows: ProductSpecRow[]): ProductSpecGroup[] {
+  const groups: ProductSpecGroup[] = [];
+  for (const row of rows) {
+    const last = groups.at(-1);
+    if (last && last.heading === row.group) last.rows.push(row);
+    else groups.push({ heading: row.group, rows: [row] });
+  }
+  return groups;
+}
 
 export type ProductDocument = { title: string; href: string; size: number };
 
@@ -166,7 +183,8 @@ export async function findProduct(locale: Locale, slug: string): Promise<Product
       const label = pickLocale(spec.label, locale).trim();
       const value = pickLocale(spec.value, locale).trim();
       const unit = spec.unit ? pickLocale(spec.unit, locale).trim() || null : null;
-      return label && value ? [{ label, value, unit }] : [];
+      const group = spec.group ? pickLocale(spec.group, locale).trim() || null : null;
+      return label && value ? [{ label, value, unit, group }] : [];
     }),
     images,
     documents: documentRows.map((document) => ({

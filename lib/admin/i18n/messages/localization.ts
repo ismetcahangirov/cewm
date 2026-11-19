@@ -46,6 +46,12 @@ export const ru = {
   "Saytı axtarış sistemlərinə göstər": "Показывать сайт поисковым системам",
   "Söndürülsə, axtarış sistemlərinə saytı indekslətməmək bildirilir. Sayt hazır olana qədər söndürmək olar.":
     "Если выключить, поисковым системам будет запрещено индексировать сайт. Можно выключить, пока сайт не готов.",
+  "Brend şəkli": "Фото бренда",
+  "İstəyə bağlıdır. Şəklin təsviri hər dil üçün Media bölməsində yazılır.":
+    "Необязательно. Описание изображения для каждого языка пишется в разделе «Медиа».",
+  "Qrup (istəyə bağlı), məs. Ölçülər": "Группа (необязательно), напр. Размеры",
+  "Qrup {number} ({locale})": "Группа {number} ({locale})",
+  "Ad yazılmalıdır": "Нужно указать название",
 };
 
 export const en: Record<keyof typeof ru, string> = {
@@ -97,6 +103,12 @@ export const en: Record<keyof typeof ru, string> = {
   "Saytı axtarış sistemlərinə göstər": "Show the site to search engines",
   "Söndürülsə, axtarış sistemlərinə saytı indekslətməmək bildirilir. Sayt hazır olana qədər söndürmək olar.":
     "When switched off, search engines are told not to index the site. You can switch it off until the site is ready.",
+  "Brend şəkli": "Brand image",
+  "İstəyə bağlıdır. Şəklin təsviri hər dil üçün Media bölməsində yazılır.":
+    "Optional. The image description for each language is written in the Media section.",
+  "Qrup (istəyə bağlı), məs. Ölçülər": "Group (optional), e.g. Dimensions",
+  "Qrup {number} ({locale})": "Group {number} ({locale})",
+  "Ad yazılmalıdır": "Name needed",
 };
 
 export const de: Record<keyof typeof ru, string> = {
@@ -149,4 +161,10 @@ export const de: Record<keyof typeof ru, string> = {
   "Saytı axtarış sistemlərinə göstər": "Website für Suchmaschinen anzeigen",
   "Söndürülsə, axtarış sistemlərinə saytı indekslətməmək bildirilir. Sayt hazır olana qədər söndürmək olar.":
     "Wenn ausgeschaltet, wird Suchmaschinen die Indexierung der Website untersagt. Sie können es ausschalten, bis die Website fertig ist.",
+  "Brend şəkli": "Markenbild",
+  "İstəyə bağlıdır. Şəklin təsviri hər dil üçün Media bölməsində yazılır.":
+    "Optional. Die Bildbeschreibung für jede Sprache wird im Bereich «Medien» geschrieben.",
+  "Qrup (istəyə bağlı), məs. Ölçülər": "Gruppe (optional), z. B. Abmessungen",
+  "Qrup {number} ({locale})": "Gruppe {number} ({locale})",
+  "Ad yazılmalıdır": "Name erforderlich",
 };

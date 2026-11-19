@@ -64,7 +64,7 @@ export function ProductBenefits() {
                       </label>
                       <Input
                         id={id}
-                        maxLength={200}
+                        maxLength={400}
                         placeholder={locale === "az" ? "" : (benefits[index]?.text?.az ?? "")}
                         aria-invalid={Boolean(message)}
                         {...form.register(`benefits.${index}.text.${locale}`)}

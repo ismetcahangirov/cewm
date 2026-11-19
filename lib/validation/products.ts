@@ -54,9 +54,10 @@ export const specSchema = z.object({
   label: localizedText(120, "Göstəricinin adını yazın."),
   value: localizedText(250, "Dəyəri yazın."),
   unit: localizedOptional(30),
+  group: localizedOptional(120),
 });
 
-export const benefitSchema = z.object({ text: localizedText(200, "Üstünlüyü yazın.") });
+export const benefitSchema = z.object({ text: localizedText(400, "Üstünlüyü yazın.") });
 
 export const documentSchema = z.object({
   mediaId: uuid("Sənəd seçin."),
@@ -196,7 +197,7 @@ export type ProductDetailDto = {
   categoryIds: string[];
   brandId: string | null;
   benefits: Localized[];
-  specs: { label: Localized; value: Localized; unit: Localized | null }[];
+  specs: { label: Localized; value: Localized; unit: Localized | null; group: Localized | null }[];
   images: { mediaId: string; alt: Localized }[];
   documents: { mediaId: string; title: Localized }[];
   media: MediaDto[];

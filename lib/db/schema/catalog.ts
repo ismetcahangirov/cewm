@@ -25,7 +25,12 @@ import {
 } from "./columns";
 import { media } from "./media";
 
-export type ProductSpec = { label: Localized; value: Localized; unit: Localized | null };
+export type ProductSpec = {
+  label: Localized;
+  value: Localized;
+  unit: Localized | null;
+  group?: Localized | null;
+};
 
 export const categories = pgTable(
   "categories",
@@ -55,6 +60,7 @@ export const brands = pgTable(
     name: text("name").notNull(),
     slug: text("slug").notNull().unique(),
     logoId: uuid("logo_id").references(() => media.id, { onDelete: "set null" }),
+    imageId: uuid("image_id").references(() => media.id, { onDelete: "set null" }),
     description: localized("description"),
     websiteUrl: text("website_url"),
     sortOrder: integer("sort_order").notNull().default(0),
