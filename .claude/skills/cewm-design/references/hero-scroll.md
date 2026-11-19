@@ -155,6 +155,22 @@ const fraction = position - k;
   holding the frame. Without `motion` the player cross-fades plainly.
 - Reason: at slow scroll 86 % of refreshes showed no new image and then the picture jumped one
   whole frame (6.7 px). With the blend 0 % of refreshes are blank.
+- The blend is dropped on devices that cannot afford it (`frameBudget()` in
+  `lib/motion/frame-budget.ts`). Every refresh in which the pinned film moves records its
+  interval; when more than 25 % of the last 32 such refreshes took longer than 24 ms (a 60 Hz
+  screen missing frames), the player draws only frame `k` warped to the position (one
+  `drawImage`, so one texture upload per new film frame instead of two per refresh). The picture
+  still moves every refresh, without the cross-fade. After 120 calm refreshes (at most 3 % slow)
+  it blends again, and each later return waits twice as long, so a borderline device does not
+  flip back and forth. `window.__heroFilm.smoothness` shows `rich` and `switches`.
+- Why: the drawn bitmaps come from the worker as CPU bitmaps, so every new one is uploaded to
+  the GPU on the main thread (`GpuImageDecodeCache::UploadImage` in a trace, 4.1 ms per refresh
+  for a 1600 x 900 frame at 4x CPU, measured 2026-11-19 on AC power). Measured at 4x, 1440 x 900,
+  3 runs, frames in the hero over 34 ms: blend 12 / 13 / 5, single warped frame 2 / 2 / 5; main
+  thread per refresh 17.4 ms against 14.7 ms. At 1x the threshold is never reached (hero p95
+  8.5 ms at 240 Hz). The remaining cost is the upload itself; moving the drawing into the worker
+  (`OffscreenCanvas`) would take it off the main thread entirely and is the next step if phones
+  still drop frames.
 - `scroll.y` comes from the shared loop (`motion-recipes.md`), never from `window.scrollY`.
 - Tell the worker the position and velocity at most every 50 ms so the window moves ahead.
 
@@ -227,8 +243,9 @@ run it as a background job or a CLI script, not inside a request.
 ## Done when
 
 - [ ] LCP element is the poster `<img>`; no frame request starts before `load`.
-- [ ] Scrubbing a 5 s scroll trace through the pin at 4x CPU throttle: no frame over 34 ms,
-      `drawImage` under 3 ms.
+- [ ] Scrubbing a 5 s scroll trace through the pin at 4x CPU throttle on AC power: at most 3
+      frames over 34 ms, `drawImage` under 3 ms; at 1x `window.__heroFilm.smoothness.rich` is
+      true at the end of the trace (the blend is kept on a fast machine).
 - [ ] Memory in the DevTools Memory panel stays under the window total for the tier.
 - [ ] Reduced motion, Save-Data and `deviceMemory` 2 each show the poster layout.
 - [ ] Bytes transferred for the full film are within 10.0 MB wide / 7.2 MB desktop / 3.3 MB mobile.

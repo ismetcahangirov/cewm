@@ -10,6 +10,14 @@
 @source "../components/home";
 @source "../components/seo";
 
+@custom-variant hover {
+  @media (hover: hover) {
+    :where(:root:not(.lenis-scrolling)) &:hover {
+      @slot;
+    }
+  }
+}
+
 .site-main {
   position: relative;
   z-index: 1;
@@ -111,7 +119,7 @@
       text-decoration-thickness: 1px;
       text-underline-offset: 4px;
     }
-    a:hover {
+    :where(:root:not(.lenis-scrolling)) & a:hover {
       color: var(--color-ink);
       text-underline-offset: 2px;
     }
@@ -387,7 +395,7 @@
 }
 
 @media (hover: hover) {
-  .group\/card:hover .machine-card-photo {
+  :where(:root:not(.lenis-scrolling)) .group\/card:hover .machine-card-photo {
     transform: scale(1);
   }
 }
@@ -773,12 +781,12 @@
 }
 
 @media (hover: hover) {
-  .stack-card:hover .stack-link {
+  :where(:root:not(.lenis-scrolling)) .stack-card:hover .stack-link {
     text-decoration-line: underline;
     text-decoration-thickness: 1px;
     text-underline-offset: 6px;
   }
-  .stack-card:hover .stack-photo img {
+  :where(:root:not(.lenis-scrolling)) .stack-card:hover .stack-photo img {
     transform: scale(1);
   }
 }

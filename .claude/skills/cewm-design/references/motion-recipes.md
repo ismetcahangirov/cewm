@@ -508,6 +508,17 @@ Only under `@media (hover: hover)`:
 
 Focus-visible gets the same visual change as hover plus the focus ring.
 
+Hover visuals never start while Lenis is gliding the page (`html.lenis-scrolling`): the public
+`hover` variant in `app/site.css` is `@media (hover: hover) { :where(:root:not(.lenis-scrolling))
+&:hover }`, and every hand-written hover rule carries the same `:where()` prefix (zero
+specificity). Clicks are untouched (no `pointer-events` change); the hover look appears as soon
+as the scroll settles. Reason, measured 2026-11-19 on AC power, home from the card stack to the
+footer, 4x CPU, pointer resting mid-screen, 3 runs: main thread per refresh 15.0 / 11.6 / 11.7 ms
+and 15 / 7 / 7 frames over 34 ms; with the pointer outside the content 9.6 / 8.0 / 8.1 ms and
+1 / 2 / 3. Every card, link and button that slid under the still pointer started a colour or
+`transform` transition, which repainted the page layer and promoted and dropped image layers on
+every refresh.
+
 ## Reduced motion, all primitives
 
 | Primitive | `prefers-reduced-motion: reduce` |
@@ -534,14 +545,27 @@ Focus-visible gets the same visual change as hover plus the focus ring.
 | Lenis, gzip | 5.3 KB (measured) |
 | Hero film worker, gzip | 3 KB |
 | Total motion JavaScript on the home page, gzip | 17 KB |
-| Main-thread work per frame while scrolling, 4x CPU throttle, p95 | 8 ms |
-| Frames over 34 ms in a 5 s scroll trace from the hero through the card stack, 4x throttle | 0 |
+| Main-thread work per refresh while scrolling, 4x CPU throttle, p95 | 13 ms (was 8 ms; see below) |
+| Frames over 34 ms in a 5 s scroll trace, 4x throttle | 3 at most (was 0; see below) |
 | CLS | < 0.05 |
 | INP | < 200 ms |
 
-Check with Chrome DevTools Performance at 1440 x 900, CPU 4x slowdown, and report the numbers in
-the PR. Headless runs do not show GPU cost: `backdrop-filter` and large repaints must also be
-traced on a mid-range Android phone.
+Check with a CDP trace at 1440 x 900, CPU 4x slowdown, and report the numbers in the PR. Headless
+runs do not show GPU cost: `backdrop-filter` and large repaints must also be traced on a
+mid-range Android phone.
+
+Why the scroll budget moved (measured 2026-11-19, AC power, headless Chromium 1248 with GPU
+raster, wheel 100 px every 50 ms, main-thread busy time per refresh from the trace): Lenis moves
+the page from the main thread, so every refresh runs a full main-thread frame (rAF, `scrollTo`,
+scroll event, style, prepaint, paint, commit, plus the hit test for the pointer). The S-240
+product page, which has no scroll-linked primitive at all, measures p95 12.4 ms and 1 to 3 frames
+over 34 ms at 4x; 8 ms and 0 are below that floor. Native wheel scrolling would remove the floor
+but loses the smooth wheel the hero film needs.
+
+Measuring conditions matter more than the page: the same build and script on this laptop on
+battery gave p95 54 ms and 36 frames over 34 ms on S-240, and 16 busy cores gave p95 29 ms and 14
+frames. Measure on AC power with nothing else building; Lighthouse's `benchmarkIndex` is then
+2230 to 2540.
 
 ## Measured costs (2026-11-19)
 
