@@ -5,4 +5,4 @@ drizzle/
 .claude/
 next-env.d.ts
 .playwright-mcp/
-reports/
+assets/fonts/

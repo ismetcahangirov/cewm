@@ -56,18 +56,18 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_USER: mebline
-          POSTGRES_PASSWORD: mebline
-          POSTGRES_DB: mebline
+          POSTGRES_USER: cewm
+          POSTGRES_PASSWORD: cewm
+          POSTGRES_DB: cewm
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U mebline -d mebline"
+          --health-cmd "pg_isready -U cewm -d cewm"
           --health-interval 5s
           --health-timeout 3s
           --health-retries 10
     env:
-      DATABASE_URL: postgres://mebline:mebline@localhost:5432/mebline
+      DATABASE_URL: postgres://cewm:cewm@localhost:5432/cewm
     steps:
       - uses: actions/checkout@v5
       - uses: pnpm/action-setup@v4
@@ -93,13 +93,13 @@ jobs:
       postgres:
         image: postgres:17-alpine
         env:
-          POSTGRES_USER: mebline
-          POSTGRES_PASSWORD: mebline
-          POSTGRES_DB: mebline
+          POSTGRES_USER: cewm
+          POSTGRES_PASSWORD: cewm
+          POSTGRES_DB: cewm
         ports:
           - 5432:5432
         options: >-
-          --health-cmd "pg_isready -U mebline -d mebline"
+          --health-cmd "pg_isready -U cewm -d cewm"
           --health-interval 5s
           --health-timeout 3s
           --health-retries 10
@@ -111,25 +111,25 @@ jobs:
       storage:
         image: rustfs/rustfs:1.0.3
         env:
-          RUSTFS_ACCESS_KEY: mebline
-          RUSTFS_SECRET_KEY: mebline-secret
+          RUSTFS_ACCESS_KEY: cewm
+          RUSTFS_SECRET_KEY: cewm-secret
         ports:
           - 9000:9000
     env:
-      DATABASE_URL: postgres://mebline:mebline@localhost:5432/mebline
+      DATABASE_URL: postgres://cewm:cewm@localhost:5432/cewm
       BETTER_AUTH_SECRET: ci-only-secret-not-used-anywhere-else-0123456789
       BETTER_AUTH_URL: http://localhost:3000
       S3_ENDPOINT: http://localhost:9000
       S3_REGION: eu-central
-      S3_BUCKET: mebline
-      S3_ACCESS_KEY_ID: mebline
-      S3_SECRET_ACCESS_KEY: mebline-secret
+      S3_BUCKET: cewm
+      S3_ACCESS_KEY_ID: cewm
+      S3_SECRET_ACCESS_KEY: cewm-secret
       SMTP_HOST: localhost
       SMTP_PORT: 1025
-      SMTP_USER: mebline
-      SMTP_PASSWORD: mebline
-      SMTP_FROM: Mebline <no-reply@mebline.az>
-      QUOTE_NOTIFY_EMAIL: info@mebline.az
+      SMTP_USER: cewm
+      SMTP_PASSWORD: cewm
+      SMTP_FROM: CEWM <no-reply@cewm.az>
+      CONSULTATION_NOTIFY_EMAIL: sales@example.com
       MAILPIT_URL: http://localhost:8025
     steps:
       - uses: actions/checkout@v5
@@ -159,17 +159,17 @@ jobs:
         with:
           context: .
           load: true
-          tags: mebline:ci
+          tags: cewm:ci
           cache-from: type=gha
           cache-to: type=gha,mode=max
       - name: Health route answers from the container
         run: |
-          docker run -d --name mebline -p 3000:3000 mebline:ci
+          docker run -d --name cewm -p 3000:3000 cewm:ci
           for i in $(seq 1 30); do
             if curl -fsS http://localhost:3000/api/health; then exit 0; fi
             sleep 1
           done
-          docker logs mebline
+          docker logs cewm
           exit 1
 
   ci-complete:

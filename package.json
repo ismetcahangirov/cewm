@@ -1,9 +1,9 @@
 {
-  "name": "mebline",
+  "name": "cewm",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "dev": "next dev --port 3020",
     "build": "next build",
     "start": "node .next/standalone/server.js",
     "lint": "eslint --max-warnings=0",
@@ -16,9 +16,7 @@
     "db:seed": "tsx scripts/seed.mts",
     "db:studio": "drizzle-kit studio",
     "auth:owner": "tsx scripts/create-owner.mts",
-    "storage:cors": "tsx scripts/storage-cors.mts",
-    "migrate:wp": "tsx scripts/migrate-wp/index.mts",
-    "check:redirects": "tsx scripts/check-redirects.mts"
+    "storage:cors": "tsx scripts/storage-cors.mts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1152.0",
@@ -41,7 +39,7 @@
     "cn": "^0.5.0",
     "drizzle-orm": "^0.45.4",
     "lucide-react": "^1.59.0",
-    "next": "16.4.2",
+    "next": "16.4.6",
     "nodemailer": "^10.1.7",
     "postgres": "^3.4.9",
     "radix-ui": "^1.8.1",
@@ -65,10 +63,7 @@
     "dotenv": "^18.0.8",
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
-    "eslint-config-next": "16.4.2",
-    "node-html-parser": "^9.0.5",
-    "onnxruntime-node": "^1.30.0",
-    "p-limit": "^7.3.3",
+    "eslint-config-next": "16.4.6",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",
