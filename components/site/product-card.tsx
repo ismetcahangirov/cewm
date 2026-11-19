@@ -6,7 +6,7 @@ import type { ProductCardItem } from "@/lib/public/catalog";
 export function ProductCard({ product }: { product: ProductCardItem }) {
   return (
     <Link href={product.href} className="group flex flex-col border border-line bg-white">
-      <span className="relative block aspect-[4/3] bg-light">
+      <span className="bg-mist relative block aspect-[4/3]">
         {product.image ? (
           <Image
             src={product.image.src}
@@ -19,13 +19,11 @@ export function ProductCard({ product }: { product: ProductCardItem }) {
       </span>
       <span className="flex flex-col gap-1 p-4">
         {product.brand || product.category ? (
-          <span className="text-meta text-muted">
+          <span className="text-ink-muted text-small">
             {[product.brand, product.category].filter(Boolean).join(" · ")}
           </span>
         ) : null}
-        <span className="text-card font-semibold text-navy group-hover:text-cyan">
-          {product.name}
-        </span>
+        <span className="group-hover:text-cyan-ink text-h4 text-navy">{product.name}</span>
       </span>
     </Link>
   );

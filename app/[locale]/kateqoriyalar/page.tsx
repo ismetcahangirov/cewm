@@ -51,17 +51,14 @@ export default async function CategoriesPage() {
                 />
               ) : null}
               <div className="p-4">
-                <Link
-                  href={category.href}
-                  className="text-card font-semibold text-navy hover:text-cyan"
-                >
+                <Link href={category.href} className="hover:text-cyan-ink text-h4 text-navy">
                   {category.name}
                 </Link>
                 {category.children.length ? (
                   <ul className="mt-2 flex flex-col gap-1 text-small">
                     {category.children.map((child) => (
                       <li key={child.id}>
-                        <Link href={child.href} className="hover:text-cyan">
+                        <Link href={child.href} className="hover:text-cyan-ink">
                           {child.name}
                         </Link>
                       </li>

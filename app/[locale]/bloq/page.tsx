@@ -63,13 +63,10 @@ export default async function BlogPage({ searchParams }: PageProps<"/[locale]/bl
                     />
                   ) : null}
                   <div className="flex flex-col gap-2 p-4">
-                    <time dateTime={post.publishedAt} className="text-meta text-muted">
+                    <time dateTime={post.publishedAt} className="text-ink-muted text-small">
                       {formatPostDate(post.publishedAt, locale)}
                     </time>
-                    <Link
-                      href={post.href}
-                      className="text-card font-semibold text-navy hover:text-cyan"
-                    >
+                    <Link href={post.href} className="hover:text-cyan-ink text-h4 text-navy">
                       {post.title}
                     </Link>
                     {post.excerpt ? <p className="text-small">{post.excerpt}</p> : null}
@@ -79,7 +76,7 @@ export default async function BlogPage({ searchParams }: PageProps<"/[locale]/bl
             </ul>
             {items.length < total ? (
               <div className="mt-8 flex flex-col items-start gap-2">
-                <p className="text-meta text-muted">
+                <p className="text-ink-muted text-small">
                   {fill(dict.blog.shown, { shown: items.length, total })}
                 </p>
                 <Link href={`${path}?page=${page + 1}`} className={button()}>

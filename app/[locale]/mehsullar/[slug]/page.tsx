@@ -108,7 +108,7 @@ export default async function CategoryPage({
         {description ? <RichText doc={description} className="mb-10 max-w-3xl" /> : null}
         {listing.items.length ? (
           <>
-            <p className="mb-6 text-meta text-muted">
+            <p className="text-ink-muted mb-6 text-small">
               {fill(dict.catalog.count, { shown: listing.shown, total: listing.total })}
             </p>
             <ProductGrid products={listing.items} />

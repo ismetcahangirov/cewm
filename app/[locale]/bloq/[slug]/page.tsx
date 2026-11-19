@@ -58,7 +58,7 @@ export default async function PostPage({ params }: PageProps<"/[locale]/bloq/[sl
           { label: post.title, href: post.href },
         ]}
       >
-        <time dateTime={post.publishedAt} className="mt-2 block text-meta text-muted">
+        <time dateTime={post.publishedAt} className="text-ink-muted mt-2 block text-small">
           {formatPostDate(post.publishedAt, locale)}
         </time>
       </PageHeading>

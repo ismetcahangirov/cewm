@@ -9,9 +9,50 @@ export { heroFilmFormats, type HeroFilmFormat };
 
 export const heroFilmKeyPattern = /^[a-z0-9]+(?:[-_/][a-z0-9]+)*$/;
 
-export function heroFilmFrameKey(prefix: string, index: number, format: HeroFilmFormat): string {
-  return `${prefix}/${String(index + 1).padStart(4, "0")}.${format}`;
+export const heroFilmTiers = ["desktop", "mobile"] as const;
+
+export type HeroFilmTier = (typeof heroFilmTiers)[number];
+
+export function heroFilmFrameName(index: number): string {
+  return String(index + 1).padStart(4, "0");
 }
+
+export function heroFilmFrameKey(
+  prefix: string,
+  index: number,
+  format: HeroFilmFormat,
+  tier?: HeroFilmTier,
+): string {
+  const folder = tier ? `${prefix}/${tier}` : prefix;
+  return `${folder}/${heroFilmFrameName(index)}.${format}`;
+}
+
+export function heroFilmManifestKey(prefix: string): string {
+  return `${prefix}/manifest.json`;
+}
+
+const manifestTier = z.object({
+  width: z.number().int().min(160).max(7680),
+  height: z.number().int().min(160).max(7680),
+  count: z.number().int().min(2).max(2000),
+});
+
+const manifestPoster = z.object({
+  key: z.string().regex(/^[a-z0-9][a-z0-9/._-]*$/),
+  width: z.number().int().positive(),
+  height: z.number().int().positive(),
+});
+
+export const heroFilmManifestSchema = z.object({
+  version: z.number().int().positive(),
+  format: z.enum(heroFilmFormats),
+  tiers: z.object({ desktop: manifestTier, mobile: manifestTier.optional() }),
+  posters: z
+    .object({ desktop: manifestPoster.optional(), mobile: manifestPoster.optional() })
+    .optional(),
+});
+
+export type HeroFilmManifest = z.infer<typeof heroFilmManifestSchema>;
 
 const dimension = (message: string) =>
   z.coerce
