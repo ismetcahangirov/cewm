@@ -1,0 +1,7 @@
+@import "tailwindcss" source(none);
+@import "./globals.css";
+
+@source ".";
+@source not "./admin";
+@source "../components/site";
+@source "../components/icons";

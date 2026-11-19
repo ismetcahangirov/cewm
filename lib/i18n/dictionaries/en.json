@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "siteName": "CEWM",
+    "description": "CEWM: the HOMAG woodworking machinery partner in Azerbaijan. Machines and consultation for furniture and woodworking manufacturers.",
+    "homeTitle": "CEWM: HOMAG woodworking machinery in Azerbaijan"
+  },
+  "common": {
+    "skipToContent": "Skip to content",
+    "requestConsultation": "Request a consultation",
+    "language": "Language",
+    "more": "Learn more",
+    "home": "Home",
+    "mainNavigation": "Main menu",
+    "allProducts": "All products",
+    "catalogue": "Catalogue (PDF)",
+    "breadcrumb": "Breadcrumb",
+    "contactUs": "Contact us",
+    "previous": "Previous",
+    "next": "Next"
+  },
+  "contact": {
+    "title": "Contact",
+    "intro": "Call us, write to us or fill in the form.",
+    "persons": "Contact persons",
+    "phone": "Phone",
+    "email": "Email",
+    "address": "Address",
+    "hours": "Opening hours",
+    "openMap": "Open in maps",
+    "whatsapp": "Message us on WhatsApp",
+    "call": "{name}: call",
+    "write": "{name}: send an email"
+  },
+  "footer": {
+    "contacts": "Contact",
+    "followUs": "Follow us",
+    "rights": "All rights reserved."
+  },
+  "home": {
+    "categoriesTitle": "Product categories",
+    "productsTitle": "Featured machinery",
+    "brandsTitle": "Brands we represent",
+    "clientsTitle": "Our clients",
+    "postsTitle": "Blog"
+  },
+  "catalog": {
+    "title": "Products",
+    "description": "The CEWM catalogue: woodworking machines and equipment from HOMAG and partner brands.",
+    "indexTitle": "Product categories",
+    "indexDescription": "Cutting, edge banding, CNC machining centres, drilling and dowel insertion, assembly, packaging technology and software.",
+    "categories": "Categories",
+    "count": "{shown} of {total} products",
+    "loadMore": "Show more",
+    "empty": "There are no products in this section yet.",
+    "pageSuffix": "Page {page}",
+    "categoryDescription": "{name}: woodworking machinery in the CEWM catalogue."
+  },
+  "product": {
+    "brand": "Brand",
+    "model": "Model",
+    "benefits": "Key benefits",
+    "specs": "Technical specifications",
+    "parameter": "Parameter",
+    "value": "Value",
+    "documents": "Downloads",
+    "download": "Download",
+    "video": "Video",
+    "gallery": "Photos",
+    "related": "Related products",
+    "description": "{name} in the CEWM catalogue. Request a consultation on price and technical details."
+  },
+  "blog": {
+    "title": "Blog",
+    "description": "CEWM news and articles on woodworking technology.",
+    "read": "Read",
+    "empty": "No posts yet.",
+    "related": "More posts",
+    "loadMore": "Show more",
+    "shown": "{shown} of {total} posts"
+  },
+  "brands": {
+    "title": "Brands",
+    "visit": "Brand website",
+    "empty": "The list will be added soon."
+  },
+  "clients": {
+    "title": "Clients",
+    "empty": "The list will be added soon."
+  },
+  "consultation": {
+    "title": "Request a consultation",
+    "intro": "Fill in the form and our specialist will contact you.",
+    "name": "Full name",
+    "phone": "Phone",
+    "phoneHint": "For example 050 123 45 67",
+    "email": "Email",
+    "company": "Company",
+    "message": "Message",
+    "messagePlaceholder": "Which machines interest you, your production volume, your questions",
+    "products": "Selected products",
+    "removeProduct": "Remove from list",
+    "submit": "Send",
+    "sending": "Sending",
+    "required": "required field",
+    "errorName": "Enter your name (at least 2 letters).",
+    "errorPhone": "Enter the number as 050 123 45 67 or +994 50 123 45 67.",
+    "errorEmail": "The email address is not valid.",
+    "errorTooLong": "The text is too long.",
+    "errorGeneric": "Sending failed. Try again later or call us.",
+    "errorRateLimit": "Too many requests were sent in the last hour. Try again later or call us.",
+    "successTitle": "Your request has been received",
+    "successBody": "Thank you. Our specialist will contact you soon.",
+    "successLink": "Browse products",
+    "honeypot": "Leave this field empty"
+  },
+  "locales": {
+    "az": "Azərbaycanca",
+    "ru": "Русский",
+    "en": "English",
+    "de": "Deutsch"
+  },
+  "notFound": {
+    "title": "Page not found",
+    "body": "The page you are looking for has been moved or deleted.",
+    "home": "Back to the home page",
+    "products": "Products"
+  },
+  "error": {
+    "title": "Something went wrong",
+    "body": "The page could not be loaded. Please try again in a moment.",
+    "retry": "Try again"
+  }
+}

@@ -1,0 +1,133 @@
+{
+  "meta": {
+    "siteName": "CEWM",
+    "description": "CEWM: Azərbaycanda HOMAG ağac emalı avadanlıqlarının tərəfdaşı. Mebel və ağac emalı istehsalçıları üçün dəzgahlar və konsultasiya.",
+    "homeTitle": "CEWM: Azərbaycanda HOMAG ağac emalı avadanlıqları"
+  },
+  "common": {
+    "skipToContent": "Məzmuna keç",
+    "requestConsultation": "Konsultasiya al",
+    "language": "Dil",
+    "more": "Ətraflı",
+    "home": "Ana səhifə",
+    "mainNavigation": "Əsas menyu",
+    "allProducts": "Bütün məhsullar",
+    "catalogue": "Kataloq (PDF)",
+    "breadcrumb": "Naviqasiya yolu",
+    "contactUs": "Bizimlə əlaqə",
+    "previous": "Əvvəlki",
+    "next": "Növbəti"
+  },
+  "contact": {
+    "title": "Əlaqə",
+    "intro": "Bizə zəng edin, yazın və ya formu doldurun.",
+    "persons": "Əlaqə şəxsləri",
+    "phone": "Telefon",
+    "email": "E-poçt",
+    "address": "Ünvan",
+    "hours": "İş saatları",
+    "openMap": "Xəritədə aç",
+    "whatsapp": "WhatsApp ilə yazın",
+    "call": "{name}: zəng et",
+    "write": "{name}: e-poçt yaz"
+  },
+  "footer": {
+    "contacts": "Əlaqə",
+    "followUs": "Bizi izləyin",
+    "rights": "Bütün hüquqlar qorunur."
+  },
+  "home": {
+    "categoriesTitle": "Məhsul kateqoriyaları",
+    "productsTitle": "Seçilmiş avadanlıqlar",
+    "brandsTitle": "Təmsil etdiyimiz brendlər",
+    "clientsTitle": "Müştərilərimiz",
+    "postsTitle": "Bloq"
+  },
+  "catalog": {
+    "title": "Məhsullar",
+    "description": "CEWM kataloqu: HOMAG və partnyor brendlərin ağac emalı dəzgahları və avadanlıqları.",
+    "indexTitle": "Məhsul kateqoriyaları",
+    "indexDescription": "Kəsmə, kənar örtmə, CNC emal mərkəzləri, deşmə, montaj, qablaşdırma texnologiyası və proqram təminatı.",
+    "categories": "Kateqoriyalar",
+    "count": "{shown} / {total} məhsul",
+    "loadMore": "Daha çox",
+    "empty": "Bu bölmədə hələ məhsul yoxdur.",
+    "pageSuffix": "Səhifə {page}",
+    "categoryDescription": "{name}: CEWM kataloqunda ağac emalı avadanlıqları."
+  },
+  "product": {
+    "brand": "Brend",
+    "model": "Model",
+    "benefits": "Üstünlüklər",
+    "specs": "Texniki göstəricilər",
+    "parameter": "Göstərici",
+    "value": "Dəyər",
+    "documents": "Sənədlər",
+    "download": "Yüklə",
+    "video": "Video",
+    "gallery": "Şəkillər",
+    "related": "Oxşar məhsullar",
+    "description": "{name}: CEWM kataloqunda. Qiymət və texniki məsləhət üçün konsultasiya alın."
+  },
+  "blog": {
+    "title": "Bloq",
+    "description": "CEWM xəbərləri və ağac emalı texnologiyaları haqqında yazılar.",
+    "read": "Oxu",
+    "empty": "Hələ yazı yoxdur.",
+    "related": "Digər yazılar",
+    "loadMore": "Daha çox",
+    "shown": "{shown} / {total} yazı"
+  },
+  "brands": {
+    "title": "Brendlər",
+    "visit": "Brendin saytı",
+    "empty": "Siyahı tezliklə əlavə olunacaq."
+  },
+  "clients": {
+    "title": "Müştərilər",
+    "empty": "Siyahı tezliklə əlavə olunacaq."
+  },
+  "consultation": {
+    "title": "Konsultasiya alın",
+    "intro": "Formu doldurun, mütəxəssisimiz sizinlə əlaqə saxlasın.",
+    "name": "Ad, soyad",
+    "phone": "Telefon",
+    "phoneHint": "Məsələn 050 123 45 67",
+    "email": "E-poçt",
+    "company": "Şirkət",
+    "message": "Mesaj",
+    "messagePlaceholder": "Hansı avadanlıq maraqlıdır, istehsalın həcmi, suallarınız",
+    "products": "Seçilmiş məhsullar",
+    "removeProduct": "Siyahıdan çıxar",
+    "submit": "Göndər",
+    "sending": "Göndərilir",
+    "required": "vacib sahə",
+    "errorName": "Adınızı yazın (ən azı 2 hərf).",
+    "errorPhone": "Nömrəni 050 123 45 67 və ya +994 50 123 45 67 şəklində yazın.",
+    "errorEmail": "E-poçt ünvanı düzgün deyil.",
+    "errorTooLong": "Mətn çox uzundur.",
+    "errorGeneric": "Göndərmək alınmadı. Bir az sonra yenidən cəhd edin və ya bizə zəng edin.",
+    "errorRateLimit": "Son bir saatda çox müraciət göndərilib. Bir az sonra yenidən cəhd edin və ya bizə zəng edin.",
+    "successTitle": "Müraciətiniz qəbul olundu",
+    "successBody": "Təşəkkür edirik. Mütəxəssisimiz tezliklə sizinlə əlaqə saxlayacaq.",
+    "successLink": "Məhsullara bax",
+    "honeypot": "Bu sahəni boş saxlayın"
+  },
+  "locales": {
+    "az": "Azərbaycanca",
+    "ru": "Русский",
+    "en": "English",
+    "de": "Deutsch"
+  },
+  "notFound": {
+    "title": "Səhifə tapılmadı",
+    "body": "Axtardığınız səhifə köçürülüb və ya silinib.",
+    "home": "Ana səhifəyə qayıt",
+    "products": "Məhsullar"
+  },
+  "error": {
+    "title": "Xəta baş verdi",
+    "body": "Səhifəni yükləmək alınmadı. Bir az sonra yenidən cəhd edin.",
+    "retry": "Yenidən cəhd et"
+  }
+}

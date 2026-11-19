@@ -1,0 +1,57 @@
+name: cewm
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    environment:
+      POSTGRES_USER: cewm
+      POSTGRES_PASSWORD: cewm
+      POSTGRES_DB: cewm
+    ports:
+      - "${POSTGRES_PORT:-5452}:5432"
+    volumes:
+      - postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U cewm -d cewm"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  storage:
+    image: rustfs/rustfs:1.0.3
+    environment:
+      RUSTFS_ACCESS_KEY: cewm
+      RUSTFS_SECRET_KEY: cewm-secret
+      RUSTFS_CONSOLE_ENABLE: "true"
+    ports:
+      - "9020:9000"
+      - "9021:9001"
+    volumes:
+      - storage:/data
+
+  storage-setup:
+    image: amazon/aws-cli:2.38.2
+    depends_on:
+      - storage
+    environment:
+      AWS_ACCESS_KEY_ID: cewm
+      AWS_SECRET_ACCESS_KEY: cewm-secret
+      AWS_DEFAULT_REGION: eu-central
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        for i in $$(seq 1 30); do aws --endpoint-url http://storage:9000 s3 ls >/dev/null 2>&1 && break; sleep 1; done
+        aws --endpoint-url http://storage:9000 s3 mb s3://cewm 2>/dev/null || true
+        aws --endpoint-url http://storage:9000 s3api put-bucket-cors --bucket cewm --cors-configuration '{"CORSRules":[{"AllowedOrigins":["http://localhost:3020"],"AllowedMethods":["PUT"],"AllowedHeaders":["content-type"],"MaxAgeSeconds":3600}]}'
+        aws --endpoint-url http://storage:9000 s3api put-bucket-policy --bucket cewm --policy '{"Version":"2012-10-17","Statement":[{"Effect":"Allow","Principal":"*","Action":"s3:GetObject","Resource":"arn:aws:s3:::cewm/*"}]}'
+        echo "bucket cewm ready"
+
+  mailpit:
+    image: axllent/mailpit:v1.31
+    ports:
+      - "1045:1025"
+      - "8045:8025"
+
+volumes:
+  postgres:
+  storage:

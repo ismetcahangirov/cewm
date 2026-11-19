@@ -1,0 +1,12 @@
+.git
+.github
+.claude
+.next
+node_modules
+coverage
+reports
+*.log
+.env
+.env*.local
+Dockerfile
+docker-compose.yml
