@@ -5,7 +5,12 @@ import type { ReactNode } from "react";
 import type { RichTextDoc, RichTextMark, RichTextNode } from "@/lib/content/rich-text";
 import { cx } from "@/lib/cx";
 
-type Options = { imageSizes: string; headingOffset: number; imageAlt: string };
+type Options = {
+  imageSizes: string;
+  headingOffset: number;
+  imageAlt: string;
+  headingIds: boolean;
+};
 
 function text(value: unknown): string | null {
   return typeof value === "string" && value.trim() ? value : null;
@@ -93,7 +98,12 @@ function renderNode(node: RichTextNode, key: string, options: Options): ReactNod
         Math.max(2, (number(node.attrs?.level) ?? 2) + options.headingOffset),
       );
       const Tag = `h${level}` as "h2" | "h3" | "h4" | "h5" | "h6";
-      return <Tag key={key}>{children()}</Tag>;
+      const id = options.headingIds && level === 2 ? headingId(key) : undefined;
+      return (
+        <Tag key={key} id={id}>
+          {children()}
+        </Tag>
+      );
     }
     case "bulletList":
       return <ul key={key}>{children()}</ul>;
@@ -130,23 +140,46 @@ function renderNode(node: RichTextNode, key: string, options: Options): ReactNod
   }
 }
 
+function headingId(key: string): string {
+  return `section-${key.slice(2)}`;
+}
+
+function plainText(node: RichTextNode): string {
+  if (node.type === "text") return node.text ?? "";
+  return (node.content ?? []).map(plainText).join("");
+}
+
+export function richTextHeadings(
+  doc: RichTextDoc | null | undefined,
+  headingOffset = 0,
+): { id: string; text: string }[] {
+  return (doc?.content ?? []).flatMap((node, index) => {
+    if (node.type !== "heading") return [];
+    const level = Math.max(2, (number(node.attrs?.level) ?? 2) + headingOffset);
+    const text = plainText(node).trim();
+    return level === 2 && text ? [{ id: headingId(`n-${index}`), text }] : [];
+  });
+}
+
 export function RichText({
   doc,
   className,
   imageSizes = "(min-width: 768px) 48rem, 100vw",
   headingOffset = 0,
   imageAlt = "",
+  headingIds = false,
 }: {
   doc: RichTextDoc | null | undefined;
   className?: string;
   imageSizes?: string;
   headingOffset?: number;
   imageAlt?: string;
+  headingIds?: boolean;
 }) {
   if (!doc?.content?.length) return null;
   return (
     <div className={cx("rich-text", className)}>
-      {renderNodes(doc.content, "n", { imageSizes, headingOffset, imageAlt })}
+      {renderNodes(doc.content, "n", { imageSizes, headingOffset, imageAlt, headingIds })}
     </div>
   );
 }

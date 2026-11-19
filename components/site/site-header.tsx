@@ -3,6 +3,7 @@ import { connection } from "next/server";
 
 import { localePath, locales, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { hideBlogWithoutPosts } from "@/lib/public/blog-link";
 import { getPageLinks } from "@/lib/public/home";
 import { getMenu, type PublicMenuItem } from "@/lib/public/menus";
 import { getSiteSettings } from "@/lib/public/settings";
@@ -30,7 +31,11 @@ export async function SiteHeader({ locale, dict }: { locale: Locale; dict: Dicti
     getSiteSettings(),
     getPageLinks(locale),
   ]);
-  const items = (menu.length ? menu : fallbackMenu(locale, dict)).flatMap((item): HeaderLink[] =>
+  const visibleMenu = await hideBlogWithoutPosts(
+    menu.length ? menu : fallbackMenu(locale, dict),
+    locale,
+  );
+  const items = visibleMenu.flatMap((item): HeaderLink[] =>
     item.href ? [{ id: item.id, label: item.label, href: item.href }] : [],
   );
   const contact = pageLinks.contact ?? pageLinks.consultation ?? null;

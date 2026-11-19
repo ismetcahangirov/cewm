@@ -2,9 +2,10 @@ import type { ReactNode } from "react";
 
 import { fontClassName } from "@/app/fonts";
 import { MotionRoot } from "@/components/motion/motion-root";
-import type { Locale } from "@/lib/i18n/config";
+import { localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
+import { ErrorTextsProvider } from "./error-texts";
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 import { VisitBeacon } from "./visit-beacon";
@@ -29,7 +30,18 @@ export function PublicShell({
         </a>
         <SiteHeader locale={locale} dict={dict} />
         <main id="main" tabIndex={-1} className="site-main overflow-x-clip outline-none">
-          {children}
+          <ErrorTextsProvider
+            value={{
+              eyebrow: dict.error.eyebrow,
+              title: dict.error.title,
+              body: dict.error.body,
+              retry: dict.error.retry,
+              home: dict.common.home,
+              homeHref: localePath(locale),
+            }}
+          >
+            {children}
+          </ErrorTextsProvider>
         </main>
         <SiteFooter locale={locale} dict={dict} />
         <MotionRoot />

@@ -21,6 +21,7 @@ import type { Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { pickLocale } from "@/lib/i18n/localized";
 import { formatAzerbaijaniPhone } from "@/lib/phone";
+import { hideBlogWithoutPosts } from "@/lib/public/blog-link";
 import { getContactPersons } from "@/lib/public/contacts";
 import { getBrands } from "@/lib/public/home";
 import { getFooterMenus, getMenu } from "@/lib/public/menus";
@@ -63,9 +64,15 @@ export async function SiteFooter({ locale, dict }: { locale: Locale; dict: Dicti
   const name = settings.legalName || dict.meta.siteName;
   const whatsapp =
     settings.whatsappNumber ?? persons.find((person) => person.whatsapp)?.whatsapp ?? null;
-  const navigation = columns.length
-    ? columns
-    : [{ key: "main", title: dict.footer.navigation, items: mainMenu }];
+  const navigation = await Promise.all(
+    (columns.length
+      ? columns
+      : [{ key: "main", title: dict.footer.navigation, items: mainMenu }]
+    ).map(async (column) => ({
+      ...column,
+      items: await hideBlogWithoutPosts(column.items, locale),
+    })),
+  );
 
   return (
     <footer

@@ -1,27 +1,47 @@
 import type { Metadata } from "next";
-import Image from "next/image";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { connection } from "next/server";
 
+import {
+  ArrowRightIcon,
+  CallIcon,
+  DocumentDownloadIcon,
+  ExportSquareIcon,
+} from "@/components/icons/iconsax";
+import { LineReveal, Reveal } from "@/components/motion/text";
+import { Breadcrumbs } from "@/components/site/breadcrumbs";
+import { button, buttonArrow } from "@/components/site/button";
 import { ConsultationSection } from "@/components/site/consultation/consultation-section";
+import { FitHeading } from "@/components/site/fit-heading";
+import { FactBlockView } from "@/components/seo/fact-block";
 import { JsonLdScript } from "@/components/site/json-ld";
-import { PageHeading } from "@/components/site/page-heading";
 import { ProductGrid } from "@/components/site/product-card";
+import { ProductGallery } from "@/components/site/product/product-gallery";
+import { ProductVideo } from "@/components/site/product/product-video";
+import { QuoteBar } from "@/components/site/product/quote-bar";
+import { SpecTable } from "@/components/site/product/spec-table";
 import { RichText } from "@/components/site/rich-text";
+import { telHref } from "@/lib/contact-links";
 import { richTextToPlain, summarize } from "@/lib/content/rich-text";
+import { cx } from "@/lib/cx";
 import { env } from "@/lib/env";
 import { localePath } from "@/lib/i18n/config";
-import { fill } from "@/lib/i18n/format";
+import { fill, formatFileSize } from "@/lib/i18n/format";
 import { getRequestDictionary } from "@/lib/i18n/server";
-import { getProductBySlug, getRelatedProducts } from "@/lib/public/product";
+import { formatAzerbaijaniPhone } from "@/lib/phone";
+import { getProductBySlug, getRelatedProducts, groupSpecs } from "@/lib/public/product";
+import { getSiteSettings } from "@/lib/public/settings";
 import { localizedPaths, redirectToCanonicalSlug } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
+import { getCorpus, entityInfo } from "@/lib/seo/corpus";
+import { productFactBlock } from "@/lib/seo/facts";
 import { productJsonLd } from "@/lib/seo/json-ld";
-import { entityInfo } from "@/lib/seo/corpus";
 import { pageMetadata } from "@/lib/seo/metadata";
 import { markdownHref } from "@/lib/seo/rewrites";
 import { describeEntity } from "@/lib/seo/text";
-import { formatFileSize } from "@/lib/validation/media";
+
+export const instant = false;
 
 export async function generateMetadata({
   params,
@@ -51,201 +71,344 @@ export async function generateMetadata({
   });
 }
 
+const factRow = "flex min-h-12 items-center justify-between gap-4 border-b border-line py-2";
+
 export default async function ProductPage({ params }: PageProps<"/[locale]/mehsul/[slug]">) {
   await connection();
   const [{ slug }, { locale, dict }] = await Promise.all([params, getRequestDictionary()]);
   const product = await getProductBySlug(locale, slug);
   if (!product) notFound();
   redirectToCanonicalSlug(product.slug, locale, slug, routes.product);
-  const related = await getRelatedProducts(locale, product.id, product.category?.id ?? null);
+  const [related, settings, corpus] = await Promise.all([
+    getRelatedProducts(locale, product.id, product.category?.id ?? null),
+    getSiteSettings(),
+    getCorpus(),
+  ]);
+  const corpusProduct = corpus.products.find((item) => item.id === product.id) ?? null;
+  const text = dict.product;
   const path = localePath(locale, routes.product(slug));
-  const [cover, ...gallery] = product.images;
+  const lang = product.contentLocale !== locale ? product.contentLocale : undefined;
+  const groups = groupSpecs(product.specs);
+  const phone = settings.phones[0]?.number ?? null;
+  const cover = product.images[0] ?? null;
+  const hasGallery = product.images.length > 0;
+  const meta = [product.brand?.name, product.category?.name].filter(Boolean).join(" · ");
 
   return (
     <>
-      <PageHeading
-        title={product.name}
-        breadcrumbLabel={dict.common.breadcrumb}
-        breadcrumbs={[
-          { label: dict.common.home, href: localePath(locale) },
-          { label: dict.catalog.title, href: localePath(locale, routes.catalogue()) },
-          ...(product.category
-            ? [{ label: product.category.name, href: product.category.href }]
-            : []),
-          { label: product.name, href: path },
-        ]}
-      >
-        <dl className="mt-4 flex flex-wrap gap-x-6 gap-y-1 text-small">
-          {product.brand ? (
-            <div className="flex gap-2">
-              <dt className="text-ink-muted">{dict.product.brand}</dt>
-              <dd>{product.brand.name}</dd>
-            </div>
-          ) : null}
-          {product.sku ? (
-            <div className="flex gap-2">
-              <dt className="text-ink-muted">{dict.product.model}</dt>
-              <dd>{product.sku}</dd>
-            </div>
-          ) : null}
-        </dl>
-      </PageHeading>
-
-      <div className="container-page grid gap-10 py-section lg:grid-cols-2">
-        {cover ? (
-          <Image
-            src={cover.src}
-            alt={cover.alt}
-            width={cover.width}
-            height={cover.height}
-            sizes="(min-width: 1024px) 50vw, 100vw"
-            priority
-            className="bg-mist h-auto w-full object-contain"
-          />
-        ) : null}
-        <div className="flex flex-col gap-8">
-          {product.shortDescription ? <RichText doc={product.shortDescription} /> : null}
-          {product.benefits.length ? (
-            <section aria-labelledby="product-benefits">
-              <h2 id="product-benefits" className="text-h3">
-                {dict.product.benefits}
-              </h2>
-              <ul className="mt-4 list-disc pl-5">
-                {product.benefits.map((benefit) => (
-                  <li key={benefit}>{benefit}</li>
-                ))}
-              </ul>
-            </section>
-          ) : null}
-        </div>
+      <div className="container-page pt-6">
+        <Breadcrumbs
+          label={dict.common.breadcrumb}
+          items={[
+            { label: dict.common.home, href: localePath(locale) },
+            { label: dict.catalog.title, href: localePath(locale, routes.catalogue()) },
+            ...(product.category
+              ? [{ label: product.category.name, href: product.category.href }]
+              : []),
+            { label: product.name, href: path },
+          ]}
+        />
       </div>
 
-      <div className="container-page flex flex-col gap-section pb-section">
-        {product.description ? <RichText doc={product.description} className="max-w-3xl" /> : null}
-
-        {product.specs.length ? (
-          <section aria-labelledby="product-specs">
-            <h2 id="product-specs" className="text-h2">
-              {dict.product.specs}
-            </h2>
-            <div className="mt-6 overflow-x-auto">
-              <table className="w-full text-left text-small">
-                <thead>
-                  <tr className="border-b border-line-strong">
-                    <th scope="col" className="py-3 pr-4 font-semibold">
-                      {dict.product.parameter}
-                    </th>
-                    <th scope="col" className="py-3 font-semibold">
-                      {dict.product.value}
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {product.specs.map((spec, index) => (
-                    <tr key={`${spec.label}-${index}`} className="border-b border-line">
-                      <th scope="row" className="text-ink-muted py-3 pr-4 font-normal">
-                        {spec.label}
-                      </th>
-                      <td className="py-3">
-                        {spec.unit ? `${spec.value} ${spec.unit}` : spec.value}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+      <section aria-labelledby="product-title" className="container-page pt-8 pb-section lg:pt-12">
+        <div className="gap-x-column grid gap-y-10 lg:grid-cols-12">
+          {hasGallery ? (
+            <div className="min-w-0 lg:col-span-7">
+              <ProductGallery
+                images={product.images}
+                labels={{
+                  gallery: fill(text.galleryLabel, { name: product.name }),
+                  open: text.galleryOpen,
+                  close: text.galleryClose,
+                  previous: text.galleryPrevious,
+                  next: text.galleryNext,
+                  position: text.galleryPosition,
+                }}
+              />
             </div>
-          </section>
-        ) : null}
-
-        {product.video ? (
-          <section aria-labelledby="product-video">
-            <h2 id="product-video" className="text-h2">
-              {dict.product.video}
-            </h2>
-            {product.video.kind === "file" ? (
-              <video
-                controls
-                playsInline
-                preload="metadata"
-                poster={product.video.poster?.src}
-                className="mt-6 h-auto w-full"
-              >
-                <source src={product.video.src} type={product.video.type} />
-              </video>
-            ) : (
-              <a
-                href={product.video.url}
-                target="_blank"
-                rel="noreferrer"
-                className="mt-6 inline-block text-navy underline decoration-cyan underline-offset-4"
-              >
-                {product.video.url}
-              </a>
+          ) : null}
+          <div
+            className={cx(
+              "lg:top-header min-w-0 lg:sticky lg:self-start lg:pt-2",
+              hasGallery ? "lg:col-span-5" : "lg:col-span-8",
             )}
-          </section>
-        ) : null}
-
-        {product.documents.length ? (
-          <section aria-labelledby="product-documents">
-            <h2 id="product-documents" className="text-h2">
-              {dict.product.documents}
-            </h2>
-            <ul className="mt-6 flex flex-col gap-2">
-              {product.documents.map((document) => (
-                <li key={document.href}>
-                  <a
-                    href={document.href}
-                    download
-                    className="inline-flex min-h-11 items-center gap-3 text-navy underline decoration-cyan underline-offset-4"
-                  >
-                    {document.title}
-                    <span className="text-ink-muted text-small no-underline">
-                      PDF, {formatFileSize(document.size)}
-                    </span>
-                  </a>
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        {gallery.length ? (
-          <section aria-labelledby="product-gallery">
-            <h2 id="product-gallery" className="text-h2">
-              {dict.product.gallery}
-            </h2>
-            <ul className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {gallery.map((image) => (
-                <li key={image.src}>
-                  <Image
-                    src={image.src}
-                    alt={image.alt}
-                    width={image.width}
-                    height={image.height}
-                    sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-                    className="bg-mist h-auto w-full object-contain"
-                  />
-                </li>
-              ))}
-            </ul>
-          </section>
-        ) : null}
-
-        {related.length ? (
-          <section aria-labelledby="product-related">
-            <h2 id="product-related" className="text-h2">
-              {dict.product.related}
-            </h2>
-            <div className="mt-6">
-              <ProductGrid products={related} />
+          >
+            {meta ? <p className="text-label text-grey uppercase">{meta}</p> : null}
+            <FitHeading
+              id="product-title"
+              size="h2"
+              text={product.name}
+              lang={lang}
+              className="mt-4"
+            />
+            {lang ? (
+              <p className="border-cyan-ink text-ink-muted mt-6 border-l-2 pl-4 text-small">
+                {text.fallbackNotice}
+              </p>
+            ) : null}
+            {product.shortDescription && !corpusProduct ? (
+              <div lang={lang}>
+                <RichText doc={product.shortDescription} className="rich-text-lead mt-6" />
+              </div>
+            ) : null}
+            <div id="product-cta" className="mt-8 flex flex-wrap gap-3">
+              <a href="#consultation" className={cx(button(), "max-sm:w-full")}>
+                {text.requestQuote}
+                <ArrowRightIcon size={20} className={buttonArrow} />
+              </a>
+              {phone ? (
+                <a
+                  href={telHref(phone)}
+                  className={cx(button({ variant: "outline" }), "tabular max-sm:w-full")}
+                >
+                  <CallIcon size={20} />
+                  {formatAzerbaijaniPhone(phone)}
+                </a>
+              ) : null}
             </div>
-          </section>
-        ) : null}
-      </div>
+            <dl className="mt-10 border-t border-line text-small">
+              {product.brand ? (
+                <div className={factRow}>
+                  <dt className="text-ink-muted">{text.brand}</dt>
+                  <dd>
+                    {product.brand.url ? (
+                      <a
+                        href={product.brand.url}
+                        target="_blank"
+                        rel="noopener"
+                        className="hover:text-cyan-ink inline-flex min-h-11 items-center gap-2 underline decoration-1 underline-offset-4"
+                      >
+                        {product.brand.name}
+                        <ExportSquareIcon size={16} />
+                      </a>
+                    ) : (
+                      product.brand.name
+                    )}
+                  </dd>
+                </div>
+              ) : null}
+              {product.category ? (
+                <div className={factRow}>
+                  <dt className="text-ink-muted">{text.category}</dt>
+                  <dd className="text-right">
+                    <Link
+                      href={product.category.href}
+                      prefetch={false}
+                      className="hover:text-cyan-ink inline-flex min-h-11 items-center underline decoration-1 underline-offset-4"
+                    >
+                      {product.category.name}
+                    </Link>
+                  </dd>
+                </div>
+              ) : null}
+              {product.sku ? (
+                <div className={factRow}>
+                  <dt className="text-ink-muted">{text.model}</dt>
+                  <dd className="tabular">{product.sku}</dd>
+                </div>
+              ) : null}
+              {product.specs.length ? (
+                <div className={factRow}>
+                  <dt className="text-ink-muted">{text.specs}</dt>
+                  <dd>
+                    <a
+                      href="#product-specs"
+                      className="hover:text-cyan-ink inline-flex min-h-11 items-center underline decoration-1 underline-offset-4"
+                    >
+                      {fill(text.specCount, { count: product.specs.length })}
+                    </a>
+                  </dd>
+                </div>
+              ) : null}
+              {product.documents.length ? (
+                <div className={factRow}>
+                  <dt className="text-ink-muted">{text.documents}</dt>
+                  <dd>
+                    <a
+                      href="#product-documents"
+                      className="hover:text-cyan-ink inline-flex min-h-11 items-center underline decoration-1 underline-offset-4"
+                    >
+                      {fill(text.documentCount, { count: product.documents.length })}
+                    </a>
+                  </dd>
+                </div>
+              ) : null}
+            </dl>
+          </div>
+        </div>
+      </section>
+
+      {corpusProduct ? (
+        <div className="container-page pb-section">
+          <FactBlockView
+            block={productFactBlock(corpus, corpusProduct, locale, dict)}
+            lang={lang}
+            className="border-t border-line pt-12 lg:pt-16"
+          />
+        </div>
+      ) : null}
+
+      {product.description || product.benefits.length ? (
+        <section aria-labelledby="product-overview" className="container-page pb-section">
+          <div className="gap-x-column grid gap-y-8 border-t border-line pt-12 lg:grid-cols-12 lg:pt-16">
+            <h2 id="product-overview" className="text-label text-cyan-ink uppercase lg:col-span-3">
+              {text.overview}
+            </h2>
+            <div lang={lang} className="lg:col-span-8 lg:col-start-5">
+              {product.description ? (
+                <Reveal>
+                  <RichText doc={product.description} className="rich-text-lead" />
+                </Reveal>
+              ) : null}
+              {product.benefits.length ? (
+                <div className={product.description ? "mt-14" : undefined}>
+                  <h3 className="text-h4">{text.benefits}</h3>
+                  <ol data-reveal-group="" className="gap-x-column mt-6 grid md:grid-cols-2">
+                    {product.benefits.map((benefit, index) => (
+                      <li
+                        key={`${benefit}-${index}`}
+                        data-reveal=""
+                        className="flex gap-4 border-t border-line py-4"
+                      >
+                        <span aria-hidden="true" className="text-label text-grey tabular pt-1">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+                        <span>{benefit}</span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {groups.length || product.documents.length ? (
+        <section
+          id="product-specs"
+          aria-labelledby="product-specs-title"
+          className="surface-mist scroll-mt-header"
+        >
+          <div className="gap-x-column container-page grid gap-y-10 py-section lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <p className="text-label text-cyan-ink uppercase">{text.technicalEyebrow}</p>
+              <LineReveal
+                id="product-specs-title"
+                text={groups.length ? text.specs : text.documents}
+                className="text-safe mt-4 text-h2"
+              />
+            </div>
+            <div className="lg:col-span-8">
+              {groups.length ? (
+                <div lang={lang}>
+                  <SpecTable
+                    groups={groups}
+                    caption={fill(text.specsCaption, { name: product.name })}
+                    parameterLabel={text.parameter}
+                    valueLabel={text.value}
+                  />
+                </div>
+              ) : null}
+              {product.documents.length ? (
+                <div
+                  id="product-documents"
+                  className={cx("scroll-mt-header", groups.length ? "mt-14" : undefined)}
+                >
+                  {groups.length ? <h3 className="text-h4">{text.documents}</h3> : null}
+                  <ul className={cx("border-t border-line", groups.length ? "mt-6" : undefined)}>
+                    {product.documents.map((document) => (
+                      <li key={document.href} className="border-b border-line">
+                        <a
+                          href={document.href}
+                          download
+                          className="group/doc flex min-h-16 items-center gap-4 py-3"
+                        >
+                          <DocumentDownloadIcon size={24} className="text-ink shrink-0" />
+                          <span className="min-w-0 flex-1">
+                            <span className="text-ink block underline-offset-4 group-hover/doc:underline">
+                              {document.title}
+                            </span>
+                            <span className="text-grey tabular block text-small">
+                              PDF, {formatFileSize(document.size, locale)}
+                            </span>
+                          </span>
+                          <span className="text-cyan-ink shrink-0 text-small">{text.download}</span>
+                        </a>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {product.video ? (
+        <section aria-labelledby="product-video" className="surface-navy">
+          <div className="gap-x-column container-page grid gap-y-10 py-section lg:grid-cols-12">
+            <div className="lg:col-span-4">
+              <p className="text-label text-cyan uppercase">
+                {product.brand?.name ?? dict.meta.siteName}
+              </p>
+              <LineReveal id="product-video" text={text.video} className="mt-4 text-h2" />
+            </div>
+            <Reveal className="lg:col-span-8">
+              <ProductVideo
+                video={
+                  product.video.kind === "file"
+                    ? {
+                        kind: "file",
+                        src: product.video.src,
+                        type: product.video.type,
+                        poster: product.video.poster ?? cover,
+                      }
+                    : {
+                        kind: "link",
+                        url: product.video.url,
+                        poster: product.video.poster ?? cover,
+                      }
+                }
+                title={fill(text.videoTitle, { name: product.name })}
+                playLabel={text.videoPlay}
+                openLabel={text.videoOpen}
+              />
+            </Reveal>
+          </div>
+        </section>
+      ) : null}
+
+      {related.length ? (
+        <section aria-labelledby="product-related" className="container-page py-section">
+          <div className="gap-x-column grid gap-y-4 lg:grid-cols-12 lg:items-end">
+            <div className="lg:col-span-8">
+              <p className="text-label text-cyan-ink uppercase">{dict.catalog.eyebrow}</p>
+              <LineReveal id="product-related" text={text.related} className="mt-4 text-h2" />
+            </div>
+            {product.category ? (
+              <Link
+                href={product.category.href}
+                className="group/link text-cyan-ink hover:text-ink inline-flex min-h-11 items-center gap-2 text-small underline decoration-1 underline-offset-4 lg:col-span-4 lg:justify-self-end"
+              >
+                {product.category.name}
+                <ArrowRightIcon
+                  size={16}
+                  className="transition-transform duration-200 group-hover/link:translate-x-1"
+                />
+              </Link>
+            ) : null}
+          </div>
+          <ProductGrid products={related} moreLabel={dict.common.more} className="mt-12" />
+        </section>
+      ) : null}
 
       <ConsultationSection
+        id="consultation"
         locale={locale}
         dict={dict}
+        title={text.quoteTitle}
+        intro={text.quoteIntro}
         products={[
           {
             id: product.id,
@@ -253,6 +416,14 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
             image: cover ? { src: cover.src, alt: cover.alt } : null,
           },
         ]}
+      />
+
+      <QuoteBar
+        name={product.name}
+        label={text.requestQuote}
+        href="#consultation"
+        after="product-cta"
+        before="consultation"
       />
 
       <JsonLdScript

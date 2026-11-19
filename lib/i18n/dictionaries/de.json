@@ -32,7 +32,8 @@
     "openMap": "In der Karte öffnen",
     "whatsapp": "Per WhatsApp schreiben",
     "call": "{name}: anrufen",
-    "write": "{name}: E-Mail schreiben"
+    "write": "{name}: E-Mail schreiben",
+    "office": "Büro"
   },
   "footer": {
     "contacts": "Kontakt",
@@ -84,7 +85,17 @@
     "loadMore": "Mehr anzeigen",
     "empty": "In diesem Bereich gibt es noch keine Produkte.",
     "pageSuffix": "Seite {page}",
-    "categoryDescription": "{name}: Holzbearbeitungsmaschinen im CEWM-Katalog."
+    "categoryDescription": "{name}: Holzbearbeitungsmaschinen im CEWM-Katalog.",
+    "eyebrow": "Katalog",
+    "summary": "Produkte: {products} · Bereiche: {areas}",
+    "areasTitle": "Maschinenbereiche",
+    "brandFilter": "Marke",
+    "allBrands": "Alle Marken",
+    "areaCount": "Produkte: {count}",
+    "openArea": "Bereich öffnen",
+    "otherTitle": "Weitere Produkte",
+    "emptyTitle": "In diesem Bereich gibt es noch keine Produkte",
+    "emptyBody": "Schreiben Sie uns, welche Maschinen Sie brauchen, und wir schlagen passende Lösungen vor."
   },
   "product": {
     "brand": "Marke",
@@ -98,7 +109,26 @@
     "video": "Video",
     "gallery": "Bilder",
     "related": "Ähnliche Produkte",
-    "description": "{name} im CEWM-Katalog. Fordern Sie eine Beratung zu Preis und Technik an."
+    "description": "{name} im CEWM-Katalog. Fordern Sie eine Beratung zu Preis und Technik an.",
+    "category": "Kategorie",
+    "requestQuote": "Angebot anfordern",
+    "specCount": "Tabelle ({count})",
+    "documentCount": "PDF ({count})",
+    "overview": "Überblick",
+    "technicalEyebrow": "Datenblatt",
+    "specsCaption": "{name}: technische Daten",
+    "fallbackNotice": "Diese Seite ist noch nicht ins Deutsche übersetzt; der folgende Text ist auf Aserbaidschanisch.",
+    "galleryLabel": "{name}: Bilder",
+    "galleryOpen": "Bild vergrößern",
+    "galleryClose": "Schließen",
+    "galleryPrevious": "Vorheriges Bild",
+    "galleryNext": "Nächstes Bild",
+    "galleryPosition": "{current} / {total}",
+    "videoTitle": "{name}: Video",
+    "videoPlay": "Video abspielen",
+    "videoOpen": "Video in neuem Fenster öffnen",
+    "quoteTitle": "Angebot für dieses Produkt anfordern",
+    "quoteIntro": "Das Produkt ist bereits im Formular eingetragen. Hinterlassen Sie Ihre Kontaktdaten, unser Fachberater meldet sich bei Ihnen."
   },
   "blog": {
     "title": "Blog",
@@ -107,12 +137,15 @@
     "empty": "Noch keine Beiträge.",
     "related": "Weitere Beiträge",
     "loadMore": "Mehr anzeigen",
-    "shown": "{shown} von {total} Beiträgen"
+    "shown": "{shown} von {total} Beiträgen",
+    "emptyBody": "Beiträge erscheinen hier, sobald sie veröffentlicht sind.",
+    "back": "Alle Beiträge"
   },
   "brands": {
     "title": "Marken",
     "visit": "Website der Marke",
-    "empty": "Die Liste folgt in Kürze."
+    "empty": "Die Liste folgt in Kürze.",
+    "products": "Im Katalog: {count}"
   },
   "clients": {
     "title": "Kunden",
@@ -142,7 +175,10 @@
     "successTitle": "Ihre Anfrage ist eingegangen",
     "successBody": "Vielen Dank. Unser Fachberater meldet sich in Kürze bei Ihnen.",
     "successLink": "Produkte ansehen",
-    "honeypot": "Dieses Feld leer lassen"
+    "honeypot": "Dieses Feld leer lassen",
+    "requiredNote": "Mit * markierte Felder sind Pflichtfelder.",
+    "formLabel": "Anfrageformular",
+    "direct": "Oder rufen Sie uns direkt an"
   },
   "locales": {
     "az": "Azərbaycanca",
@@ -159,6 +195,10 @@
   "error": {
     "title": "Ein Fehler ist aufgetreten",
     "body": "Die Seite konnte nicht geladen werden. Bitte versuchen Sie es gleich noch einmal.",
-    "retry": "Erneut versuchen"
+    "retry": "Erneut versuchen",
+    "eyebrow": "Fehler"
+  },
+  "pages": {
+    "contents": "Auf dieser Seite"
   }
 }

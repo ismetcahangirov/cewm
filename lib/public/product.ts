@@ -50,6 +50,8 @@ export function groupSpecs(rows: ProductSpecRow[]): ProductSpecGroup[] {
   return groups;
 }
 
+export type ProductImage = PublicImage & { caption: string | null };
+
 export type ProductDocument = { title: string; href: string; size: number };
 
 export type ProductVideo =
@@ -66,12 +68,13 @@ export type ProductDetail = {
   description: RichTextDoc | null;
   benefits: string[];
   specs: ProductSpecRow[];
-  images: PublicImage[];
+  images: ProductImage[];
   documents: ProductDocument[];
   video: ProductVideo | null;
   category: { id: string; name: string; href: string } | null;
   seoTitle: string | null;
   seoDescription: string | null;
+  contentLocale: Locale;
 };
 
 export const relatedLimit = 4;
@@ -151,7 +154,7 @@ export async function findProduct(locale: Locale, slug: string): Promise<Product
   const [categoryRows, imageRows, documentRows] = await Promise.all([
     productCategoryRows(row.id),
     getDb()
-      .select(imageColumns)
+      .select({ ...imageColumns, caption: media.caption })
       .from(productImages)
       .innerJoin(media, eq(media.id, productImages.mediaId))
       .where(eq(productImages.productId, row.id))
@@ -166,7 +169,12 @@ export async function findProduct(locale: Locale, slug: string): Promise<Product
   if (categoryRows.linked.length && !categoryRows.visible.length) return null;
 
   const name = pickLocale(row.name, locale);
-  const images = imageRows.flatMap((image) => toPublicImage(image, locale, name) ?? []);
+  const images = imageRows.flatMap((image) => {
+    const publicImage = toPublicImage(image, locale, name);
+    if (!publicImage) return [];
+    const caption = image.caption ? pickLocale(image.caption, locale).trim() || null : null;
+    return [{ ...publicImage, caption }];
+  });
   const [category] = categoryRows.visible;
   const videoPoster = toPublicImage(row.poster, locale, name);
 
@@ -212,6 +220,7 @@ export async function findProduct(locale: Locale, slug: string): Promise<Product
       : null,
     seoTitle: pickExact(row.seoTitle, locale),
     seoDescription: pickExact(row.seoDescription, locale),
+    contentLocale: pickExact(row.name, locale) ? locale : "az",
   };
 }
 

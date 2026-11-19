@@ -32,7 +32,8 @@
     "openMap": "Xəritədə aç",
     "whatsapp": "WhatsApp ilə yazın",
     "call": "{name}: zəng et",
-    "write": "{name}: e-poçt yaz"
+    "write": "{name}: e-poçt yaz",
+    "office": "Ofis"
   },
   "footer": {
     "contacts": "Əlaqə",
@@ -84,7 +85,17 @@
     "loadMore": "Daha çox",
     "empty": "Bu bölmədə hələ məhsul yoxdur.",
     "pageSuffix": "Səhifə {page}",
-    "categoryDescription": "{name}: CEWM kataloqunda ağac emalı avadanlıqları."
+    "categoryDescription": "{name}: CEWM kataloqunda ağac emalı avadanlıqları.",
+    "eyebrow": "Kataloq",
+    "summary": "Məhsul: {products} · Sahə: {areas}",
+    "areasTitle": "Avadanlıq sahələri",
+    "brandFilter": "Brend",
+    "allBrands": "Bütün brendlər",
+    "areaCount": "{count} məhsul",
+    "openArea": "Bölməyə keç",
+    "otherTitle": "Digər məhsullar",
+    "emptyTitle": "Bu bölmədə hələ məhsul yoxdur",
+    "emptyBody": "Hansı avadanlıq lazım olduğunu yazın, sizə uyğun variantları təklif edək."
   },
   "product": {
     "brand": "Brend",
@@ -98,7 +109,26 @@
     "video": "Video",
     "gallery": "Şəkillər",
     "related": "Oxşar məhsullar",
-    "description": "{name}: CEWM kataloqunda. Qiymət və texniki məsləhət üçün konsultasiya alın."
+    "description": "{name}: CEWM kataloqunda. Qiymət və texniki məsləhət üçün konsultasiya alın.",
+    "category": "Kateqoriya",
+    "requestQuote": "Təklif istə",
+    "specCount": "Cədvəl ({count})",
+    "documentCount": "PDF ({count})",
+    "overview": "İcmal",
+    "technicalEyebrow": "Texniki məlumat",
+    "specsCaption": "{name}: texniki göstəricilər",
+    "fallbackNotice": "Bu səhifənin mətni hələ tərcümə olunmayıb.",
+    "galleryLabel": "{name}: şəkillər",
+    "galleryOpen": "Şəkli böyüt",
+    "galleryClose": "Bağla",
+    "galleryPrevious": "Əvvəlki şəkil",
+    "galleryNext": "Növbəti şəkil",
+    "galleryPosition": "{current} / {total}",
+    "videoTitle": "{name}: video",
+    "videoPlay": "Videonu oynat",
+    "videoOpen": "Videonu yeni pəncərədə aç",
+    "quoteTitle": "Bu məhsul üçün təklif alın",
+    "quoteIntro": "Məhsul artıq formaya əlavə olunub. Əlaqə məlumatlarınızı yazın, mütəxəssisimiz sizinlə əlaqə saxlasın."
   },
   "blog": {
     "title": "Bloq",
@@ -107,12 +137,15 @@
     "empty": "Hələ yazı yoxdur.",
     "related": "Digər yazılar",
     "loadMore": "Daha çox",
-    "shown": "{shown} / {total} yazı"
+    "shown": "{shown} / {total} yazı",
+    "emptyBody": "Yazılar dərc olunduqca burada görünəcək.",
+    "back": "Bütün yazılar"
   },
   "brands": {
     "title": "Brendlər",
     "visit": "Brendin saytı",
-    "empty": "Siyahı tezliklə əlavə olunacaq."
+    "empty": "Siyahı tezliklə əlavə olunacaq.",
+    "products": "Kataloqda: {count}"
   },
   "clients": {
     "title": "Müştərilər",
@@ -142,7 +175,10 @@
     "successTitle": "Müraciətiniz qəbul olundu",
     "successBody": "Təşəkkür edirik. Mütəxəssisimiz tezliklə sizinlə əlaqə saxlayacaq.",
     "successLink": "Məhsullara bax",
-    "honeypot": "Bu sahəni boş saxlayın"
+    "honeypot": "Bu sahəni boş saxlayın",
+    "requiredNote": "* ilə işarələnmiş sahələr vacibdir.",
+    "formLabel": "Müraciət forması",
+    "direct": "Birbaşa zəng edin"
   },
   "locales": {
     "az": "Azərbaycanca",
@@ -159,6 +195,10 @@
   "error": {
     "title": "Xəta baş verdi",
     "body": "Səhifəni yükləmək alınmadı. Bir az sonra yenidən cəhd edin.",
-    "retry": "Yenidən cəhd et"
+    "retry": "Yenidən cəhd et",
+    "eyebrow": "Xəta"
+  },
+  "pages": {
+    "contents": "Bu səhifədə"
   }
 }

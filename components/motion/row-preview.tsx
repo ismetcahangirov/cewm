@@ -85,19 +85,20 @@ export function RowPreview({ rows, label }: { rows: PreviewRow[]; label?: string
               {...(row.external ? { target: "_blank", rel: "noopener" } : {})}
               onPointerEnter={() => show(index)}
               onFocus={() => setActive(null)}
-              className="row-link group/row grid min-h-20 grid-cols-[auto_1fr_auto] items-center gap-x-6 gap-y-2 py-5 md:grid-cols-[3rem_minmax(0,4fr)_minmax(0,6fr)_auto]"
+              className="row-link group/row grid min-h-20 grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-6 gap-y-2 py-5 md:grid-cols-[3rem_minmax(0,4fr)_minmax(0,6fr)_auto]"
             >
-              {row.image ? (
-                <span className="row-thumb bg-mist relative size-16 overflow-clip rounded-xs">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img {...row.image} alt="" loading="lazy" className="size-full object-cover" />
-                </span>
-              ) : (
-                <span className="text-label text-grey tabular">
+              <span className="row-lead">
+                {row.image ? (
+                  <span className="row-thumb bg-mist relative block size-16 overflow-clip rounded-xs">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img {...row.image} alt="" loading="lazy" className="size-full object-cover" />
+                  </span>
+                ) : null}
+                <span className="row-index text-label text-grey tabular">
                   {String(index + 1).padStart(2, "0")}
                 </span>
-              )}
-              <span className="row-title text-ink-muted text-h4 transition-colors duration-200 ease-standard">
+              </span>
+              <span className="row-title text-safe text-ink-muted text-h4 transition-colors duration-200 ease-standard">
                 {row.title}
               </span>
               {row.tags?.length ? (

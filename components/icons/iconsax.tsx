@@ -196,3 +196,53 @@ export function TiktokIcon(props: IconProps) {
     </Bold>
   );
 }
+
+export function ArrowLeftIcon(props: IconProps) {
+  return (
+    <Linear {...props}>
+      <path d="M9.57 5.93L3.5 12l6.07 6.07M20.5 12H3.67" />
+    </Linear>
+  );
+}
+
+export function ArrowLeft2Icon(props: IconProps) {
+  return (
+    <Linear {...props}>
+      <path d="M15 19.92L8.48 13.4c-.77-.77-.77-2.03 0-2.8L15 4.08" />
+    </Linear>
+  );
+}
+
+export function ArrowRight2Icon(props: IconProps) {
+  return (
+    <Linear {...props}>
+      <path d="M8.91 19.92l6.52-6.52c.77-.77.77-2.03 0-2.8L8.91 4.08" />
+    </Linear>
+  );
+}
+
+export function Maximize4Icon(props: IconProps) {
+  return (
+    <Linear {...props}>
+      <path d="M21 9V3h-6M3 15v6h6M21 3l-7.5 7.5M10.5 13.5 3 21" />
+    </Linear>
+  );
+}
+
+export function DocumentDownloadIcon(props: IconProps) {
+  return (
+    <Linear {...props}>
+      <path d="M9 11v6l2-2M9 17l-2-2" />
+      <path d="M22 10v5c0 5-2 7-7 7H9c-5 0-7-2-7-7V9c0-5 2-7 7-7h5" />
+      <path d="M22 10h-4c-3 0-4-1-4-4V2l8 8Z" />
+    </Linear>
+  );
+}
+
+export function PlayIcon(props: IconProps) {
+  return (
+    <Linear {...props}>
+      <path d="M4 12V8.44c0-4.42 3.13-6.23 6.96-4.02l3.09 1.78 3.09 1.78c3.83 2.21 3.83 5.83 0 8.04l-3.09 1.78-3.09 1.78C7.13 21.79 4 19.98 4 15.56V12Z" />
+    </Linear>
+  );
+}
