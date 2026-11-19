@@ -28,10 +28,13 @@ export function FactBlockView({
             {block.facts.map((fact) => (
               <div
                 key={`${fact.label}-${fact.value}`}
-                className="flex flex-col gap-1 border-b border-line py-3"
+                className={cx(
+                  "flex flex-col gap-1 border-b border-line py-3",
+                  fact.value.length > 60 && "md:col-span-2",
+                )}
               >
                 <dt className="text-grey text-small">{fact.label}</dt>
-                <dd lang={lang} className="text-safe tabular">
+                <dd lang={lang} className="text-safe">
                   {fact.value}
                 </dd>
               </div>
