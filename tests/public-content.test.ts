@@ -3,7 +3,7 @@ import { join, relative } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { splitProductName, toPublicImage } from "@/lib/public/images";
+import { toPublicImage } from "@/lib/public/images";
 
 const root = join(__dirname, "..");
 const scanned = ["app", "components", "lib", "scripts"];
@@ -33,16 +33,8 @@ describe("public content", () => {
   });
 
   it("does not treat legal marks as emoji", () => {
-    expect(emoji.test("\u00a9 2026 Mebline")).toBe(false);
+    expect(emoji.test("\u00a9 2026 CEWM")).toBe(false);
     expect(emoji.test("Ofis \u{1F4BC}")).toBe(true);
-  });
-
-  it("splits product names into model and type", () => {
-    expect(splitProductName("MLIK-020 – İşçi kürsüsü")).toEqual({
-      model: "MLIK-020",
-      type: "İşçi kürsüsü",
-    });
-    expect(splitProductName("Black")).toEqual({ model: "Black", type: null });
   });
 
   it("builds image props with a locale alt and a fallback", () => {

@@ -7,7 +7,7 @@ import { afterAll, beforeAll, describe, expect, it } from "vitest";
 import { POST as visitRoute } from "@/app/api/visits/route";
 import { getDb } from "@/lib/db";
 import { siteVisits } from "@/lib/db/schema";
-import { hashClientIp } from "@/lib/quote-requests/submit";
+import { hashClientIp } from "@/lib/consultation-requests/submit";
 import { countVisitors, isAutomatedAgent, recordVisit, siteDay } from "@/lib/visits";
 
 import { createUser, origin, removeUsers, sessionCookie, testRun } from "./support/admin";

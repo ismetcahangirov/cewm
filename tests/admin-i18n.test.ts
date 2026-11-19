@@ -18,6 +18,13 @@ describe("admin translator", () => {
       "«{name}» silindi.": "«{name}» was deleted.",
       "{count} məhsul": "{count} {count|product|products}",
     },
+    de: {
+      "Yeni məhsul": "Neues Produkt",
+      "Yeni#status": "Neu",
+      "Ən çox {max} simvol ola bilər.": "Höchstens {max} Zeichen.",
+      "«{name}» silindi.": "„{name}“ wurde gelöscht.",
+      "{count} məhsul": "{count} {count|Produkt|Produkte}",
+    },
   });
 
   it("returns the Azerbaijani key as is and translates other locales", () => {
@@ -35,6 +42,10 @@ describe("admin translator", () => {
     );
     expect(translate("en", "{count} məhsul", { count: 1 })).toBe("1 product");
     expect(translate("en", "{count} məhsul", { count: 3 })).toBe("3 products");
+    expect(translate("de", "{count} məhsul", { count: 1 })).toBe("1 Produkt");
+    expect(translate("de", "{count} məhsul", { count: 4 })).toBe("4 Produkte");
+    expect(translate("de", "Yeni#status")).toBe("Neu");
+    expect(translateMessage("de", "Ən çox 80 simvol ola bilər.")).toBe("Höchstens 80 Zeichen.");
     expect(translateMessage("ru", "3 məhsul")).toBe("3 товара");
     expect(translateMessage("ru", "Yeni məhsul")).toBe("Новый товар");
     expect(translateMessage("ru", "Köhnə məhsul")).toBe("Köhnə məhsul");

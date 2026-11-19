@@ -4,17 +4,22 @@ import { eq, inArray, like } from "drizzle-orm";
 import { NextRequest } from "next/server";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { POST as submitRoute } from "@/app/api/quote-requests/route";
+import { POST as submitRoute } from "@/app/api/consultation-requests/route";
 import { getDashboardSummary } from "@/lib/admin/dashboard";
 import { toCsv } from "@/lib/csv";
 import { getDb } from "@/lib/db";
-import { products, quoteRequestProducts, quoteRequests, settings } from "@/lib/db/schema";
+import {
+  products,
+  consultationRequestProducts,
+  consultationRequests,
+  settings,
+} from "@/lib/db/schema";
 import { normalizeAzerbaijaniPhone } from "@/lib/phone";
-import { clientIp } from "@/lib/quote-requests/submit";
+import { clientIp } from "@/lib/consultation-requests/submit";
 import type {
-  QuoteRequestDetailDto,
-  QuoteRequestListItemDto,
-} from "@/lib/validation/quote-requests";
+  ConsultationRequestDetailDto,
+  ConsultationRequestListItemDto,
+} from "@/lib/validation/consultation-requests";
 
 import { call, createUser, origin, removeUsers, sessionCookie, testRun } from "./support/admin";
 
@@ -40,7 +45,7 @@ vi.mock("@/lib/mail", async (importOriginal) => {
 
 const mailpit = process.env.MAILPIT_URL ?? "http://localhost:8025";
 const { run, domain, password } = testRun();
-const notifyEmail = `notify-${run}@mebline.test`;
+const notifyEmail = `notify-${run}@cewm.test`;
 
 let owner = "";
 let editor = "";
@@ -54,7 +59,7 @@ function fakeIp(): string {
 
 function submit(body: unknown, ip = fakeIp()): Promise<Response> {
   return submitRoute(
-    new NextRequest(new URL("/api/quote-requests", origin), {
+    new NextRequest(new URL("/api/consultation-requests", origin), {
       method: "POST",
       headers: { "content-type": "application/json", "x-forwarded-for": `203.0.113.9, ${ip}` },
       body: JSON.stringify(body),
@@ -96,7 +101,9 @@ async function findMail(query: string): Promise<MailpitSummary[]> {
 }
 
 async function unreadCount(): Promise<number> {
-  const response = await call("/api/admin/quote-requests/unread-count", "GET", { cookie: owner });
+  const response = await call("/api/admin/consultation-requests/unread-count", "GET", {
+    cookie: owner,
+  });
   return (await json<{ count: number }>(response)).count;
 }
 
@@ -128,19 +135,19 @@ beforeAll(async () => {
   trashedProductId = trashed?.id ?? "";
 
   [savedSettings] = await db
-    .select({ email: settings.quoteNotifyEmail, updatedAt: settings.updatedAt })
+    .select({ email: settings.consultationNotifyEmail, updatedAt: settings.updatedAt })
     .from(settings);
   if (!savedSettings) await db.insert(settings).values({ id: 1 });
 });
 
 afterAll(async () => {
   const db = getDb();
-  await db.delete(quoteRequests).where(like(quoteRequests.name, `%${run}%`));
+  await db.delete(consultationRequests).where(like(consultationRequests.name, `%${run}%`));
   await db.delete(products).where(inArray(products.id, [productId, trashedProductId]));
   if (savedSettings) {
     await db
       .update(settings)
-      .set({ quoteNotifyEmail: savedSettings.email, updatedAt: savedSettings.updatedAt })
+      .set({ consultationNotifyEmail: savedSettings.email, updatedAt: savedSettings.updatedAt })
       .where(eq(settings.id, 1));
   } else {
     await db.delete(settings).where(eq(settings.id, 1));
@@ -174,7 +181,10 @@ describe("Azerbaijani phone numbers", () => {
 
 describe("public quote submission", () => {
   it("saves the request with live products and emails the owner", async () => {
-    await getDb().update(settings).set({ quoteNotifyEmail: notifyEmail }).where(eq(settings.id, 1));
+    await getDb()
+      .update(settings)
+      .set({ consultationNotifyEmail: notifyEmail })
+      .where(eq(settings.id, 1));
     const ip = fakeIp();
     const response = await submit(
       payload({
@@ -192,7 +202,10 @@ describe("public quote submission", () => {
     const { id } = await json<{ id: string }>(response);
 
     const db = getDb();
-    const [row] = await db.select().from(quoteRequests).where(eq(quoteRequests.id, id));
+    const [row] = await db
+      .select()
+      .from(consultationRequests)
+      .where(eq(consultationRequests.id, id));
     expect(row).toMatchObject({
       phone: "+994501112233",
       email: `client-${run}@example.com`,
@@ -204,8 +217,8 @@ describe("public quote submission", () => {
     expect(row?.ipHash).not.toContain(ip);
     const items = await db
       .select()
-      .from(quoteRequestProducts)
-      .where(eq(quoteRequestProducts.quoteRequestId, id));
+      .from(consultationRequestProducts)
+      .where(eq(consultationRequestProducts.consultationRequestId, id));
     expect(items.map((item) => [item.productId, item.productName])).toEqual([
       [productId, `Ofis kreslosu ${run} (QR-${run})`],
     ]);
@@ -231,9 +244,9 @@ describe("public quote submission", () => {
     expect(response.status).toBe(201);
     const { id } = await json<{ id: string }>(response);
     const rows = await getDb()
-      .select({ id: quoteRequests.id })
-      .from(quoteRequests)
-      .where(like(quoteRequests.name, `Bot ${run}%`));
+      .select({ id: consultationRequests.id })
+      .from(consultationRequests)
+      .where(like(consultationRequests.name, `Bot ${run}%`));
     expect(rows).toEqual([]);
     expect(id).toMatch(/^[0-9a-f-]{36}$/);
     expect(await findMail(`subject:"Bot ${run}"`)).toEqual([]);
@@ -263,7 +276,10 @@ describe("public quote submission", () => {
     mailState.fail = true;
     try {
       const id = await createRequest({ name: `Mail down ${run}` });
-      const [row] = await getDb().select().from(quoteRequests).where(eq(quoteRequests.id, id));
+      const [row] = await getDb()
+        .select()
+        .from(consultationRequests)
+        .where(eq(consultationRequests.id, id));
       expect(row?.name).toBe(`Mail down ${run}`);
       expect(error).toHaveBeenCalled();
     } finally {
@@ -273,14 +289,14 @@ describe("public quote submission", () => {
   });
 
   it("falls back to the server address when settings has none", async () => {
-    await getDb().update(settings).set({ quoteNotifyEmail: null }).where(eq(settings.id, 1));
+    await getDb().update(settings).set({ consultationNotifyEmail: null }).where(eq(settings.id, 1));
     await createRequest({ name: `Fallback ${run}` });
     const [mail] = await findMail(`subject:"Fallback ${run}"`);
     const message = (await (await fetch(`${mailpit}/api/v1/message/${mail?.ID}`)).json()) as {
       To: { Address: string }[];
       ReplyTo: { Address: string }[];
     };
-    expect(message.To.map((to) => to.Address)).toEqual([process.env.QUOTE_NOTIFY_EMAIL]);
+    expect(message.To.map((to) => to.Address)).toEqual([process.env.CONSULTATION_NOTIFY_EMAIL]);
     expect(message.ReplyTo).toEqual([]);
   });
 });
@@ -296,12 +312,12 @@ describe("quote request inbox", () => {
     });
 
     const list = async (query: string) => {
-      const response = await call("/api/admin/quote-requests", "GET", {
+      const response = await call("/api/admin/consultation-requests", "GET", {
         cookie: editor,
-        path: `/api/admin/quote-requests?${query}`,
+        path: `/api/admin/consultation-requests?${query}`,
       });
       expect(response.status).toBe(200);
-      return json<{ rows: QuoteRequestListItemDto[]; rowCount: number }>(response);
+      return json<{ rows: ConsultationRequestListItemDto[]; rowCount: number }>(response);
     };
 
     const byRun = await list(`search=${run}&pageSize=50`);
@@ -323,9 +339,9 @@ describe("quote request inbox", () => {
     const done = await list(`search=${run}&status=done`);
     expect(done.rowCount).toBe(0);
 
-    const invalid = await call("/api/admin/quote-requests", "GET", {
+    const invalid = await call("/api/admin/consultation-requests", "GET", {
       cookie: editor,
-      path: "/api/admin/quote-requests?status=spam",
+      path: "/api/admin/consultation-requests?status=spam",
     });
     expect(invalid.status).toBe(400);
   });
@@ -336,12 +352,12 @@ describe("quote request inbox", () => {
     expect(await unreadCount()).toBe(before + 1);
 
     const open = async () => {
-      const response = await call("/api/admin/quote-requests/[id]", "GET", {
+      const response = await call("/api/admin/consultation-requests/[id]", "GET", {
         cookie: editor,
         params: { id },
       });
       expect(response.status).toBe(200);
-      return json<QuoteRequestDetailDto>(response);
+      return json<ConsultationRequestDetailDto>(response);
     };
 
     const first = await open();
@@ -354,7 +370,7 @@ describe("quote request inbox", () => {
     const second = await open();
     expect(second).toMatchObject({ status: "in-progress", markedSeen: false });
 
-    const missing = await call("/api/admin/quote-requests/[id]", "GET", {
+    const missing = await call("/api/admin/consultation-requests/[id]", "GET", {
       cookie: editor,
       params: { id: randomUUID() },
     });
@@ -364,25 +380,29 @@ describe("quote request inbox", () => {
   it("saves the internal note and status separately", async () => {
     const id = await createRequest({ name: `Patch ${run}` });
     const patch = (body: unknown) =>
-      call("/api/admin/quote-requests/[id]", "PATCH", { cookie: editor, body, params: { id } });
+      call("/api/admin/consultation-requests/[id]", "PATCH", {
+        cookie: editor,
+        body,
+        params: { id },
+      });
 
     const noted = await patch({ internalNote: "  Zəng edildi, sabah ofisə gələcək.  " });
     expect(noted.status).toBe(200);
-    expect(await json<QuoteRequestDetailDto>(noted)).toMatchObject({
+    expect(await json<ConsultationRequestDetailDto>(noted)).toMatchObject({
       internalNote: "Zəng edildi, sabah ofisə gələcək.",
       status: "new",
     });
 
     const before = await unreadCount();
     const answered = await patch({ status: "done" });
-    expect(await json<QuoteRequestDetailDto>(answered)).toMatchObject({
+    expect(await json<ConsultationRequestDetailDto>(answered)).toMatchObject({
       internalNote: "Zəng edildi, sabah ofisə gələcək.",
       status: "done",
     });
     expect(await unreadCount()).toBe(before - 1);
 
     const cleared = await patch({ internalNote: "" });
-    expect(await json<QuoteRequestDetailDto>(cleared)).toMatchObject({
+    expect(await json<ConsultationRequestDetailDto>(cleared)).toMatchObject({
       internalNote: null,
       status: "done",
     });
@@ -393,18 +413,21 @@ describe("quote request inbox", () => {
 
   it("lets only the owner delete a request", async () => {
     const id = await createRequest({ name: `Spam ${run}` });
-    const byEditor = await call("/api/admin/quote-requests/[id]", "DELETE", {
+    const byEditor = await call("/api/admin/consultation-requests/[id]", "DELETE", {
       cookie: editor,
       params: { id },
     });
     expect(byEditor.status).toBe(403);
 
-    const byOwner = await call("/api/admin/quote-requests/[id]", "DELETE", {
+    const byOwner = await call("/api/admin/consultation-requests/[id]", "DELETE", {
       cookie: owner,
       params: { id },
     });
     expect(byOwner.status).toBe(204);
-    const [row] = await getDb().select().from(quoteRequests).where(eq(quoteRequests.id, id));
+    const [row] = await getDb()
+      .select()
+      .from(consultationRequests)
+      .where(eq(consultationRequests.id, id));
     expect(row).toBeUndefined();
   });
 
@@ -416,9 +439,9 @@ describe("quote request inbox", () => {
       productIds: [productId],
     });
 
-    const response = await call("/api/admin/quote-requests/export", "GET", {
+    const response = await call("/api/admin/consultation-requests/export", "GET", {
       cookie: editor,
-      path: `/api/admin/quote-requests/export?search=${encodeURIComponent(`@Export ${run}`)}`,
+      path: `/api/admin/consultation-requests/export?search=${encodeURIComponent(`@Export ${run}`)}`,
     });
     expect(response.status).toBe(200);
     expect(response.headers.get("content-type")).toBe("text/csv; charset=utf-8");
@@ -440,9 +463,9 @@ describe("quote request inbox", () => {
     expect(body).toContain('"Yeni";"Azərbaycanca"');
     expect(lines.length).toBe(2);
 
-    const none = await call("/api/admin/quote-requests/export", "GET", {
+    const none = await call("/api/admin/consultation-requests/export", "GET", {
       cookie: owner,
-      path: `/api/admin/quote-requests/export?search=${encodeURIComponent(`@Export ${run}`)}&status=done`,
+      path: `/api/admin/consultation-requests/export?search=${encodeURIComponent(`@Export ${run}`)}&status=done`,
     });
     const empty = new TextDecoder().decode(new Uint8Array(await none.arrayBuffer()));
     expect(empty.split("\r\n")).toHaveLength(1);
@@ -458,17 +481,17 @@ describe("dashboard", () => {
   it("counts the products of each latest request", async () => {
     const db = getDb();
     const [request] = await db
-      .insert(quoteRequests)
+      .insert(consultationRequests)
       .values({
         name: `Dashboard ${run}`,
         phone: "+994552555423",
         createdAt: new Date(Date.now() + 60 * 60 * 1000),
       })
-      .returning({ id: quoteRequests.id });
+      .returning({ id: consultationRequests.id });
     const id = request?.id ?? "";
-    await db.insert(quoteRequestProducts).values([
-      { quoteRequestId: id, productId, productName: "Kreslo" },
-      { quoteRequestId: id, productId: null, productName: "Köhnə masa" },
+    await db.insert(consultationRequestProducts).values([
+      { consultationRequestId: id, productId, productName: "Kreslo" },
+      { consultationRequestId: id, productId: null, productName: "Köhnə masa" },
     ]);
 
     const summary = await getDashboardSummary();
@@ -477,9 +500,9 @@ describe("dashboard", () => {
     const others = summary.latestRequests.filter((row) => row.id !== id);
     for (const row of others) {
       const items = await db
-        .select({ id: quoteRequestProducts.id })
-        .from(quoteRequestProducts)
-        .where(eq(quoteRequestProducts.quoteRequestId, row.id));
+        .select({ id: consultationRequestProducts.id })
+        .from(consultationRequestProducts)
+        .where(eq(consultationRequestProducts.consultationRequestId, row.id));
       expect(row.productCount).toBe(items.length);
     }
   });

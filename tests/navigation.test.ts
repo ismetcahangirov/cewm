@@ -14,9 +14,9 @@ import {
   type EditorItem,
 } from "@/lib/admin/menu-tree";
 import { getDb } from "@/lib/db";
-import { categories, logos, media, menuItems, menus, pages, projects } from "@/lib/db/schema";
+import { categories, clientLogos, media, menuItems, menus, pages } from "@/lib/db/schema";
 import { buildMenuTree, type MenuSourceRow } from "@/lib/public/menus";
-import type { LogoDto } from "@/lib/validation/logos";
+import type { ClientLogoDto } from "@/lib/validation/client-logos";
 import {
   isMenuUrl,
   mainMenuKey,
@@ -40,7 +40,6 @@ const created = {
   logos: new Set<string>(),
   categories: [] as string[],
   pages: [] as string[],
-  projects: [] as string[],
 };
 
 let owner = "";
@@ -118,12 +117,6 @@ beforeAll(async () => {
   created.pages = insertedPages.map((row) => row.id);
   [publishedPage = "", draftPage = ""] = created.pages;
 
-  const insertedProjects = await db
-    .insert(projects)
-    .values({ title: { az: `Layihə ${run}` }, slug: { az: `layihe-${run}` }, status: "draft" })
-    .returning({ id: projects.id });
-  created.projects = insertedProjects.map((row) => row.id);
-
   const [navMenu] = await db
     .insert(menus)
     .values({ key: `nav-test-${run}`, title: { az: `Test ${run}` }, sortOrder: 900 })
@@ -138,15 +131,14 @@ beforeEach(() => {
 afterAll(async () => {
   const db = getDb();
   await db.delete(menus).where(like(menus.key, `%${run}%`));
-  if (created.logos.size) await db.delete(logos).where(inArray(logos.id, [...created.logos]));
+  if (created.logos.size) {
+    await db.delete(clientLogos).where(inArray(clientLogos.id, [...created.logos]));
+  }
   if (imageId) await db.delete(media).where(eq(media.id, imageId));
   if (created.categories.length) {
     await db.delete(categories).where(inArray(categories.id, created.categories));
   }
   if (created.pages.length) await db.delete(pages).where(inArray(pages.id, created.pages));
-  if (created.projects.length) {
-    await db.delete(projects).where(inArray(projects.id, created.projects));
-  }
   await removeUsers(domain);
 });
 
@@ -158,19 +150,19 @@ describe("menu rules", () => {
 
   it("accepts https, site paths, tel and mailto links only", () => {
     for (const value of [
-      "https://mebline.az/kataloq",
-      "/layiheler",
+      "https://cewm.az/kataloq",
+      "/bloq",
       "/",
       "tel:+994 12 555 55 55",
-      "mailto:info@mebline.az",
+      "mailto:info@cewm.az",
     ]) {
       expect(isMenuUrl(value), value).toBe(true);
     }
     for (const value of [
-      "http://mebline.az",
+      "http://cewm.az",
       "//evil.example",
       "javascript:alert(1)",
-      "mebline.az",
+      "cewm.az",
       "https://",
       "/with space",
       "tel:abc",
@@ -233,7 +225,7 @@ describe("menus API", () => {
         id: root?.id,
         label: "Məhsullar",
         children: [
-          item({ label: "Yeni", target: "url", url: "/layiheler" }),
+          item({ label: "Yeni", target: "url", url: "/bloq" }),
           item({
             id: grandchild?.id,
             label: "Xarici",
@@ -285,10 +277,10 @@ describe("menus API", () => {
 
     const unknown = await saveMenu(footer.id, [
       item({ target: "url", url: "/" }),
-      item({ target: "project", projectId: randomUUID() }),
+      item({ target: "page", pageId: randomUUID() }),
     ]);
     expect(unknown.status).toBe(400);
-    expect(await fields(unknown)).toHaveProperty("items.1.projectId");
+    expect(await fields(unknown)).toHaveProperty("items.1.pageId");
   });
 
   it("validates custom links", async () => {
@@ -301,7 +293,7 @@ describe("menus API", () => {
       footer.id,
       [
         item({ label: "Zəng", target: "url", url: "tel:+994125555555" }),
-        item({ label: "Yaz", target: "url", url: "mailto:info@mebline.az" }),
+        item({ label: "Yaz", target: "url", url: "mailto:info@cewm.az" }),
         item({ label: "Haqqımızda", target: "page", pageId: publishedPage }),
       ],
       `Yeni başlıq ${run}`,
@@ -403,7 +395,6 @@ describe("menus API", () => {
     expect(targets.pages).toContainEqual(
       expect.objectContaining({ id: publishedPage, isPublished: true }),
     );
-    expect(targets.projects.map((project) => project.id)).toContain(created.projects[0]);
   });
 
   it("expires the menus tag when a category changes", async () => {
@@ -418,23 +409,22 @@ describe("menus API", () => {
   });
 });
 
-describe("logos API", () => {
+describe("client logos API", () => {
   async function createLogo(name: string, overrides: Record<string, unknown> = {}) {
-    const response = await call("/api/admin/logos", "POST", {
+    const response = await call("/api/admin/client-logos", "POST", {
       cookie: owner,
-      body: { name, imageId, url: null, group: "references", isActive: true, ...overrides },
+      body: { name, imageId, url: null, isActive: true, ...overrides },
     });
     if (response.status === 201) created.logos.add((await json<{ id: string }>(response)).id);
     return response;
   }
 
   async function referenceIds(): Promise<string[]> {
-    const response = await call("/api/admin/logos", "GET", {
+    const response = await call("/api/admin/client-logos", "GET", {
       cookie: owner,
-      path: "/api/admin/logos?group=references",
     });
     expect(response.status).toBe(200);
-    return (await json<LogoDto[]>(response)).map((logo) => logo.id);
+    return (await json<ClientLogoDto[]>(response)).map((logo) => logo.id);
   }
 
   it("validates the link and the image", async () => {
@@ -455,14 +445,13 @@ describe("logos API", () => {
     expect(second.status).toBe(201);
     const [firstId = "", secondId = ""] = [...created.logos];
 
-    const updated = await call("/api/admin/logos/[id]", "PUT", {
+    const updated = await call("/api/admin/client-logos/[id]", "PUT", {
       cookie: owner,
       params: { id: secondId },
       body: {
         name: `İkinci yeni ${run}`,
         imageId,
         url: "http://example.org",
-        group: "references",
         isActive: true,
       },
     });
@@ -470,7 +459,7 @@ describe("logos API", () => {
     expectRevalidated("content");
 
     vi.mocked(revalidateTag).mockClear();
-    const toggled = await call("/api/admin/logos/[id]", "PATCH", {
+    const toggled = await call("/api/admin/client-logos/[id]", "PATCH", {
       cookie: owner,
       params: { id: firstId },
       body: { isActive: false },
@@ -479,7 +468,9 @@ describe("logos API", () => {
     expectRevalidated("content");
 
     const original = await referenceIds();
-    const list = await json<LogoDto[]>(await call("/api/admin/logos", "GET", { cookie: owner }));
+    const list = await json<ClientLogoDto[]>(
+      await call("/api/admin/client-logos", "GET", { cookie: owner }),
+    );
     expect(list.find((logo) => logo.id === firstId)).toMatchObject({
       isActive: false,
       url: "https://example.com",
@@ -490,30 +481,24 @@ describe("logos API", () => {
       url: "http://example.org",
     });
 
-    const stale = await call("/api/admin/logos/reorder", "POST", {
+    const stale = await call("/api/admin/client-logos/reorder", "POST", {
       cookie: owner,
-      body: { group: "references", orderedIds: [secondId] },
+      body: { orderedIds: [secondId] },
     });
     expect(stale.status).toBe(409);
 
-    const wrongGroup = await call("/api/admin/logos/reorder", "POST", {
-      cookie: owner,
-      body: { group: "partners", orderedIds: original },
-    });
-    expect(wrongGroup.status).toBe(409);
-
     vi.mocked(revalidateTag).mockClear();
     const reordered = [secondId, firstId, ...original.filter((id) => !created.logos.has(id))];
-    const reorder = await call("/api/admin/logos/reorder", "POST", {
+    const reorder = await call("/api/admin/client-logos/reorder", "POST", {
       cookie: owner,
-      body: { group: "references", orderedIds: reordered },
+      body: { orderedIds: reordered },
     });
     expect(reorder.status).toBe(204);
     expectRevalidated("content");
     expect(await referenceIds()).toEqual(reordered);
 
     vi.mocked(revalidateTag).mockClear();
-    const removed = await call("/api/admin/logos/[id]", "DELETE", {
+    const removed = await call("/api/admin/client-logos/[id]", "DELETE", {
       cookie: owner,
       params: { id: firstId },
     });
@@ -521,7 +506,7 @@ describe("logos API", () => {
     expectRevalidated("content");
     const [image] = await getDb().select().from(media).where(eq(media.id, imageId));
     expect(image).toBeDefined();
-    const again = await call("/api/admin/logos/[id]", "DELETE", {
+    const again = await call("/api/admin/client-logos/[id]", "DELETE", {
       cookie: owner,
       params: { id: firstId },
     });
@@ -540,7 +525,6 @@ describe("public menu tree", () => {
       url: null,
       category: null,
       page: null,
-      project: null,
       ...fieldsOverride,
     };
   }
@@ -561,7 +545,7 @@ describe("public menu tree", () => {
       label: { az: "Haqqımızda", en: "About" },
     }),
     row({ id: "draft", target: "page", page: { slug: { az: "qaralama" }, visible: false } }),
-    row({ id: "projects", target: "url", url: "/layiheler" }),
+    row({ id: "projects", target: "url", url: "/bloq" }),
     row({ id: "external", target: "url", url: "https://example.com/x" }),
     row({ id: "empty-heading" }),
     row({ id: "broken-parent", target: "page", page: null }),
@@ -582,7 +566,7 @@ describe("public menu tree", () => {
       children: [{ id: "boss", href: "/mehsullar/rehber-destleri", children: [] }],
     });
     expect(az[1]).toMatchObject({ label: "Haqqımızda", href: "/haqqimizda" });
-    expect(az[2]?.href).toBe("/layiheler");
+    expect(az[2]?.href).toBe("/bloq");
     expect(az[3]?.href).toBe("https://example.com/x");
     expect(az[4]).toMatchObject({
       href: null,
@@ -592,7 +576,7 @@ describe("public menu tree", () => {
     const ru = buildMenuTree(rows, "ru");
     expect(ru[0]?.label).toBe("products-ru");
     expect(ru[0]?.children[0]?.href).toBe("/ru/mehsullar/rukovoditeli");
-    expect(ru[2]?.href).toBe("/ru/layiheler");
+    expect(ru[2]?.href).toBe("/ru/bloq");
 
     const en = buildMenuTree(rows, "en");
     expect(en[1]).toMatchObject({ label: "About", href: "/en/haqqimizda" });
@@ -615,7 +599,6 @@ describe("menu editor tree", () => {
       target: "none",
       categoryId: null,
       pageId: null,
-      projectId: null,
       url: null,
       children,
     };

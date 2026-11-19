@@ -26,7 +26,7 @@ vi.mock("next/cache", () => ({
 }));
 
 const { run, domain, password } = testRun();
-const siteUrl = "https://mebline.az";
+const siteUrl = "https://cewm.az";
 
 let owner = "";
 let editor = "";
@@ -69,20 +69,20 @@ function input(overrides: Partial<SettingsInput> = {}): SettingsInput {
       { label: { az: "Ofis", ru: "Офис", en: "" }, number: "(012) 526 54 23" },
       { label: { az: "Mobil" }, number: "+994 55 255 54 23" },
     ],
-    emails: [{ address: " Office@Mebline.az " }, { address: "sales@mebline.az" }],
+    emails: [{ address: " Office@CEWM.az " }, { address: "sales@cewm.az" }],
     address: { az: "Ağ Şəhər, Bakı", ru: "", en: "Ag Seher, Baku" },
     mapUrl: "https://maps.google.com/?cid=1",
     workingHours: { az: "B.e.–Cümə: 09:00–18:00", ru: "", en: "" },
     whatsappNumber: "+994 55 255 54 23",
     socials: [
-      { network: "instagram", url: "https://www.instagram.com/mebline.az" },
-      { network: "facebook", url: "https://www.facebook.com/mebline.az" },
+      { network: "instagram", url: "https://www.instagram.com/cewm.az" },
+      { network: "facebook", url: "https://www.facebook.com/cewm.az" },
     ],
-    seoTitle: { az: `Mebline ${run}`, ru: "", en: "" },
+    seoTitle: { az: `CEWM ${run}`, ru: "", en: "" },
     seoDescription: { az: "Ofis mebeli", ru: "", en: "" },
     ogImageId: mediaIds.wide,
-    legalName: "Mebline",
-    quoteNotifyEmail: "",
+    legalName: "CEWM",
+    consultationNotifyEmail: "",
     catalogueFileId: mediaIds.pdf,
     ...overrides,
   };
@@ -141,14 +141,14 @@ describe("settings API", () => {
     const saved = (await response.json()) as SettingsDto;
     expect(saved).toMatchObject({
       phones: [
-        { label: { az: "Ofis", ru: "Офис", en: null }, number: "+994125265423" },
-        { label: { az: "Mobil", ru: null, en: null }, number: "+994552555423" },
+        { label: { az: "Ofis", ru: "Офис", en: null, de: null }, number: "+994125265423" },
+        { label: { az: "Mobil", ru: null, en: null, de: null }, number: "+994552555423" },
       ],
-      emails: ["office@mebline.az", "sales@mebline.az"],
+      emails: ["office@cewm.az", "sales@cewm.az"],
       address: { az: "Ağ Şəhər, Bakı", ru: null, en: "Ag Seher, Baku" },
       whatsappNumber: "994552555423",
-      legalName: "Mebline",
-      quoteNotifyEmail: null,
+      legalName: "CEWM",
+      consultationNotifyEmail: null,
       catalogueFileId: mediaIds.pdf,
       logoLightId: mediaIds.svg,
     });
@@ -162,20 +162,25 @@ describe("settings API", () => {
   });
 
   it("lets an editor save too", async () => {
-    const response = await put(input({ quoteNotifyEmail: `notify-${run}@mebline.test` }), editor);
+    const response = await put(
+      input({ consultationNotifyEmail: `notify-${run}@cewm.test` }),
+      editor,
+    );
     expect(response.status).toBe(200);
-    expect(await response.json()).toMatchObject({ quoteNotifyEmail: `notify-${run}@mebline.test` });
+    expect(await response.json()).toMatchObject({
+      consultationNotifyEmail: `notify-${run}@cewm.test`,
+    });
   });
 
   it("rejects a company name with MMC", async () => {
-    const response = await put(input({ legalName: "Mebline MMC" }));
+    const response = await put(input({ legalName: "CEWM MMC" }));
     expect((await fields(response)).legalName).toContain("MMC");
     expect(revalidateTag).not.toHaveBeenCalled();
 
-    for (const value of ["mebline mmc", "MMC Mebline", "Mebline, Mmc.", "«Mebline» MMC-si"]) {
+    for (const value of ["cewm mmc", "MMC CEWM", "CEWM, Mmc.", "«CEWM» MMC-si"]) {
       expect(legalNameWithoutMmc.safeParse(value).success, value).toBe(false);
     }
-    for (const value of ["Mebline", "Mmcx Group", "", null]) {
+    for (const value of ["CEWM", "Mmcx Group", "", null]) {
       expect(legalNameWithoutMmc.safeParse(value).success, String(value)).toBe(true);
     }
   });
@@ -216,8 +221,8 @@ describe("settings API", () => {
           ],
           emails: [{ address: "not-an-email" }],
           socials: [
-            { network: "instagram", url: "http://instagram.com/mebline" },
-            { network: "instagram", url: "https://instagram.com/mebline" },
+            { network: "instagram", url: "http://instagram.com/cewm" },
+            { network: "instagram", url: "https://instagram.com/cewm" },
           ],
           whatsappNumber: "12345",
           mapUrl: "javascript:alert(1)",
@@ -274,14 +279,14 @@ describe("public settings and structured data", () => {
     const before = organizationJsonLd(await getSiteSettings(), "az", siteUrl);
     expect(before).toMatchObject({
       "@type": "Organization",
-      name: "Mebline",
-      url: "https://mebline.az/",
+      name: "CEWM",
+      url: "https://cewm.az/",
       telephone: "+994125265423",
-      email: "office@mebline.az",
-      sameAs: ["https://www.instagram.com/mebline.az", "https://www.facebook.com/mebline.az"],
+      email: "office@cewm.az",
+      sameAs: ["https://www.instagram.com/cewm.az", "https://www.facebook.com/cewm.az"],
       address: { "@type": "PostalAddress", streetAddress: "Ağ Şəhər, Bakı", addressCountry: "AZ" },
     });
-    expect(before.logo).toBe("https://mebline.az/brand/logo.png");
+    expect(before.logo).toMatch(/^https:\/\/cewm\.az\/media\/tests\//);
 
     const changed = input({
       phones: [{ label: { az: "Satış", ru: "Продажи" }, number: "070 111 22 33" }],
@@ -289,7 +294,7 @@ describe("public settings and structured data", () => {
     expect((await put(changed)).status).toBe(200);
     const after = organizationJsonLd(await getSiteSettings(), "ru", siteUrl);
     expect(after.telephone).toBe("+994701112233");
-    expect(after.url).toBe("https://mebline.az/ru");
+    expect(after.url).toBe("https://cewm.az/ru");
     expect(after.contactPoint).toEqual([
       expect.objectContaining({ telephone: "+994701112233", name: "Продажи" }),
     ]);
@@ -308,11 +313,11 @@ describe("public settings and structured data", () => {
       mapUrl: null,
       workingHours: null,
       socials: [],
-      heroSlides: [],
+      hero: null,
       homeSections: [],
       whatsappNumber: "994552555423",
       legalName: null,
-      quoteNotifyEmail: "private@mebline.az",
+      consultationNotifyEmail: "private@cewm.az",
       seoTitle: null,
       seoDescription: null,
       ogImageId: null,
@@ -327,7 +332,7 @@ describe("public settings and structured data", () => {
       height: 203,
       size: 100,
       sha256: "x",
-      alt: { az: "Mebline" },
+      alt: { az: "CEWM" },
       lqip: null,
       originalId: null,
       cleanupStatus: null,
@@ -343,9 +348,9 @@ describe("public settings and structured data", () => {
       mimeType: "image/png",
       width: 465,
       height: 203,
-      alt: { az: "Mebline" },
+      alt: { az: "CEWM" },
     });
-    expect(JSON.stringify(site)).not.toContain("private@mebline.az");
+    expect(JSON.stringify(site)).not.toContain("private@cewm.az");
     expect(JSON.parse(JSON.stringify(site))).toEqual(site);
 
     const first = organizationJsonLd(site, "az", siteUrl);
@@ -358,7 +363,7 @@ describe("public settings and structured data", () => {
     );
     expect(first.telephone).toBe("+994125265423");
     expect(second.telephone).toBe("+994502223344");
-    expect(first.name).toBe("Mebline");
+    expect(first.name).toBe("CEWM");
     expect(toSiteSettings(null, [])).toMatchObject({ phones: [], logoLight: null });
   });
 
@@ -376,9 +381,9 @@ describe("contact links", () => {
     expect(whatsappHref("994552555423")).toBe("https://wa.me/994552555423");
     expect(whatsappHref("+994 55 255 54 23")).toBe("https://wa.me/994552555423");
     expect(whatsappHref("055 255 54 23", "Salam")).toBe("https://wa.me/994552555423?text=Salam");
-    expect(mailtoHref("office@mebline.az")).toBe("mailto:office@mebline.az");
-    expect(mailtoHref("office@mebline.az", "Təklif")).toBe(
-      "mailto:office@mebline.az?subject=T%C9%99klif",
+    expect(mailtoHref("office@cewm.az")).toBe("mailto:office@cewm.az");
+    expect(mailtoHref("office@cewm.az", "Təklif")).toBe(
+      "mailto:office@cewm.az?subject=T%C9%99klif",
     );
   });
 });

@@ -1,12 +1,12 @@
 import { randomBytes } from "node:crypto";
 
-import { inArray } from "drizzle-orm";
+import { inArray, like } from "drizzle-orm";
 import { revalidateTag } from "next/cache";
 import sharp from "sharp";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getDb } from "@/lib/db";
-import { categories, media, products } from "@/lib/db/schema";
+import { brands, categories, media, products } from "@/lib/db/schema";
 import type { CategoryNodeDto } from "@/lib/validation/categories";
 import type { MediaDto, MediaLibraryItem, UploadTicket } from "@/lib/validation/media";
 import type { ProductDetailDto, ProductInput, ProductListItemDto } from "@/lib/validation/products";
@@ -36,20 +36,8 @@ async function noiseImage(): Promise<Buffer> {
     .toBuffer();
 }
 
-function glb(): Buffer {
-  const text = JSON.stringify({
-    asset: { version: "2.0" },
-    extras: { run, nonce: randomBytes(8).toString("hex") },
-  });
-  const padded = text + " ".repeat((4 - (text.length % 4)) % 4);
-  const chunk = Buffer.from(padded, "utf8");
-  const header = Buffer.alloc(20);
-  header.write("glTF", 0, "latin1");
-  header.writeUInt32LE(2, 4);
-  header.writeUInt32LE(20 + chunk.length, 8);
-  header.writeUInt32LE(chunk.length, 12);
-  header.writeUInt32LE(0x4e4f534a, 16);
-  return Buffer.concat([header, chunk]);
+function pdf(): Buffer {
+  return Buffer.from(`%PDF-1.4\n% ${run} ${randomBytes(8).toString("hex")}\n%%EOF\n`, "latin1");
 }
 
 async function upload(
@@ -112,10 +100,14 @@ function productInput(overrides: Partial<ProductInput> = {}): ProductInput {
     shortDescription: null,
     description: null,
     categoryIds: [],
+    brandId: null,
+    benefits: [],
     specs: [],
     images: [],
-    modelId: null,
-    modelPosterId: null,
+    documents: [],
+    videoId: null,
+    videoUrl: null,
+    videoPosterId: null,
     relatedIds: [],
     seoTitle: null,
     seoDescription: null,
@@ -173,6 +165,7 @@ afterAll(async () => {
     await db.delete(media).where(inArray(media.id, [...created.media.keys()]));
     for (const key of created.media.values()) await removeObject(key);
   }
+  await db.delete(brands).where(like(brands.slug, `%${run}`));
   await removeUsers(domain);
 });
 
@@ -295,7 +288,7 @@ describe("products", () => {
         name: { az: "" },
         slug: { az: "Bad Slug" },
         images: [{ mediaId: "not-a-uuid", alt: { az: "" } }],
-        specs: [{ key: { az: "" }, value: { az: "x" } }],
+        specs: [{ label: { az: "" }, value: { az: "x" }, unit: null }],
         status: "maybe",
       },
     });
@@ -307,7 +300,7 @@ describe("products", () => {
         "slug.az",
         "images.0.mediaId",
         "images.0.alt.az",
-        "specs.0.key.az",
+        "specs.0.label.az",
         "status",
         "categoryIds",
       ]),
@@ -326,15 +319,27 @@ describe("products", () => {
     );
   });
 
-  it("requires a poster when a 3D model is attached", async () => {
-    const model = await uploadMedia("model.glb", "model/gltf-binary", glb());
+  it("accepts either an uploaded video or a video link, not both", async () => {
+    const document = await uploadMedia("brochure.pdf", "application/pdf", pdf());
     const response = await call("/api/admin/products", "POST", {
       cookie: owner,
-      body: productInput({ modelId: model.id, slug: { az: `no-poster-${run}` } }),
+      body: productInput({
+        videoId: document.id,
+        videoUrl: "https://www.youtube.com/watch?v=example",
+        slug: { az: `two-videos-${run}` },
+      }),
     });
     expect(response.status).toBe(400);
     expect((await json<{ fields: Record<string, string> }>(response)).fields).toHaveProperty(
-      "modelPosterId",
+      "videoUrl",
+    );
+    const wrongKind = await call("/api/admin/products", "POST", {
+      cookie: owner,
+      body: productInput({ videoId: document.id, slug: { az: `pdf-video-${run}` } }),
+    });
+    expect(wrongKind.status).toBe(400);
+    expect((await json<{ fields: Record<string, string> }>(wrongKind)).fields).toHaveProperty(
+      "videoId",
     );
   });
 
@@ -344,8 +349,12 @@ describe("products", () => {
     const images = await Promise.all(
       [1, 2, 3].map(async (n) => uploadMedia(`foto-${n}.png`, "image/png", await noiseImage())),
     );
-    const model = await uploadMedia("kursu.glb", "model/gltf-binary", glb());
+    const brochure = await uploadMedia("brochure.pdf", "application/pdf", pdf());
     const poster = await uploadMedia("poster.png", "image/png", await noiseImage());
+    const [brand] = await getDb()
+      .insert(brands)
+      .values({ name: `Brand ${run}`, slug: `brand-${run}` })
+      .returning({ id: brands.id });
 
     const input = productInput({
       status: "published",
@@ -354,9 +363,18 @@ describe("products", () => {
         mediaId: image.id,
         alt: { az: `Foto ${index + 1}`, ru: index === 0 ? "Фото 1" : "", en: "" },
       })),
-      specs: [{ key: { az: "Hündürlük" }, value: { az: "75 sm" } }],
-      modelId: model.id,
-      modelPosterId: poster.id,
+      brandId: brand?.id ?? null,
+      benefits: [{ text: { az: "Dəqiq kəsmə", de: "Präziser Zuschnitt" } }],
+      specs: [
+        {
+          label: { az: "Kəsmə uzunluğu", de: "Schnittlänge" },
+          value: { az: "3200" },
+          unit: { az: "mm" },
+        },
+      ],
+      documents: [{ mediaId: brochure.id, title: { az: "Broşür", en: "Brochure" } }],
+      videoUrl: "https://www.youtube.com/watch?v=example",
+      videoPosterId: poster.id,
       seoTitle: { az: "Rəhbər kürsüsü" },
     });
     const id = await createProduct(input);
@@ -366,13 +384,21 @@ describe("products", () => {
     expect(detail).toMatchObject({
       status: "published",
       categoryIds: [child],
-      modelId: model.id,
-      modelPosterId: poster.id,
-      seoTitle: { az: "Rəhbər kürsüsü", ru: null, en: null },
+      brandId: brand?.id,
+      videoUrl: "https://www.youtube.com/watch?v=example",
+      videoPosterId: poster.id,
+      seoTitle: { az: "Rəhbər kürsüsü", ru: null, en: null, de: null },
     });
     expect(detail.publishedAt).not.toBeNull();
     expect(detail.images.map((image) => image.mediaId)).toEqual(images.map((image) => image.id));
-    expect(detail.images[0]?.alt).toEqual({ az: "Foto 1", ru: "Фото 1", en: null });
+    expect(detail.images[0]?.alt).toEqual({ az: "Foto 1", ru: "Фото 1", en: null, de: null });
+    expect(detail.benefits).toEqual([
+      { az: "Dəqiq kəsmə", ru: null, en: null, de: "Präziser Zuschnitt" },
+    ]);
+    expect(detail.specs[0]?.unit).toEqual({ az: "mm", ru: null, en: null, de: null });
+    expect(detail.documents).toEqual([
+      { mediaId: brochure.id, title: { az: "Broşür", ru: null, en: "Brochure", de: null } },
+    ]);
 
     const inParent = await listProducts(`categoryId=${parent}&status=published&search=${run}`);
     expect(inParent.map((row) => row.id)).toContain(id);
@@ -418,7 +444,8 @@ describe("products", () => {
     const copyId = (await json<{ id: string }>(copyResponse)).id;
     created.products.add(copyId);
     const copy = await getProduct(copyId);
-    expect(copy).toMatchObject({ status: "draft", categoryIds: [child], modelId: model.id });
+    expect(copy).toMatchObject({ status: "draft", categoryIds: [child], brandId: brand?.id });
+    expect(copy.documents).toHaveLength(1);
     expect(copy.slug.az).toBe(`${input.slug.az}-kopiya`);
     expect(copy.name.az).toBe(`${input.name.az} (kopiya)`);
     expect(copy.images).toHaveLength(3);
@@ -494,7 +521,12 @@ describe("products", () => {
       }),
     );
     const row = (await listProducts(`search=${run}`)).find((item) => item.id === id);
-    expect(row?.name).toEqual({ az: `Dilli kürsü ${run}`, ru: `Кресло ${run}`, en: null });
+    expect(row?.name).toEqual({
+      az: `Dilli kürsü ${run}`,
+      ru: `Кресло ${run}`,
+      en: null,
+      de: null,
+    });
     expect(row?.slug).toEqual(expect.objectContaining({ az: `dilli-kursu-${run}` }));
     expect(row?.categories).toEqual([expect.objectContaining({ az: `Dilli ${run}` })]);
 

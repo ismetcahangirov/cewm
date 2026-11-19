@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { normalizeAzerbaijaniPhone, formatPhoneInput } from "@/lib/phone";
-import { parseProductIds } from "@/lib/public/quote";
+import { parseProductIds } from "@/lib/public/consultation";
 
 const a = "4b3c8927-766f-4bb4-b8fa-1ab30d83a1fd";
 const b = "0f6e2b1a-1234-4abc-9def-0123456789ab";

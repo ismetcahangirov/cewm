@@ -3,7 +3,7 @@ import { join } from "node:path";
 
 import { describe, expect, it } from "vitest";
 
-import { en, ru } from "@/lib/admin/i18n";
+import { de, en, ru } from "@/lib/admin/i18n";
 
 const azLetters = /[əğıöüşçƏĞİÖÜŞÇ]/;
 
@@ -15,7 +15,9 @@ const extraFiles = [
   "components/ui/dialog.tsx",
 ];
 
-const allowed = new Set(["Azərbaycanca", "Mebline: təklif sorğunuz"]);
+const allowed = new Set(["Azərbaycanca", "CEWM: konsultasiya sorğunuz"]);
+
+const azOnlyLetters = /[əğışçƏĞİŞÇ]/;
 
 function sourceFiles(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -60,17 +62,23 @@ describe("admin interface translations", () => {
     expect(missing).toEqual([]);
   });
 
-  it("translates every key into Russian and English", () => {
-    const untranslated = Object.entries({ ru, en }).flatMap(([locale, messages]) =>
+  it("translates every key into Russian, English and German", () => {
+    const untranslated = Object.entries({ ru, en, de }).flatMap(([locale, messages]) =>
       Object.entries(messages)
-        .filter(([, value]) => !value.trim() || azLetters.test(value))
+        .filter(([, value]) => !value.trim() || azOnlyLetters.test(value))
         .map(([key]) => `${locale}: ${key}`),
     );
     expect(untranslated).toEqual([]);
   });
 
+  it("has a German dictionary of its own, not a copy of the English one", () => {
+    const keys = Object.keys(de) as (keyof typeof de)[];
+    const copied = keys.filter((key) => de[key] === en[key]);
+    expect(copied.length / keys.length).toBeLessThan(0.05);
+  });
+
   it("keeps the placeholders of every key", () => {
-    const broken = Object.entries({ ru, en }).flatMap(([locale, messages]) =>
+    const broken = Object.entries({ ru, en, de }).flatMap(([locale, messages]) =>
       Object.entries(messages)
         .filter(([key, value]) => {
           const expected = [...new Set(placeholders(key))];

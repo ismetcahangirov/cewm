@@ -67,7 +67,7 @@ describe("every /api/admin route handler", () => {
 
 describe("roles", () => {
   it("lets an editor read the unread request count", async () => {
-    const response = await call("/api/admin/quote-requests/unread-count", "GET", {
+    const response = await call("/api/admin/consultation-requests/unread-count", "GET", {
       cookie: editor.cookie,
     });
     expect(response.status).toBe(200);
@@ -146,9 +146,7 @@ describe("invite and deactivate", () => {
       `${mailpit}/api/v1/search?query=${encodeURIComponent(`to:${email}`)}`,
     );
     const found = (await search.json()) as { messages: { Subject: string }[] };
-    expect(found.messages.map((message) => message.Subject)).toContain(
-      "Mebline idarə panelinə dəvət",
-    );
+    expect(found.messages.map((message) => message.Subject)).toContain("CEWM idarə panelinə dəvət");
   });
 
   it("deactivating a user ends their session and blocks sign-in", async () => {
@@ -160,7 +158,7 @@ describe("invite and deactivate", () => {
     expect(response.status).toBe(200);
     expect(await response.json()).toMatchObject({ active: false });
 
-    const afterBan = await call("/api/admin/quote-requests/unread-count", "GET", {
+    const afterBan = await call("/api/admin/consultation-requests/unread-count", "GET", {
       cookie: editor.cookie,
     });
     expect(afterBan.status).toBe(401);

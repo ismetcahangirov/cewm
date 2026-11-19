@@ -5,10 +5,10 @@ import { revalidateTag } from "next/cache";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getDb } from "@/lib/db";
-import { media, products, settings } from "@/lib/db/schema";
-import { getFeaturedProducts, getHeroSlides, getHomeSections } from "@/lib/public/home";
+import { heroFilms, media, products, settings } from "@/lib/db/schema";
+import { getFeaturedProducts, getHero, getHomeSections } from "@/lib/public/home";
 import type { HomeSectionsDto, HomeSectionsInput } from "@/lib/validation/home-sections";
-import { heroSlideHref, type SettingsDto, type SettingsInput } from "@/lib/validation/settings";
+import { siteHref, type SettingsDto, type SettingsInput } from "@/lib/validation/settings";
 
 import { call, createUser, removeUsers, sessionCookie, testRun } from "./support/admin";
 
@@ -82,16 +82,21 @@ async function insertProduct(
 const defaultSections: HomeSectionsInput["sections"] = [
   { key: "categories", visible: true, title: null },
   { key: "products", visible: true, title: null },
-  { key: "projects", visible: true, title: null },
-  { key: "logos", visible: true, title: null },
+  { key: "brands", visible: true, title: null },
+  { key: "clients", visible: true, title: null },
+  { key: "posts", visible: true, title: null },
 ];
 
-function input(overrides: Partial<HomeSectionsInput> = {}): HomeSectionsInput {
-  return { heroSlides: [], sections: defaultSections, featuredIds: [], ...overrides };
-}
+const defaultHero: HomeSectionsInput["hero"] = {
+  headline: { az: `Başlıq ${run}`, ru: "", en: "", de: "" },
+  subline: null,
+  ctaLabel: null,
+  ctaHref: "",
+  filmId: "",
+};
 
-function slide(imageId: string, title: string): HomeSectionsInput["heroSlides"][number] {
-  return { imageId, title: { az: title, ru: "", en: "" }, lead: null, href: "" };
+function input(overrides: Partial<HomeSectionsInput> = {}): HomeSectionsInput {
+  return { hero: defaultHero, sections: defaultSections, featuredIds: [], ...overrides };
 }
 
 async function put(body: HomeSectionsInput, cookie = owner): Promise<Response> {
@@ -162,8 +167,9 @@ describe("home sections API", () => {
       expect(body.sections.map((section) => section.key)).toEqual([
         "categories",
         "products",
-        "projects",
-        "logos",
+        "brands",
+        "clients",
+        "posts",
       ]);
     }
     expect((await put(input(), editor)).status).toBe(200);
@@ -176,38 +182,48 @@ describe("home sections API", () => {
         input({
           sections: [
             { key: "products", visible: true, title: { az: " Yeni məhsullar ", ru: "", en: "" } },
-            { key: "logos", visible: false, title: { az: "Yox", ru: "", en: "" } },
+            { key: "clients", visible: false, title: null },
             { key: "categories", visible: true, title: { az: "", ru: "Категории", en: "" } },
-            { key: "projects", visible: false, title: null },
+            { key: "brands", visible: false, title: null },
+            { key: "posts", visible: true, title: { az: "", ru: "", en: "", de: "Neuigkeiten" } },
           ],
         }),
       ),
     );
     expect(body.sections).toEqual([
-      { key: "products", visible: true, title: { az: "Yeni məhsullar", ru: null, en: null } },
-      { key: "logos", visible: false, title: null },
-      { key: "categories", visible: true, title: { az: "", ru: "Категории", en: null } },
-      { key: "projects", visible: false, title: null },
+      {
+        key: "products",
+        visible: true,
+        title: { az: "Yeni məhsullar", ru: null, en: null, de: null },
+      },
+      { key: "clients", visible: false, title: null },
+      { key: "categories", visible: true, title: { az: "", ru: "Категории", en: null, de: null } },
+      { key: "brands", visible: false, title: null },
+      { key: "posts", visible: true, title: { az: "", ru: null, en: null, de: "Neuigkeiten" } },
     ]);
     expect(revalidateTag).toHaveBeenCalledWith("settings", { expire: 0 });
     expect(revalidateTag).toHaveBeenCalledWith("catalog", { expire: 0 });
 
     expect(await getHomeSections("az")).toEqual([
       { key: "products", visible: true, title: "Yeni məhsullar" },
-      { key: "logos", visible: false, title: null },
+      { key: "clients", visible: false, title: null },
       { key: "categories", visible: true, title: null },
-      { key: "projects", visible: false, title: null },
+      { key: "brands", visible: false, title: null },
+      { key: "posts", visible: true, title: null },
     ]);
     expect(
       (await getHomeSections("ru")).map((section) => ("title" in section ? section.title : null)),
-    ).toEqual([null, null, "Категории", null]);
+    ).toEqual([null, null, "Категории", null, null]);
+    expect(
+      (await getHomeSections("de")).map((section) => ("title" in section ? section.title : null)),
+    ).toEqual([null, null, null, null, "Neuigkeiten"]);
   });
 
   it("requires every section exactly once", async () => {
-    const missing = await put(input({ sections: defaultSections.slice(0, 3) }));
+    const missing = await put(input({ sections: defaultSections.slice(0, 4) }));
     expect((await fields(missing)).sections).toBe("Bütün bölmələr bir dəfə göndərilməlidir.");
     const repeated = await put(
-      input({ sections: [...defaultSections.slice(0, 3), defaultSections[0]] }),
+      input({ sections: [...defaultSections.slice(0, 4), defaultSections[0]] }),
     );
     expect((await fields(repeated)).sections).toBe("Bütün bölmələr bir dəfə göndərilməlidir.");
     expect(revalidateTag).not.toHaveBeenCalled();
@@ -243,8 +259,12 @@ describe("home sections API", () => {
     expect((await fields(repeated)).featuredIds).toBe("Məhsul təkrarlanır.");
   });
 
-  it("does not touch the slides when the general settings are saved", async () => {
-    await saved(await put(input({ heroSlides: [slide(mediaIds.hero, "Qalır")] })));
+  it("does not touch the hero when the general settings are saved", async () => {
+    await saved(
+      await put(
+        input({ hero: { ...defaultHero, headline: { az: "Qalır", ru: "", en: "", de: "" } } }),
+      ),
+    );
     const current = (await (
       await call("/api/admin/settings", "GET", { cookie: owner })
     ).json()) as SettingsDto;
@@ -261,7 +281,7 @@ describe("home sections API", () => {
     });
     expect(response.status, JSON.stringify(await response.clone().json())).toBe(200);
     const after = await saved(await call("/api/admin/home-sections", "GET", { cookie: owner }));
-    expect(after.heroSlides.map((item) => item.title.az)).toEqual(["Qalır"]);
+    expect(after.hero?.headline.az).toBe("Qalır");
   });
 });
 
@@ -307,7 +327,7 @@ describe("custom home sections", () => {
             defaultSections[0]!,
             custom(id, {
               eyebrow: { az: "Showroom", ru: "", en: "" },
-              body: { az: paragraph("Bakıda 600 m² sərgi zalı."), ru: null, en: null },
+              body: { az: paragraph("Bakıda 600 m² sərgi zalı."), ru: null, en: null, de: null },
               linkLabel: { az: "Ünvana bax", ru: "Адрес", en: "" },
               href: "/elaqe",
               mediaKind: "image",
@@ -315,7 +335,7 @@ describe("custom home sections", () => {
               posterId: mediaIds.hero,
               layout: "media-right",
               mediaWidth: 60,
-              tone: "cream",
+              tone: "light",
             }),
             ...defaultSections.slice(1),
           ],
@@ -326,11 +346,11 @@ describe("custom home sections", () => {
       key: "custom",
       id,
       visible: true,
-      title: { az: "Showroom", ru: null, en: null },
+      title: { az: "Showroom", ru: null, en: null, de: null },
       block: {
-        eyebrow: { az: "Showroom", ru: null, en: null },
-        body: { az: paragraph("Bakıda 600 m² sərgi zalı."), ru: null, en: null },
-        linkLabel: { az: "Ünvana bax", ru: "Адрес", en: null },
+        eyebrow: { az: "Showroom", ru: null, en: null, de: null },
+        body: { az: paragraph("Bakıda 600 m² sərgi zalı."), ru: null, en: null, de: null },
+        linkLabel: { az: "Ünvana bax", ru: "Адрес", en: null, de: null },
         href: "/elaqe",
         mediaKind: "image",
         mediaId: mediaIds.wide,
@@ -339,7 +359,7 @@ describe("custom home sections", () => {
         sound: false,
         layout: "media-right",
         mediaWidth: 60,
-        tone: "cream",
+        tone: "light",
       },
     });
     expect(body.media.map((item) => item.id)).toContain(mediaIds.wide);
@@ -356,7 +376,7 @@ describe("custom home sections", () => {
         video: null,
         layout: "media-right",
         mediaWidth: 60,
-        tone: "cream",
+        tone: "light",
       },
     });
 
@@ -433,7 +453,7 @@ describe("custom home sections", () => {
         }),
       ),
     );
-    expect(wrongKind["sections.4.block.mediaId"]).toBe("Video tapılmadı.");
+    expect(wrongKind["sections.5.block.mediaId"]).toBe("Video tapılmadı.");
 
     const invalid = await fields(
       await put(
@@ -449,11 +469,11 @@ describe("custom home sections", () => {
         }),
       ),
     );
-    expect(invalid["sections.4.block.layout"]).toBe("Fon düzülüşü üçün şəkil və ya video seçin.");
-    expect(invalid["sections.5.block.href"]).toBe("Düymə üçün link yazın.");
-    expect(invalid["sections.6.block.mediaId"]).toBe("Şəkil seçin.");
-    expect(invalid["sections.7.title.az"]).toBe("Başlıq, mətn və ya media əlavə edin.");
-    expect(invalid["sections.8.block.mediaWidth"]).toBe("Ən çox 70% ola bilər.");
+    expect(invalid["sections.5.block.layout"]).toBe("Fon düzülüşü üçün şəkil və ya video seçin.");
+    expect(invalid["sections.6.block.href"]).toBe("Düymə üçün link yazın.");
+    expect(invalid["sections.7.block.mediaId"]).toBe("Şəkil seçin.");
+    expect(invalid["sections.8.title.az"]).toBe("Başlıq, mətn və ya media əlavə edin.");
+    expect(invalid["sections.9.block.mediaWidth"]).toBe("Ən çox 70% ola bilər.");
 
     const tooMany = Array.from({ length: 13 }, () => custom(randomUUID()));
     expect(
@@ -463,164 +483,87 @@ describe("custom home sections", () => {
   });
 });
 
-describe("home hero slides", () => {
-  it("saves slides in order, normalises them and returns their images", async () => {
+describe("home hero", () => {
+  it("saves the hero text, link and film and shows it on the site in every locale", async () => {
+    const [film] = await getDb()
+      .insert(heroFilms)
+      .values({
+        name: `Film ${run}`,
+        keyPrefix: `tests/${run}/film`,
+        frameCount: 120,
+        frameWidth: 1920,
+        frameHeight: 1080,
+        format: "webp",
+        posterId: mediaIds.hero,
+      })
+      .returning({ id: heroFilms.id });
     const body = await saved(
       await put(
         input({
-          heroSlides: [
-            {
-              imageId: mediaIds.hero,
-              title: { az: " Ofis mebeli ", ru: "Офисная мебель", en: "" },
-              lead: { az: "Layihədən quraşdırmaya qədər.", ru: "", en: "" },
-              href: "/mehsullar",
-            },
-            {
-              imageId: mediaIds.hero,
-              title: { az: "Layihələr", ru: "", en: "" },
-              lead: { az: "", ru: "", en: "" },
-              href: "https://mebline.az/layiheler",
-            },
-            slide(mediaIds.hero, "Kataloq"),
-          ],
+          hero: {
+            headline: { az: "Başlıq", ru: "Заголовок", en: "", de: "Überschrift" },
+            subline: { az: "Alt mətn", ru: "", en: "", de: "" },
+            ctaLabel: { az: "Məhsullar", ru: "", en: "", de: "Produkte" },
+            ctaHref: "/mehsullar",
+            filmId: film?.id ?? "",
+          },
         }),
       ),
     );
-    expect(body.heroSlides).toEqual([
-      {
-        imageId: mediaIds.hero,
-        mobileImageId: null,
-        title: { az: "Ofis mebeli", ru: "Офисная мебель", en: null },
-        lead: { az: "Layihədən quraşdırmaya qədər.", ru: null, en: null },
-        href: "/mehsullar",
-      },
-      {
-        imageId: mediaIds.hero,
-        mobileImageId: null,
-        title: { az: "Layihələr", ru: null, en: null },
-        lead: null,
-        href: "https://mebline.az/layiheler",
-      },
-      {
-        imageId: mediaIds.hero,
-        mobileImageId: null,
-        title: { az: "Kataloq", ru: null, en: null },
-        lead: null,
-        href: null,
-      },
-    ]);
-    expect(body.media.map((item) => item.id)).toContain(mediaIds.hero);
+    expect(body.hero).toEqual({
+      headline: { az: "Başlıq", ru: "Заголовок", en: null, de: "Überschrift" },
+      subline: { az: "Alt mətn", ru: null, en: null, de: null },
+      ctaLabel: { az: "Məhsullar", ru: null, en: null, de: "Produkte" },
+      ctaHref: "/mehsullar",
+      filmId: film?.id,
+    });
+    expect(body.films.map((item) => item.id)).toContain(film?.id);
 
-    const again = await saved(await call("/api/admin/home-sections", "GET", { cookie: editor }));
-    expect(again.heroSlides).toEqual(body.heroSlides);
+    expect(await getHero("de")).toMatchObject({
+      headline: "Überschrift",
+      subline: "Alt mətn",
+      cta: { label: "Produkte", href: "/de/mehsullar" },
+      film: {
+        frameCount: 120,
+        width: 1920,
+        height: 1080,
+        format: "webp",
+        firstFrame: `/media/tests/${run}/film/0001.webp`,
+        framePattern: `/media/tests/${run}/film/{frame}.webp`,
+        poster: { src: `/media/tests/${run}/hero.jpeg` },
+      },
+    });
+    expect(await getHero("en")).toMatchObject({
+      headline: "Başlıq",
+      cta: { href: "/en/mehsullar" },
+    });
 
-    const inUse = await call("/api/admin/media/[id]", "DELETE", {
+    const removed = await call("/api/admin/hero-films/[id]", "DELETE", {
       cookie: owner,
-      params: { id: mediaIds.hero },
+      params: { id: film?.id ?? "" },
     });
-    expect(inUse.status).toBe(409);
-
-    expect((await saved(await put(input()))).heroSlides).toEqual([]);
+    expect(removed.status).toBe(204);
+    const after = await saved(await call("/api/admin/home-sections", "GET", { cookie: owner }));
+    expect(after.hero?.filmId).toBeNull();
   });
 
-  it("allows at most three slides", async () => {
-    const four = Array.from({ length: 4 }, (_, index) => slide(mediaIds.hero, `Slayd ${index}`));
-    const response = await put(input({ heroSlides: four }));
-    expect((await fields(response)).heroSlides).toBe("Ən çox 3 slayd ola bilər.");
+  it("validates the hero text, button and film", async () => {
+    const missing = await fields(
+      await put(input({ hero: { ...defaultHero, headline: { az: "", ru: "", en: "", de: "" } } })),
+    );
+    expect(missing["hero.headline.az"]).toBe("Hero başlığını yazın.");
+    const noLink = await fields(
+      await put(input({ hero: { ...defaultHero, ctaLabel: { az: "Bax" } } })),
+    );
+    expect(noLink["hero.ctaHref"]).toBe("Düymə üçün link yazın.");
+    const noFilm = await fields(
+      await put(
+        input({ hero: { ...defaultHero, filmId: "00000000-0000-4000-8000-000000000000" } }),
+      ),
+    );
+    expect(noFilm["hero.filmId"]).toBe("Film tapılmadı.");
+    expect(siteHref.safeParse("http://example.com").success).toBe(false);
+    expect(siteHref.safeParse("/mehsullar").success).toBe(true);
     expect(revalidateTag).not.toHaveBeenCalled();
-  });
-
-  it("requires a landscape raster image at least 1600 px wide", async () => {
-    const result = await fields(
-      await put(
-        input({
-          heroSlides: [
-            slide(mediaIds.wide, "Dar"),
-            slide(mediaIds.tall, "Şaquli"),
-            slide(mediaIds.svg, "Vektor"),
-          ],
-        }),
-      ),
-    );
-    expect(result).toEqual({
-      "heroSlides.0.imageId":
-        "Slayd şəklinin eni ən azı 1600 px olmalıdır. Bu şəklin eni 1200 px-dir.",
-      "heroSlides.1.imageId":
-        "Slayd şəkli üfüqi olmalıdır: eni hündürlüyündən böyük. Bu şəkil 1800 × 2400 px-dir.",
-      "heroSlides.2.imageId": "JPG, PNG və ya WebP şəkil seçin.",
-    });
-
-    const missing = await fields(await put(input({ heroSlides: [slide(randomUUID(), "Yox")] })));
-    expect(missing).toEqual({ "heroSlides.0.imageId": "Şəkil tapılmadı." });
-  });
-
-  it("serves an optional portrait image to phones", async () => {
-    const body = await saved(
-      await put(
-        input({ heroSlides: [{ ...slide(mediaIds.hero, "Mobil"), mobileImageId: mediaIds.tall }] }),
-      ),
-    );
-    expect(body.heroSlides[0]?.mobileImageId).toBe(mediaIds.tall);
-    expect(body.media.map((item) => item.id)).toEqual(
-      expect.arrayContaining([mediaIds.hero, mediaIds.tall]),
-    );
-
-    const [hero] = await getHeroSlides("az");
-    expect(hero?.image.src).toContain(`tests/${run}/hero.jpeg`);
-    expect(hero?.mobileImage).toMatchObject({ width: 1800, height: 2400 });
-    expect(hero?.mobileImage?.src).toContain(`tests/${run}/tall.jpeg`);
-
-    const result = await fields(
-      await put(
-        input({
-          heroSlides: [
-            { ...slide(mediaIds.hero, "Üfüqi"), mobileImageId: mediaIds.wide },
-            { ...slide(mediaIds.hero, "Dar"), mobileImageId: mediaIds.narrowTall },
-          ],
-        }),
-      ),
-    );
-    expect(result).toEqual({
-      "heroSlides.0.mobileImageId":
-        "Mobil şəkil şaquli olmalıdır: hündürlüyü enindən böyük. Bu şəkil 1200 × 630 px-dir.",
-      "heroSlides.1.mobileImageId":
-        "Mobil şəklin eni ən azı 900 px olmalıdır. Bu şəklin eni 600 px-dir.",
-    });
-
-    expect((await saved(await put(input()))).heroSlides).toEqual([]);
-  });
-
-  it("validates slide text and links", async () => {
-    const result = await fields(
-      await put(
-        input({
-          heroSlides: [
-            {
-              imageId: "",
-              title: { az: "", ru: "", en: "" },
-              lead: { az: "a".repeat(201) },
-              href: "javascript:alert(1)",
-            },
-            { ...slide(mediaIds.hero, "b".repeat(81)), href: "//evil.example" },
-          ],
-        }),
-      ),
-    );
-    expect(Object.keys(result).sort()).toEqual([
-      "heroSlides.0.href",
-      "heroSlides.0.imageId",
-      "heroSlides.0.lead.az",
-      "heroSlides.0.title.az",
-      "heroSlides.1.href",
-      "heroSlides.1.title.az",
-    ]);
-
-    for (const value of ["/", "/mehsullar/ofis-kursuleri?sort=new#top", "https://mebline.az/x"]) {
-      expect(heroSlideHref.parse(value), value).toBe(value);
-    }
-    for (const value of ["", null, undefined]) expect(heroSlideHref.parse(value)).toBeNull();
-    for (const value of ["http://mebline.az", "mehsullar", "/ bad", "/\\evil", "mailto:a@b.c"]) {
-      expect(heroSlideHref.safeParse(value).success, value).toBe(false);
-    }
   });
 });

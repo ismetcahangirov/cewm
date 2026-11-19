@@ -4,23 +4,20 @@ import { inArray } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it } from "vitest";
 
 import { getDb } from "@/lib/db";
-import { logos, media, posts, projectImages, projects } from "@/lib/db/schema";
+import { brands, clientLogos, media, posts } from "@/lib/db/schema";
 import {
-  filterProjects,
   formatPostDate,
   postsPerPage,
-  projectTypeFromQuery,
-  queryLogosByGroup,
   queryPostBySlug,
   queryPosts,
-  queryProjects,
   queryRelatedPosts,
 } from "@/lib/public/content";
+import { queryBrands, queryClientLogos } from "@/lib/public/home";
 
 const run = randomUUID().slice(0, 8);
 const created = {
   media: [] as string[],
-  projects: [] as string[],
+  brands: [] as string[],
   posts: [] as string[],
   logos: [] as string[],
 };
@@ -40,23 +37,6 @@ async function makeMedia(name: string, width: number | null = 1200, height: numb
     .returning();
   created.media.push(row.id);
   return row;
-}
-
-async function makeProject(
-  name: string,
-  values: Partial<typeof projects.$inferInsert> = {},
-): Promise<string> {
-  const [row] = await getDb()
-    .insert(projects)
-    .values({
-      slug: { az: `${run}-${name}` },
-      title: { az: `Layihə ${name}`, en: `Project ${name}` },
-      status: "published",
-      ...values,
-    })
-    .returning({ id: projects.id });
-  created.projects.push(row.id);
-  return row.id;
 }
 
 async function makePost(
@@ -80,88 +60,24 @@ async function makePost(
 async function makeLogo(
   name: string,
   imageId: string,
-  values: Partial<typeof logos.$inferInsert> = {},
+  values: Partial<typeof clientLogos.$inferInsert> = {},
 ): Promise<string> {
   const [row] = await getDb()
-    .insert(logos)
-    .values({ name: `${run}-${name}`, imageId, group: "partners", ...values })
-    .returning({ id: logos.id });
+    .insert(clientLogos)
+    .values({ name: `${run}-${name}`, imageId, ...values })
+    .returning({ id: clientLogos.id });
   created.logos.push(row.id);
   return row.id;
 }
 
 afterAll(async () => {
   const db = getDb();
-  if (created.logos.length) await db.delete(logos).where(inArray(logos.id, created.logos));
-  if (created.posts.length) await db.delete(posts).where(inArray(posts.id, created.posts));
-  if (created.projects.length) {
-    await db.delete(projects).where(inArray(projects.id, created.projects));
+  if (created.logos.length) {
+    await db.delete(clientLogos).where(inArray(clientLogos.id, created.logos));
   }
+  if (created.brands.length) await db.delete(brands).where(inArray(brands.id, created.brands));
+  if (created.posts.length) await db.delete(posts).where(inArray(posts.id, created.posts));
   if (created.media.length) await db.delete(media).where(inArray(media.id, created.media));
-});
-
-describe("projects list", () => {
-  const ids: Record<string, string> = {};
-
-  beforeAll(async () => {
-    const cover = await makeMedia("cover");
-    const second = await makeMedia("second");
-    const first = await makeMedia("first");
-    ids.late = await makeProject("late", { coverId: cover.id, sortOrder: 2 });
-    ids.visual = await makeProject("visual", {
-      coverId: second.id,
-      type: "3d-visual",
-      sortOrder: 1,
-    });
-    ids.gallery = await makeProject("gallery", { sortOrder: 0 });
-    await getDb()
-      .insert(projectImages)
-      .values([
-        { projectId: ids.gallery, mediaId: second.id, position: 1 },
-        { projectId: ids.gallery, mediaId: first.id, position: 0 },
-      ]);
-    ids.draft = await makeProject("draft", { coverId: cover.id, status: "draft" });
-    ids.bare = await makeProject("bare", { sortOrder: 3 });
-  });
-
-  it("lists published projects in order with a cover or the first gallery image", async () => {
-    const items = (await queryProjects("az")).filter((item) =>
-      Object.values(ids).includes(item.id),
-    );
-    expect(items.map((item) => item.id)).toEqual([ids.gallery, ids.visual, ids.late]);
-    expect(items[0].image.src).toBe(`/media/test/${run}/first.jpg`);
-    expect(items[1]).toMatchObject({ isVisual: true, type: "3d-visual" });
-    expect(items[2].href).toBe(`/layiheler/${run}-late`);
-  });
-
-  it("localizes titles and falls back to az", async () => {
-    const items = await queryProjects("en");
-    const visual = items.find((item) => item.id === ids.visual);
-    expect(visual?.title).toBe("Project visual");
-    expect(visual?.image.alt).toBe("Alt en second");
-    const ru = await queryProjects("ru");
-    expect(ru.find((item) => item.id === ids.visual)?.title).toBe("Layihə visual");
-  });
-
-  it("filters by type", async () => {
-    const items = (await queryProjects("az")).filter((item) =>
-      Object.values(ids).includes(item.id),
-    );
-    expect(filterProjects(items, "3d-visual").map((item) => item.id)).toEqual([ids.visual]);
-    expect(filterProjects(items, "completed").map((item) => item.id)).toEqual([
-      ids.gallery,
-      ids.late,
-    ]);
-    expect(filterProjects(items, null)).toHaveLength(3);
-  });
-
-  it("maps the query parameter to a type", () => {
-    expect(projectTypeFromQuery("tamamlanmis")).toBe("completed");
-    expect(projectTypeFromQuery("3d")).toBe("3d-visual");
-    expect(projectTypeFromQuery("x")).toBeNull();
-    expect(projectTypeFromQuery(undefined)).toBeNull();
-    expect(projectTypeFromQuery(["3d"])).toBeNull();
-  });
 });
 
 describe("posts", () => {
@@ -248,7 +164,7 @@ describe("posts", () => {
   });
 });
 
-describe("logos by group", () => {
+describe("client logos and brands", () => {
   const ids: Record<string, string> = {};
 
   beforeAll(async () => {
@@ -256,21 +172,41 @@ describe("logos by group", () => {
     const broken = await makeMedia("logo-broken", null, null);
     ids.second = await makeLogo("b-second", image.id, { sortOrder: 2 });
     ids.first = await makeLogo("a-first", image.id, { sortOrder: 1, url: "https://example.com" });
-    ids.reference = await makeLogo("ref", image.id, { group: "references" });
     ids.inactive = await makeLogo("inactive", image.id, { isActive: false });
     ids.broken = await makeLogo("broken", broken.id);
+    const [brand] = await getDb()
+      .insert(brands)
+      .values({
+        name: `Brand ${run}`,
+        slug: `brand-${run}`,
+        description: { az: "Təsvir", de: "Beschreibung" },
+        sortOrder: -1,
+      })
+      .returning({ id: brands.id });
+    ids.brand = brand?.id ?? "";
+    created.brands.push(ids.brand);
   });
 
   const mine = (items: { id: string }[]) =>
     items.filter((item) => Object.values(ids).includes(item.id)).map((item) => item.id);
 
-  it("returns active logos of one group in sort order", async () => {
-    const partners = await queryLogosByGroup("az", "partners");
-    expect(mine(partners)).toEqual([ids.first, ids.second]);
-    expect(partners.find((item) => item.id === ids.first)).toMatchObject({
+  it("returns active client logos with an image in sort order", async () => {
+    const logos = await queryClientLogos("az");
+    expect(mine(logos)).toEqual([ids.first, ids.second]);
+    expect(logos.find((item) => item.id === ids.first)).toMatchObject({
       name: `${run}-a-first`,
       url: "https://example.com",
     });
-    expect(mine(await queryLogosByGroup("az", "references"))).toEqual([ids.reference]);
+  });
+
+  it("returns brands with a localized description and no logo yet", async () => {
+    const german = (await queryBrands("de")).find((item) => item.id === ids.brand);
+    expect(german).toMatchObject({
+      name: `Brand ${run}`,
+      description: "Beschreibung",
+      image: null,
+    });
+    const russian = (await queryBrands("ru")).find((item) => item.id === ids.brand);
+    expect(russian?.description).toBe("Təsvir");
   });
 });

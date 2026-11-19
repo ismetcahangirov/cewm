@@ -71,7 +71,7 @@ export async function call(
 
 export function testRun() {
   const run = randomUUID().slice(0, 8);
-  return { run, domain: `${run}.mebline.test`, password: `Test-password-${run}` };
+  return { run, domain: `${run}.cewm.test`, password: `Test-password-${run}` };
 }
 
 export async function createUser(

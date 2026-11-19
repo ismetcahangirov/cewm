@@ -1,15 +1,12 @@
-import { createHash, randomBytes } from "node:crypto";
-
 import { eq, inArray, isNotNull } from "drizzle-orm";
 import { revalidateTag } from "next/cache";
 import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getDb } from "@/lib/db";
-import { media, pages, posts, projects } from "@/lib/db/schema";
+import { media, pages, posts } from "@/lib/db/schema";
 import type { RichTextDoc } from "@/lib/content/rich-text";
 import type { PageDetailDto, PageInput, PageListItemDto } from "@/lib/validation/pages";
 import type { PostDetailDto, PostInput, PostListItemDto } from "@/lib/validation/posts";
-import type { ProjectDetailDto, ProjectInput, ProjectListItemDto } from "@/lib/validation/projects";
 import type { SlugCheckResult } from "@/lib/validation/slugs";
 
 import { call, createUser, removeUsers, sessionCookie, testRun } from "./support/admin";
@@ -20,7 +17,6 @@ const { run, domain, password } = testRun();
 const created = {
   pages: new Set<string>(),
   posts: new Set<string>(),
-  projects: new Set<string>(),
   media: new Set<string>(),
 };
 
@@ -33,25 +29,6 @@ async function json<T>(response: Response): Promise<T> {
 
 function revalidated(): string[] {
   return vi.mocked(revalidateTag).mock.calls.map(([tag]) => tag);
-}
-
-async function insertImage(name: string): Promise<string> {
-  const sha256 = createHash("sha256").update(randomBytes(16)).digest("hex");
-  const [row] = await getDb()
-    .insert(media)
-    .values({
-      key: `uploads/2026/10/test-${run}-${name}.png`,
-      mimeType: "image/png",
-      width: 64,
-      height: 48,
-      size: 128,
-      sha256,
-      alt: null,
-    })
-    .returning({ id: media.id });
-  if (!row) throw new Error("Media was not created");
-  created.media.add(row.id);
-  return row.id;
 }
 
 const paragraph = (text: string) => ({ type: "paragraph", content: [{ type: "text", text }] });
@@ -135,37 +112,6 @@ async function listPosts(query: string): Promise<PostListItemDto[]> {
   return (await json<{ rows: PostListItemDto[] }>(response)).rows;
 }
 
-function projectInput(overrides: Partial<ProjectInput> = {}): ProjectInput {
-  return {
-    title: { az: `Test layihə ${run}`, ru: "", en: "" },
-    slug: { az: `test-layihe-${run}`, ru: "", en: "" },
-    excerpt: null,
-    body: null,
-    clientName: "Test MMC",
-    type: "completed",
-    coverId: null,
-    images: [],
-    status: "draft",
-    seoTitle: null,
-    seoDescription: null,
-    ...overrides,
-  };
-}
-
-async function createProject(input: ProjectInput): Promise<string> {
-  const response = await call("/api/admin/projects", "POST", { cookie: owner, body: input });
-  expect(response.status, JSON.stringify(await response.clone().json())).toBe(201);
-  const { id } = await json<{ id: string }>(response);
-  created.projects.add(id);
-  return id;
-}
-
-async function getProject(id: string): Promise<ProjectDetailDto> {
-  const response = await call("/api/admin/projects/[id]", "GET", { cookie: owner, params: { id } });
-  expect(response.status).toBe(200);
-  return json<ProjectDetailDto>(response);
-}
-
 beforeAll(async () => {
   const ownerUser = await createUser("owner", domain, password);
   const editorUser = await createUser("editor", domain, password);
@@ -179,9 +125,6 @@ beforeEach(() => {
 
 afterAll(async () => {
   const db = getDb();
-  if (created.projects.size) {
-    await db.delete(projects).where(inArray(projects.id, [...created.projects]));
-  }
   if (created.posts.size) await db.delete(posts).where(inArray(posts.id, [...created.posts]));
   if (created.pages.size) await db.delete(pages).where(inArray(pages.id, [...created.pages]));
   if (created.media.size) await db.delete(media).where(inArray(media.id, [...created.media]));
@@ -222,7 +165,7 @@ describe("pages", () => {
       await call("/api/admin/pages/[id]", "GET", { cookie: owner, params: { id } }),
     );
     expect(detail).toMatchObject({
-      title: { az: `Zəmanət ${run}`, ru: `Гарантия ${run}`, en: null },
+      title: { az: `Zəmanət ${run}`, ru: `Гарантия ${run}`, en: null, de: null },
       status: "published",
       kind: null,
     });
@@ -252,11 +195,11 @@ describe("pages", () => {
 
     const check = await call("/api/admin/slugs", "GET", {
       cookie: owner,
-      path: "/api/admin/slugs?entity=page&slug=layiheler",
+      path: "/api/admin/slugs?entity=page&slug=kateqoriyalar",
     });
     expect(await json<SlugCheckResult>(check)).toEqual({
       available: false,
-      suggestion: "layiheler-2",
+      suggestion: "kateqoriyalar-2",
     });
   });
 
@@ -309,7 +252,7 @@ describe("pages", () => {
     const id = await createPage(
       pageInput({
         slug: { az: `cedvel-${run}`, ru: "", en: "" },
-        content: { az: tableDoc, ru: null, en: null },
+        content: { az: tableDoc, ru: null, en: null, de: null },
       }),
     );
     const detail = await json<PageDetailDto>(
@@ -390,134 +333,5 @@ describe("posts", () => {
     expect((await json<{ fields: Record<string, string> }>(response)).fields).toHaveProperty(
       "publishedAt",
     );
-  });
-});
-
-describe("projects", () => {
-  it("keeps gallery order and captions after reordering the images", async () => {
-    const first = await insertImage("first");
-    const second = await insertImage("second");
-    const id = await createProject(
-      projectInput({
-        type: "3d-visual",
-        images: [
-          {
-            mediaId: first,
-            alt: { az: "Ofis planı" },
-            caption: { az: "Birinci mərtəbə", ru: "Первый этаж" },
-          },
-          { mediaId: second, alt: { az: "Divan" }, caption: { az: "", ru: "Диван" } },
-        ],
-      }),
-    );
-    expect(revalidated()).toEqual(expect.arrayContaining(["content", "menus"]));
-
-    const before = await getProject(id);
-    expect(before.images).toEqual([
-      {
-        mediaId: first,
-        alt: { az: "Ofis planı", ru: null, en: null },
-        caption: { az: "Birinci mərtəbə", ru: "Первый этаж", en: null },
-      },
-      {
-        mediaId: second,
-        alt: { az: "Divan", ru: null, en: null },
-        caption: { az: "", ru: "Диван", en: null },
-      },
-    ]);
-
-    vi.mocked(revalidateTag).mockClear();
-    const update = await call("/api/admin/projects/[id]", "PUT", {
-      cookie: editor,
-      params: { id },
-      body: projectInput({
-        type: "3d-visual",
-        coverId: second,
-        images: [...before.images].reverse(),
-      }),
-    });
-    expect(update.status, JSON.stringify(await update.clone().json())).toBe(200);
-    expect(revalidated()).toEqual(expect.arrayContaining(["content", "menus"]));
-
-    const after = await getProject(id);
-    expect(after.images.map((image) => image.mediaId)).toEqual([second, first]);
-    expect(after.images[0]?.caption).toEqual({ az: "", ru: "Диван", en: null });
-    expect(after.images[1]?.caption).toEqual({
-      az: "Birinci mərtəbə",
-      ru: "Первый этаж",
-      en: null,
-    });
-    expect(after.coverId).toBe(second);
-    expect(after.type).toBe("3d-visual");
-  });
-
-  it("uses the first gallery image as the cover when none is chosen", async () => {
-    const image = await insertImage("cover");
-    await createProject(
-      projectInput({
-        title: { az: `Örtük ${run}` },
-        slug: { az: `ortuk-${run}` },
-        images: [{ mediaId: image, alt: { az: "Qəbul zalı" }, caption: null }],
-      }),
-    );
-    const response = await call("/api/admin/projects", "GET", {
-      cookie: owner,
-      path: `/api/admin/projects?search=${encodeURIComponent(`Örtük ${run}`)}`,
-    });
-    const rows = (await json<{ rows: ProjectListItemDto[] }>(response)).rows;
-    expect(rows[0]?.cover?.src).toBe(`/media/uploads/2026/10/test-${run}-cover.png`);
-  });
-
-  it("reorders projects for the site and refuses a stale list", async () => {
-    const extra = await createProject(
-      projectInput({ title: { az: `Sıra ${run}` }, slug: { az: `sira-${run}` } }),
-    );
-    const orderResponse = await call("/api/admin/projects/reorder", "GET", { cookie: owner });
-    const original = (await json<ProjectListItemDto[]>(orderResponse)).map((item) => item.id);
-    expect(original.at(-1)).toBe(extra);
-
-    const reordered = [extra, ...original.filter((projectId) => projectId !== extra)];
-    vi.mocked(revalidateTag).mockClear();
-    const response = await call("/api/admin/projects/reorder", "POST", {
-      cookie: editor,
-      body: { orderedIds: reordered },
-    });
-    expect(response.status).toBe(204);
-    expect(revalidated()).toEqual(expect.arrayContaining(["content", "menus"]));
-
-    const list = await call("/api/admin/projects", "GET", {
-      cookie: owner,
-      path: "/api/admin/projects?sort=sortOrder&order=asc&pageSize=50",
-    });
-    const rows = (await json<{ rows: ProjectListItemDto[] }>(list)).rows;
-    expect(rows[0]?.id).toBe(extra);
-
-    const stale = await call("/api/admin/projects/reorder", "POST", {
-      cookie: owner,
-      body: { orderedIds: reordered.slice(1) },
-    });
-    expect(stale.status).toBe(409);
-
-    const restore = await call("/api/admin/projects/reorder", "POST", {
-      cookie: owner,
-      body: { orderedIds: original },
-    });
-    expect(restore.status).toBe(204);
-  });
-
-  it("deletes a project", async () => {
-    const id = await createProject(
-      projectInput({ title: { az: `Silinən ${run}` }, slug: { az: `silinen-${run}` } }),
-    );
-    vi.mocked(revalidateTag).mockClear();
-    const response = await call("/api/admin/projects/[id]", "DELETE", {
-      cookie: owner,
-      params: { id },
-    });
-    expect(response.status).toBe(204);
-    created.projects.delete(id);
-    expect(revalidated()).toEqual(expect.arrayContaining(["content", "menus"]));
-    const gone = await call("/api/admin/projects/[id]", "GET", { cookie: owner, params: { id } });
-    expect(gone.status).toBe(404);
   });
 });

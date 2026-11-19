@@ -67,7 +67,7 @@ describe("admin redirects API", () => {
 
   it("creates a redirect and normalises a pasted WordPress URL", async () => {
     const response = await create({
-      fromPath: `https://mebline.az${base}-r%c9%99hb%c9%99r-d%c9%99stl%c9%99ri/`,
+      fromPath: `https://cewm.az${base}-r%c9%99hb%c9%99r-d%c9%99stl%c9%99ri/`,
       toPath: `/mehsullar/${run}/`,
       statusCode: 301,
     });

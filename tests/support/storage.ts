@@ -18,7 +18,7 @@ function client(): S3Client {
   });
 }
 
-const bucket = () => process.env.S3_BUCKET ?? "mebline";
+const bucket = () => process.env.S3_BUCKET ?? "cewm";
 
 export async function ensureBucket(): Promise<void> {
   const s3 = client();

@@ -3,21 +3,19 @@ import { randomUUID } from "node:crypto";
 import { inArray } from "drizzle-orm";
 import { afterAll, beforeAll, describe, expect, it, vi } from "vitest";
 
-import { storyRows } from "@/components/site/project/story-rows";
 import { getDb } from "@/lib/db";
 import {
+  brands,
   categories,
   media,
   productCategories,
+  productDocuments,
   productImages,
   productRelations,
   products,
-  projectImages,
-  projects,
 } from "@/lib/db/schema";
 import type { Localized } from "@/lib/i18n/localized";
 import { getProductBySlug, getRelatedProducts, visibleCategoryIds } from "@/lib/public/product";
-import { getProjectBySlug, type ProjectPhoto } from "@/lib/public/project";
 import { summarize } from "@/lib/content/rich-text";
 
 vi.mock("next/cache", () => ({ cacheTag: vi.fn(), cacheLife: vi.fn() }));
@@ -27,7 +25,7 @@ const created = {
   media: new Set<string>(),
   categories: new Set<string>(),
   products: new Set<string>(),
-  projects: new Set<string>(),
+  brands: new Set<string>(),
 };
 
 const slug = (name: string) => `${name.toLowerCase()}-${run}`;
@@ -37,9 +35,9 @@ async function addMedia(name: string, width = 800, height = 600): Promise<string
     .insert(media)
     .values({
       key: `test/${run}/${name}`,
-      mimeType: name.endsWith(".glb") ? "model/gltf-binary" : "image/jpeg",
-      width: name.endsWith(".glb") ? null : width,
-      height: name.endsWith(".glb") ? null : height,
+      mimeType: name.endsWith(".pdf") ? "application/pdf" : "image/jpeg",
+      width: name.endsWith(".pdf") ? null : width,
+      height: name.endsWith(".pdf") ? null : height,
       size: 1000,
       sha256: randomUUID(),
       alt: { az: `${name} az`, en: `${name} en` },
@@ -70,8 +68,10 @@ async function addProduct(
     categoryIds?: string[];
     imageIds?: { id: string; position: number }[];
     sortOrder?: number;
-    modelId?: string;
-    specs?: { key: Localized; value: Localized }[];
+    brandId?: string;
+    videoUrl?: string;
+    benefits?: Localized[];
+    specs?: { label: Localized; value: Localized; unit: Localized | null }[];
   } = {},
 ): Promise<string> {
   const [row] = await getDb()
@@ -83,7 +83,9 @@ async function addProduct(
       publishedAt: new Date(),
       deletedAt: values.deletedAt,
       sortOrder: values.sortOrder ?? 0,
-      modelId: values.modelId,
+      brandId: values.brandId,
+      videoUrl: values.videoUrl,
+      benefits: values.benefits ?? [],
       specs: values.specs ?? [],
     })
     .returning({ id: products.id });
@@ -107,56 +109,8 @@ async function addProduct(
   return row.id;
 }
 
-async function addProject(
-  name: string,
-  values: {
-    status?: "draft" | "published";
-    sortOrder: number;
-    coverId?: string;
-    body?: string;
-    images?: { id: string; position: number; caption?: Localized }[];
-  },
-): Promise<string> {
-  const [row] = await getDb()
-    .insert(projects)
-    .values({
-      slug: { az: slug(name), en: slug(`${name}-en`) },
-      title: { az: name, en: `${name} EN` },
-      excerpt: { az: `${name} haqqında` },
-      clientName: `${name} MMC`,
-      status: values.status ?? "published",
-      sortOrder: values.sortOrder,
-      coverId: values.coverId,
-      body: values.body
-        ? {
-            az: {
-              type: "doc",
-              content: [{ type: "paragraph", content: [{ type: "text", text: values.body }] }],
-            },
-          }
-        : null,
-    })
-    .returning({ id: projects.id });
-  created.projects.add(row.id);
-  if (values.images?.length) {
-    await getDb()
-      .insert(projectImages)
-      .values(
-        values.images.map((image) => ({
-          projectId: row.id,
-          mediaId: image.id,
-          position: image.position,
-          caption: image.caption,
-        })),
-      );
-  }
-  return row.id;
-}
-
 afterAll(async () => {
   const db = getDb();
-  if (created.projects.size)
-    await db.delete(projects).where(inArray(projects.id, [...created.projects]));
   if (created.products.size)
     await db.delete(products).where(inArray(products.id, [...created.products]));
   if (created.categories.size) {
@@ -164,6 +118,7 @@ afterAll(async () => {
     await db.delete(categories).where(inArray(categories.parentId, ids));
     await db.delete(categories).where(inArray(categories.id, ids));
   }
+  if (created.brands.size) await db.delete(brands).where(inArray(brands.id, [...created.brands]));
   if (created.media.size) await db.delete(media).where(inArray(media.id, [...created.media]));
 });
 
@@ -178,7 +133,13 @@ describe("product detail reader", () => {
     ids.cover = await addMedia("cover.jpg");
     ids.hover = await addMedia("hover.jpg");
     ids.third = await addMedia("third.jpg");
-    ids.model = await addMedia("chair.glb");
+    ids.brochure = await addMedia("brochure.pdf");
+    const [brand] = await getDb()
+      .insert(brands)
+      .values({ name: `Brand ${run}`, slug: `brand-${run}`, websiteUrl: "https://example.com" })
+      .returning({ id: brands.id });
+    ids.brand = brand?.id ?? "";
+    created.brands.add(ids.brand);
 
     ids.main = await addProduct("Main", {
       slug: { az: slug("main"), ru: slug("main-ru") },
@@ -188,11 +149,21 @@ describe("product detail reader", () => {
         { id: ids.cover, position: 0 },
         { id: ids.hover, position: 1 },
       ],
+      brandId: ids.brand,
+      benefits: [{ az: "Sürətli", de: "Schnell" }, { az: " " }],
       specs: [
-        { key: { az: "En", ru: "Ширина" }, value: { az: "120 sm" } },
-        { key: { az: "" }, value: { az: "boş" } },
+        { label: { az: "En", ru: "Ширина" }, value: { az: "1200" }, unit: { az: "mm", ru: "мм" } },
+        { label: { az: "" }, value: { az: "boş" }, unit: null },
       ],
     });
+    await getDb()
+      .insert(productDocuments)
+      .values({
+        productId: ids.main,
+        mediaId: ids.brochure,
+        title: { az: "Broşür", de: "Broschüre" },
+        position: 0,
+      });
     ids.draft = await addProduct("Draft", { status: "draft", categoryIds: [ids.active] });
     ids.trashed = await addProduct("Trashed", {
       deletedAt: new Date(),
@@ -202,7 +173,7 @@ describe("product detail reader", () => {
     ids.hiddenChild = await addProduct("HiddenChild", { categoryIds: [ids.child] });
     ids.mixed = await addProduct("Mixed", { categoryIds: [ids.inactive, ids.second] });
     ids.loose = await addProduct("Loose", {
-      modelId: ids.model,
+      videoUrl: "https://www.youtube.com/watch?v=example",
       imageIds: [{ id: ids.hover, position: 0 }],
     });
     for (let index = 0; index < 5; index += 1) {
@@ -217,12 +188,17 @@ describe("product detail reader", () => {
     const product = await getProductBySlug("az", slug("main"));
     expect(product).toMatchObject({
       id: ids.main,
-      model: "Main",
-      type: "Test məhsulu",
+      name: "Main – Test məhsulu",
+      brand: { name: `Brand ${run}`, url: "https://example.com" },
       category: { id: ids.active, name: "aktiv" },
-      specs: [{ label: "En", value: "120 sm" }],
-      model3d: null,
+      benefits: ["Sürətli"],
+      specs: [{ label: "En", value: "1200", unit: "mm" }],
+      documents: [{ title: "Broşür", href: `/media/test/${run}/brochure.pdf`, size: 1000 }],
+      video: null,
     });
+    const german = await getProductBySlug("de", slug("main"));
+    expect(german?.benefits).toEqual(["Schnell"]);
+    expect(german?.documents[0]?.title).toBe("Broschüre");
     expect(product?.category?.href).toBe(`/mehsullar/${slug("aktiv")}`);
   });
 
@@ -255,18 +231,19 @@ describe("product detail reader", () => {
     const ru = await getProductBySlug("ru", slug("main-ru"));
     expect(ru?.id).toBe(ids.main);
     expect(ru?.name).toBe("Main – Тестовый товар");
-    expect(ru?.specs[0]).toEqual({ label: "Ширина", value: "120 sm" });
+    expect(ru?.specs[0]).toEqual({ label: "Ширина", value: "1200", unit: "мм" });
     const legacy = await getProductBySlug("ru", slug("main"));
     expect(legacy?.slug.ru).toBe(slug("main-ru"));
     expect(await getProductBySlug("en", slug("main"))).not.toBeNull();
     expect(await getProductBySlug("az", slug("main-ru"))).toBeNull();
   });
 
-  it("exposes the 3D model with the first photo as the poster", async () => {
+  it("exposes an external video link", async () => {
     const product = await getProductBySlug("az", slug("loose"));
-    expect(product?.model3d).toEqual({
-      src: `/media/test/${run}/chair.glb`,
-      poster: expect.objectContaining({ src: `/media/test/${run}/hover.jpg` }),
+    expect(product?.video).toEqual({
+      kind: "link",
+      url: "https://www.youtube.com/watch?v=example",
+      poster: null,
     });
   });
 
@@ -315,95 +292,5 @@ describe("product detail reader", () => {
     const result = summarize(long, 40);
     expect(result.length).toBeLessThanOrEqual(40);
     expect(result.endsWith("söz…")).toBe(true);
-  });
-});
-
-describe("project detail reader", () => {
-  const ids: Record<string, string> = {};
-
-  beforeAll(async () => {
-    ids.one = await addMedia("p1.jpg", 742, 400);
-    ids.two = await addMedia("p2.jpg", 742, 400);
-    ids.three = await addMedia("p3.jpg", 742, 400);
-    ids.cover = await addMedia("p-cover.jpg", 742, 400);
-    ids.first = await addProject("Birinci", { sortOrder: 900001, body: "Birinci haqqında" });
-    ids.middle = await addProject("Orta", {
-      sortOrder: 900002,
-      images: [
-        { id: ids.three, position: 2, caption: { az: "Üçüncü", en: "Third" } },
-        { id: ids.one, position: 0, caption: { az: "Birinci şəkil" } },
-        { id: ids.two, position: 1 },
-      ],
-    });
-    ids.hidden = await addProject("Qaralama", { sortOrder: 900003, status: "draft" });
-    ids.last = await addProject("Sonuncu", {
-      sortOrder: 900004,
-      coverId: ids.cover,
-      body: "Layihənin təfərrüatları",
-      images: [
-        { id: ids.one, position: 0 },
-        { id: ids.cover, position: 1 },
-      ],
-    });
-  });
-
-  it("hides unpublished projects", async () => {
-    expect(await getProjectBySlug("az", slug("Qaralama"))).toBeNull();
-    expect(await getProjectBySlug("az", slug("yoxdur"))).toBeNull();
-  });
-
-  it("uses the first image as the cover and keeps the rest in order with captions", async () => {
-    const project = await getProjectBySlug("en", slug("Orta-en"));
-    expect(project?.title).toBe("Orta EN");
-    expect(project?.cover?.src).toBe(`/media/test/${run}/p1.jpg`);
-    expect(project?.photos.map((photo) => [photo.src, photo.caption])).toEqual([
-      [`/media/test/${run}/p2.jpg`, null],
-      [`/media/test/${run}/p3.jpg`, "Third"],
-    ]);
-    const az = await getProjectBySlug("az", slug("Orta"));
-    expect(az?.photos[1].caption).toBe("Üçüncü");
-  });
-
-  it("uses cover_id when set and leaves it out of the photo story", async () => {
-    const project = await getProjectBySlug("az", slug("Sonuncu"));
-    expect(project?.cover?.src).toBe(`/media/test/${run}/p-cover.jpg`);
-    expect(project?.photos.map((photo) => photo.src)).toEqual([`/media/test/${run}/p1.jpg`]);
-  });
-
-  it("drops a body that only repeats the excerpt", async () => {
-    expect((await getProjectBySlug("az", slug("Birinci")))?.body).toBeNull();
-    const last = await getProjectBySlug("az", slug("Sonuncu"));
-    expect(last?.excerpt).toBe("Sonuncu haqqında");
-    expect(last?.body?.content?.[0]?.content?.[0]?.text).toBe("Layihənin təfərrüatları");
-  });
-
-  it("links the previous and next published project by sort order", async () => {
-    const middle = await getProjectBySlug("az", slug("Orta"));
-    expect(middle?.previous).toEqual({ title: "Birinci", href: `/layiheler/${slug("Birinci")}` });
-    expect(middle?.next).toEqual({ title: "Sonuncu", href: `/layiheler/${slug("Sonuncu")}` });
-    const last = await getProjectBySlug("en", slug("Sonuncu-en"));
-    expect(last?.previous).toEqual({ title: "Orta EN", href: `/en/layiheler/${slug("Orta-en")}` });
-    expect(last?.next).toBeNull();
-  });
-
-  it("lays the photo story out as alternating singles and pairs", () => {
-    const photos = Array.from({ length: 6 }, (_, index): ProjectPhoto => ({
-      id: String(index),
-      src: `/media/${index}.jpg`,
-      width: 742,
-      height: 400,
-      alt: "",
-      blurDataURL: null,
-      caption: null,
-    }));
-    expect(
-      storyRows(photos).map((row) => [row.kind, row.shift, row.photos.map((item) => item.index)]),
-    ).toEqual([
-      ["single", false, [0]],
-      ["pair", false, [1, 2]],
-      ["single", true, [3]],
-      ["pair", false, [4, 5]],
-    ]);
-    expect(storyRows(photos.slice(0, 2)).map((row) => row.kind)).toEqual(["single", "single"]);
   });
 });
