@@ -314,7 +314,13 @@ expires the tags in `lib/cache/tags.ts` (`catalog` for products, categories,
 brands and media alt text; `content` for pages, posts, client logos and contact
 persons; `menus`; `settings` for settings, home sections and hero films). Every
 cached public read must call `cacheTag()` with the matching tag, or edits in
-the admin will not reach the site. Media uploads go straight from the browser
+the admin will not reach the site. A command line script that writes public
+data (`db:seed`, `migrate:wp`, `hero:upload`) runs outside the server process,
+so it ends with `requestPublicRevalidation()` from
+`lib/cache/remote-revalidate.ts`: a `POST /api/revalidate` to
+`BETTER_AUTH_URL`, signed with a token derived from `BETTER_AUTH_SECRET`, which
+expires every public tag and reloads the redirect map. When the site is not
+reachable the script says so and nothing else changes. Media uploads go straight from the browser
 to the bucket through a presigned URL, so the bucket needs a CORS rule for the
 app origin (`pnpm storage:cors`).
 

@@ -5,6 +5,7 @@ import { parseArgs } from "node:util";
 import { sql } from "drizzle-orm";
 import { format, resolveConfig } from "prettier";
 
+import { describeRevalidation, requestPublicRevalidation } from "../../lib/cache/remote-revalidate";
 import { getDb } from "../../lib/db";
 import { locales, type Locale } from "../../lib/i18n/config";
 import { loadCrawl } from "./crawl";
@@ -123,6 +124,7 @@ export async function main(argv: string[]): Promise<void> {
   });
   for (const [name, counter] of Object.entries(result.summary))
     console.log(describe(name, counter));
+  console.log(describeRevalidation(await requestPublicRevalidation()));
 
   for (const url of result.failedDocuments) {
     for (const product of plan.products.filter((item) =>

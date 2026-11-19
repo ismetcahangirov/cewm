@@ -518,6 +518,7 @@ describe("home hero", () => {
       filmId: film?.id,
     });
     expect(body.films.map((item) => item.id)).toContain(film?.id);
+    expect(revalidateTag).toHaveBeenCalledWith("settings", { expire: 0 });
 
     expect(await getHero("de")).toMatchObject({
       headline: "Überschrift",
@@ -538,11 +539,13 @@ describe("home hero", () => {
       cta: { href: "/en/mehsullar" },
     });
 
+    vi.mocked(revalidateTag).mockClear();
     const removed = await call("/api/admin/hero-films/[id]", "DELETE", {
       cookie: owner,
       params: { id: film?.id ?? "" },
     });
     expect(removed.status).toBe(204);
+    expect(revalidateTag).toHaveBeenCalledWith("settings", { expire: 0 });
     const after = await saved(await call("/api/admin/home-sections", "GET", { cookie: owner }));
     expect(after.hero?.filmId).toBeNull();
   });
