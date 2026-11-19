@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 
 import { LineReveal, Reveal } from "@/components/motion/text";
+import { cx } from "@/lib/cx";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { ConsultationProduct } from "@/lib/public/consultation";
@@ -66,6 +67,7 @@ export function ConsultationSection({
   title,
   intro,
   aside,
+  className,
 }: {
   locale: Locale;
   dict: Dictionary;
@@ -74,10 +76,15 @@ export function ConsultationSection({
   title?: string;
   intro?: string;
   aside?: ReactNode;
+  className?: string;
 }) {
   const text = dict.consultation;
   return (
-    <section id={id} aria-labelledby="consultation-title" className="surface-mist scroll-mt-header">
+    <section
+      id={id}
+      aria-labelledby="consultation-title"
+      className={cx("surface-mist scroll-mt-header", className)}
+    >
       <div className="gap-x-column container-page grid gap-y-10 py-section lg:grid-cols-12">
         <div className="min-w-0 lg:col-span-5">
           <p className="text-label text-cyan-ink uppercase">{dict.home.consultationEyebrow}</p>

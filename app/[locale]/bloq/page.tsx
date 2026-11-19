@@ -86,6 +86,7 @@ export default async function BlogPage({ searchParams }: PageProps<"/[locale]/bl
                     <h2 className="text-safe mt-2 text-h4">
                       <Link
                         href={post.href}
+                        prefetch={false}
                         className="decoration-1 underline-offset-4 group-hover/card:underline after:absolute after:inset-0"
                       >
                         {post.title}

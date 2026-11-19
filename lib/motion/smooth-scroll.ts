@@ -1,6 +1,6 @@
 import type Lenis from "lenis";
 
-import { setScrollDriver, writeScroll, writeViewport } from "./loop";
+import { setScrollDriver, wake, writeScroll, writeViewport } from "./loop";
 
 let lenis: Lenis | null = null;
 
@@ -25,6 +25,10 @@ export function startSmoothScroll() {
     };
   }
 
+  const wakeOnInput = () => wake();
+  addEventListener("wheel", wakeOnInput, { passive: true });
+  addEventListener("click", wakeOnInput, { capture: true, passive: true });
+
   void import("lenis").then(({ default: LenisClass }) => {
     if (!active) return;
     lenis = new LenisClass({
@@ -44,6 +48,8 @@ export function startSmoothScroll() {
   return () => {
     active = false;
     removeEventListener("resize", syncViewport);
+    removeEventListener("wheel", wakeOnInput);
+    removeEventListener("click", wakeOnInput, { capture: true });
     setScrollDriver(null);
     lenis?.destroy();
     lenis = null;

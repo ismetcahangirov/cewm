@@ -18,6 +18,7 @@ import { formatPostDate, getPostBySlug, getRelatedPosts } from "@/lib/public/con
 import { getSiteSettings } from "@/lib/public/settings";
 import { localizedPaths, redirectToCanonicalSlug } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
+import { ogImagePath } from "@/lib/seo/config";
 import { entityInfo } from "@/lib/seo/corpus";
 import { blogPostingJsonLd } from "@/lib/seo/json-ld";
 import { pageMetadata } from "@/lib/seo/metadata";
@@ -137,7 +138,7 @@ export default async function PostPage({ params }: PageProps<"/[locale]/bloq/[sl
           headline: post.title,
           description: post.seoDescription ?? post.excerpt,
           url: post.href,
-          image: post.image?.src ?? null,
+          image: post.image?.src ?? ogImagePath(locale, "post", slug),
           datePublished: post.publishedAt,
           locale,
           siteUrl: env.NEXT_PUBLIC_SITE_URL,

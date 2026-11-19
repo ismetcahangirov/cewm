@@ -701,3 +701,14 @@
     opacity: 0;
   }
 }
+
+.defer-render {
+  content-visibility: auto;
+  contain-intrinsic-size: auto 50rem;
+}
+
+@media (max-width: 639px) {
+  .gallery-thumbs {
+    display: none;
+  }
+}

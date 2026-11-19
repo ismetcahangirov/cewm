@@ -249,7 +249,10 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
       ) : null}
 
       {product.description || product.benefits.length ? (
-        <section aria-labelledby="product-overview" className="container-page pb-section">
+        <section
+          aria-labelledby="product-overview"
+          className="defer-render container-page pb-section"
+        >
           <div className="gap-x-column grid gap-y-8 border-t border-line pt-12 lg:grid-cols-12 lg:pt-16">
             <h2 id="product-overview" className="text-label text-cyan-ink uppercase lg:col-span-3">
               {text.overview}
@@ -288,7 +291,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
         <section
           id="product-specs"
           aria-labelledby="product-specs-title"
-          className="surface-mist scroll-mt-header"
+          className="defer-render surface-mist scroll-mt-header"
         >
           <div className="gap-x-column container-page grid gap-y-10 py-section lg:grid-cols-12">
             <div className="lg:col-span-4">
@@ -346,7 +349,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
       ) : null}
 
       {product.video ? (
-        <section aria-labelledby="product-video" className="surface-navy">
+        <section aria-labelledby="product-video" className="defer-render surface-navy">
           <div className="gap-x-column container-page grid gap-y-10 py-section lg:grid-cols-12">
             <div className="lg:col-span-4">
               <p className="text-label text-cyan uppercase">
@@ -380,7 +383,10 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
       ) : null}
 
       {related.length ? (
-        <section aria-labelledby="product-related" className="container-page py-section">
+        <section
+          aria-labelledby="product-related"
+          className="defer-render container-page py-section"
+        >
           <div className="gap-x-column grid gap-y-4 lg:grid-cols-12 lg:items-end">
             <div className="lg:col-span-8">
               <p className="text-label text-cyan-ink uppercase">{dict.catalog.eyebrow}</p>
@@ -405,6 +411,7 @@ export default async function ProductPage({ params }: PageProps<"/[locale]/mehsu
 
       <ConsultationSection
         id="consultation"
+        className="defer-render"
         locale={locale}
         dict={dict}
         title={text.quoteTitle}

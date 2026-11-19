@@ -50,6 +50,7 @@ export function ProductCard({
         <Heading className="machine-card-title text-safe mt-2 text-h4">
           <Link
             href={product.href}
+            prefetch={false}
             className="decoration-1 underline-offset-4 group-hover/card:underline after:absolute after:inset-0"
           >
             {product.name}

@@ -23,6 +23,7 @@ export function ChipNav({
           <li key={chip.key} className="shrink-0">
             <Link
               href={chip.href}
+              prefetch={false}
               aria-current={chip.current ? "page" : undefined}
               className={cx(
                 "inline-flex min-h-11 items-center gap-2 rounded-full border px-4 text-small whitespace-nowrap transition-colors duration-200 ease-standard",
