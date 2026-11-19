@@ -94,7 +94,7 @@ export function CategoryStack({ items, label }: { items: StackCategory[]; label:
                     src={item.image.src}
                     alt={item.image.alt}
                     fill
-                    sizes="(min-width: 768px) 1100px, 100vw"
+                    sizes="(min-width: 768px) 1500px, 150vw"
                     className="object-cover"
                   />
                 ) : null}
