@@ -106,7 +106,7 @@ Scroll velocity profile, pixels per frame at 1440 x 930 (f567-f593):
 | Line reveal of headings in a mask | f576-f592 | `LineReveal` for section headings, 120 ms stagger |
 | Row hover with one tilted photo, 400 ms in / 200 ms out | f609-f675 | `RowPreview` on the machine category list, following the pointer with a lerp, static thumbnail on touch |
 | Giant wordmark layered behind a foreground photo | Footer | `FooterWordmark`: "CEWM" across the full width behind a cut-out machine or house photo |
-| Header contracting into an island | f106-f136 | `Header` island after 80 px of scroll; links stay visible from 1280 px |
+| Header contracting into an island | f106-f136 | Not taken (owner, 2026-11-19: the header must not get small). The bar keeps its full size; only its background changes from clear over the film to solid navy |
 | Smoothed wheel scroll | Inertia | Lenis on fine pointers only, `lerp` 0.08 (a little crisper than the measured 0.065) |
 | Asymmetric enter / exit easing | Row hover | `--ease-standard` in, `--ease-in` out, out is half the in time |
 

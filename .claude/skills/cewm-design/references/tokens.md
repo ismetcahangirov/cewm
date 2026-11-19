@@ -22,7 +22,7 @@ from them, each value picked by contrast.
 
 | Token | Hex | Role |
 |---|---|---|
-| `navy` | #001941 | Brand. Dark bands, header island, filled primary button, focus ring on light |
+| `navy` | #001941 | Brand. Dark bands, the header bar, filled primary button, focus ring on light |
 | `navy-deep` | #000f29 | Footer, scrims over photos and the film |
 | `navy-raised` | #0b2756 | Cards and hovers inside navy bands, the filled button hover |
 | `cyan` | #00b9ff | Brand accent. **Only on navy surfaces** as text, icons, active states, focus ring; as a fill only with `ink` on top |
@@ -177,7 +177,7 @@ box). Fixed steps inside components use the default scale: 4, 8, 12, 16, 24, 32,
 | (none) | 0 | Photos, bands, panels, tables, the film, machine cards' image |
 | `rounded-xs` | 2 px | Buttons, inputs, selects, checkboxes, thumbnails |
 | `rounded-sm` | 4 px | Dropdown panels, toasts, admin cards |
-| `rounded-md` | 8 px | Header island, stacked cards, dialogs |
+| `rounded-md` | 8 px | Stacked cards (home catalogue, service process), dialogs |
 | `rounded-full` | pill / circle | Tags (application, material), icon buttons, the language switch |
 
 Nothing else. `rounded-lg`, `rounded-xl`, `rounded-2xl` do not exist on the public site.
@@ -186,9 +186,9 @@ Nothing else. `rounded-lg`, `rounded-xl`, `rounded-2xl` do not exist on the publ
 
 | Token | Value | Use |
 |---|---|---|
-| `shadow-island` | `0 8px 24px -12px rgb(0 25 65 / 0.35)` | Header island, dropdowns |
+| `shadow-island` | `0 8px 24px -12px rgb(0 25 65 / 0.35)` | Dropdowns, the floating quote bar |
 | `shadow-stack` | `0 24px 48px -24px rgb(0 15 41 / 0.55)` | Stacked cards, dialogs |
-| `backdrop-blur-glass` | 12 px | Header island and one arriving card at a time, fine pointers only |
+| `backdrop-blur-glass` | 12 px | One arriving card at a time, fine pointers only |
 
 No shadow on machine cards, buttons or images. No glow, no coloured shadow.
 

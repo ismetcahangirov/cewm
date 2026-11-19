@@ -4,7 +4,12 @@ import { and, asc, desc, eq, inArray, isNotNull, isNull, lte, sql } from "drizzl
 import { cacheLife, cacheTag } from "next/cache";
 
 import { publicTags } from "@/lib/cache/tags";
-import { pickRichText, type RichTextDoc } from "@/lib/content/rich-text";
+import {
+  pickRichText,
+  richTextToPlain,
+  summarize,
+  type RichTextDoc,
+} from "@/lib/content/rich-text";
 import { getDb } from "@/lib/db";
 import {
   brands,
@@ -93,7 +98,13 @@ export type HomeHero = {
   film: HeroFilm | null;
 };
 
-export type HomeCategory = { id: string; name: string; href: string; image: PublicImage | null };
+export type HomeCategory = {
+  id: string;
+  name: string;
+  summary: string | null;
+  href: string;
+  image: PublicImage | null;
+};
 
 export type HomeProduct = ProductCardItem;
 
@@ -219,7 +230,13 @@ export async function getHomeCategories(locale: Locale): Promise<HomeCategory[]>
   cacheTag(publicTags.catalog);
   cacheLife("hours");
   const rows = await getDb()
-    .select({ id: categories.id, slug: categories.slug, name: categories.name, ...imageColumns })
+    .select({
+      id: categories.id,
+      slug: categories.slug,
+      name: categories.name,
+      description: categories.description,
+      ...imageColumns,
+    })
     .from(categories)
     .leftJoin(media, eq(media.id, categories.imageId))
     .where(and(isNull(categories.parentId), eq(categories.isActive, true)))
@@ -229,6 +246,7 @@ export async function getHomeCategories(locale: Locale): Promise<HomeCategory[]>
     return {
       id: row.id,
       name,
+      summary: summarize(richTextToPlain(pickRichText(row.description, locale))) || null,
       href: localePath(locale, routes.category(pickLocale(row.slug, locale))),
       image: toPublicImage(row, locale, name),
     };

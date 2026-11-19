@@ -8,10 +8,10 @@ Every number here comes from `reference-motion.md` (measured) or from a benchmar
 1. Motion explains structure: a pinned subject, a scene that changes underneath, a step that
    arrives. Nothing loops, nothing moves on its own, nothing decorates.
 2. Two kinds of motion only. **Scroll-linked** moves are mapped to scroll position (pins, panel
-   push, clip expand, word reveal, the hero film). **Arrivals** are time-based, start when a
+   push, clip expand, word reveal, the hero film, the card stack scale). **Arrivals** are time-based, start when a
    threshold is crossed and run once (reveals, callouts, cards, header states, hovers).
-3. Compositor first: `transform` and `opacity`. `clip-path` only for the two primitives that need
-   it (clip expand, header morph); it was measured at 1.7-2.3 ms of main-thread work per frame at
+3. Compositor first: `transform` and `opacity`. `clip-path` only for the one primitive that needs
+   it (clip expand); it was measured at 1.7-2.3 ms of main-thread work per frame at
    4x CPU throttle. Never animate `width`, `height`, `top`, `left`, `margin`, `filter` or
    `box-shadow`.
 4. Asymmetric timing (measured on the row hover): exits run at half the enter time with
@@ -28,7 +28,7 @@ namespace); in classes use `duration-200`, `duration-400`, `duration-600`, `dura
 |---|---|---|
 | `--motion-fast` | 200 ms | Section copy fade-in f194-f200, callouts f234-f240, row image exit f651-f657 |
 | `--motion-base` | 400 ms | Row image enter f609-f621, page transition enter (**chosen**) |
-| `--motion-slow` | 600 ms | Card glass-to-solid f437-f455, header island (**chosen**, reference about 1000 ms) |
+| `--motion-slow` | 600 ms | Card glass-to-solid f437-f455 |
 | `--motion-slower` | 900 ms | Footer wordmark letters (**chosen**) |
 | `--motion-stagger-word` | 60 ms | Callouts appear within two frames of each other (66 ms) |
 | `--motion-stagger-item` | 120 ms | Line reveal stagger, measured about 170 ms; tightened (**chosen**) |
@@ -54,7 +54,8 @@ stacked cards are offset 28 px (measured) and tilted +/-2 degrees (reference abo
 | Subject with labelled parts | `Callouts` | Hero film, machine detail hero image |
 | Image takes over the viewport | `ClipExpand` | Home: project photo from the gable shape; project detail opener |
 | Steps that build up | `CardStack` | Service process (consultation, planning, delivery, installation, training: owner copy) |
-| Browsable list with previews | `RowPreview` | Machine categories, brands, projects list |
+| Sticky cards that pile up | `StackCards` | Home catalogue: the machine areas |
+| Browsable list with previews | `RowPreview` | Category index, posts, brands, projects list |
 | Closing signature | `FooterWordmark` | Footer on every page |
 | Navigation | `Header` | Every public page |
 | Pointer feedback | `Hover` | Buttons, links, cards, rows |
@@ -316,8 +317,11 @@ Touch devices keep native momentum scrolling; under reduced motion Lenis is neve
   next sibling in normal flow with `position: relative; z-index: 1` and a solid `bg-navy`, so it
   scrolls up over the sticky subject; the subject keeps changing underneath (the film keeps
   scrubbing while it is covered).
-- The panel's content uses `WordReveal` and `Reveal`. The panel is at least `100svh` tall so it
-  fully covers the subject before the subject unpins.
+- The panel's content uses `WordReveal` and `Reveal`. The panel is as tall as its content plus
+  `py-section`, never a fixed viewport height (owner, 2026-11-19: a `100svh` statement panel was
+  "too tall"). It slides up over the pinned subject; when its bottom reaches the bottom of the
+  viewport the subject unpins and both leave together. Measured on the home statement: 473 px at
+  1440 x 900 and 494 px at 390 x 844 (was 900 and 844).
 - Reduced motion: unchanged (it is ordinary scrolling), but the hero film is replaced by its
   poster and the wrapper shrinks to `100svh`.
 
@@ -406,6 +410,40 @@ Touch devices keep native momentum scrolling; under reduced motion Lenis is neve
   start (`object-cover`, `rounded-xs`) and the whole row is the link.
 - Reduced motion: the preview appears at a fixed offset beside the hovered row, opacity only.
 
+### StackCards
+
+The home catalogue, after the "What we build" section of alievsspace.com (structure and
+behaviour only; colours, type, icons and copy are ours).
+
+- Section head: eyebrow, `LineReveal` H2, a lead paragraph, and the outline "all products"
+  button aligned to the right on the last line (wraps under the head on phones).
+- One card per top-level machine area, in admin order, as an `<ol>`. Each card is
+  `position: sticky` at `calc(var(--spacing-header) + 0.75rem + var(--i) * 1rem)`, so every next
+  card stops 16 px lower and the earlier ones show as a pile of 16 px edges. `min-height:
+  min(66svh, 40rem)`, `rounded-md`, `shadow-stack`, a 1 px `white/15` top edge, surfaces
+  rotating `navy`, `navy-raised`, `navy-deep`.
+- Card grid: a decorative column (`minmax(5.25rem, 26%)`, 30 % below 768 px) with the area name
+  set vertically (`writing-mode: vertical-rl` rotated 180 degrees, reading upwards, display
+  weight 500, `-0.045em`), then the body bottom-aligned: number (`text-label` cyan), the name as
+  `text-h3` (the real heading and the link), the description summary (`on-navy-muted`, 160
+  characters) and one tag with the product count. The cover image sits top-right
+  (`clamp(7.5rem, 22cqw, 18.75rem)` wide, 16:9, `rounded-xs`); a card without a cover simply has
+  no image.
+- The vertical name is split server-side into at most two balanced lines (names over 14
+  characters) and sized to fit both the card height and the column:
+  `min(clamp(3rem, 9.5svh, 8rem), (stack height - 2.75rem) / (chars x 0.56), (column - 1rem) /
+  (lines x 0.95))`, with `cqw` units (the card is an inline-size container; `cqi` resolves
+  against the vertical text's own inline axis and must not be used). It is `aria-hidden`.
+- Scroll-linked: while a later card covers card `i`, card `i` scales down by 0.045 per covering
+  card (`transform-origin: 50% 0`), from cached positions in the shared loop, written only when
+  the value changes.
+- The whole card is one link (the title link stretched with `::after`); the image ignores the
+  pointer. Hover: title underline, image `scale(1.04 to 1)`; focus ring around the card.
+- Touch: identical (sticky works with native momentum scrolling).
+- Reduced motion and landscape phones (`max-height: 500px`): no sticky, no scaling; a plain
+  vertical list of the same cards. Without JavaScript the cards still stack (CSS only), without
+  the scale.
+
 ### FooterWordmark
 
 - The footer is `position: sticky; bottom: 0; z-index: 0`; `<main>` has `position: relative;
@@ -424,19 +462,24 @@ Touch devices keep native momentum scrolling; under reduced motion Lenis is neve
 
 ### Header
 
+The header never gets smaller (owner, 2026-11-19). The reference's contracting island is not
+used.
+
 | State | When | Look | Motion |
 |---|---|---|---|
-| `top` | scroll < 80 px | Full width, transparent, white logo and links over the hero film (a top scrim `from-navy-deep/60` keeps 4.5:1 over bright frames) | none |
-| `island` | scroll >= 80 px | Centred, `max-width: 56rem` from 1280 px, `rounded-md`, `bg-navy/88` with `backdrop-blur-glass` on fine pointers (solid `bg-navy` otherwise), `shadow-island` | `clip-path: inset()` of the background from full width to the island width, logo and CTA `translateX` inward, `--motion-slow`, `--ease-out-expo` |
-| `hidden` | scrolling down and scroll > 600 px | Out of view | `translateY(-120%)`, `--motion-base`, `--ease-in` |
-| back | any scroll up of 8 px or more | `island` | `translateY(0)`, `--motion-base`, `--ease-out-expo` |
+| `clear` | Home only, while the pinned house film is behind the header: until the statement panel reaches the header or the film unpins, whichever comes first; at scroll 0 when the film is static (reduced motion, Save-Data, no film) | Full width, transparent background, white logo and links, a top scrim `from-navy-deep/60` (10 rem) over the film's own top scrim keeps 4.5:1 over bright frames | none |
+| `solid` | Every other scroll position, every other page, and while the mobile menu is open | Full width, solid `bg-navy` | Background `opacity` 0 to 1 (scrim 1 to 0), `--motion-base`, `--ease-standard` |
 
-- From 1280 px the island keeps the primary links (the reference collapses them; a catalogue
-  needs them). Below 1280 px: logo, language switch, menu button; the menu is a full-height navy
-  sheet (`data-lenis-prevent`), links stagger in with `Reveal` timing, focus trapped, Escape
-  closes.
-- Stays `island` while a pinned scene is active; never hides while focus is inside it.
-- Reduced motion: state changes are instant.
+- Same height (`h-header`, 64 to 76 px), same logo (40 / 48 px), same container padding and
+  same position in both states. No `clip-path`, no `translate`, no hide on scroll: the header is
+  always in view, so sticky elements offset by `--spacing-header` (spec table heads, the card
+  stack) never collide with it.
+- The state is computed from cached positions (`ResizeObserver`, `resize`) and the shared scroll
+  listener; nothing is measured per frame.
+- From 1280 px the primary links are inline (the reference collapses them; a catalogue needs
+  them). Below 1280 px: logo, language switch, menu button; the menu is a full-height navy sheet
+  (`data-lenis-prevent`), links stagger in with `Reveal` timing, focus trapped, Escape closes.
+- Reduced motion: the background change is instant.
 
 ### Hover
 
@@ -464,9 +507,10 @@ Focus-visible gets the same visual change as hover plus the focus ring.
 | Callouts | All visible, no line drawing |
 | ClipExpand | No pin, full-bleed photo |
 | CardStack | Vertical list |
+| StackCards | Plain list, no sticky, no scale |
 | RowPreview | Fixed offset, opacity only; touch fallback unchanged |
 | FooterWordmark | Static |
-| Header | Instant state changes |
+| Header | Instant background change (size never changes) |
 | HeroFilm | Poster image only, see `hero-scroll.md` |
 
 ## Performance budget

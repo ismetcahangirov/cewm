@@ -21,7 +21,7 @@ import {
 import { mailtoHref, telHref } from "@/lib/contact-links";
 import { cx } from "@/lib/cx";
 import type { Locale } from "@/lib/i18n/config";
-import { onScroll, readScroll } from "@/lib/motion/loop";
+import { documentTop, measure, onScroll, readScroll } from "@/lib/motion/loop";
 import { lockScroll } from "@/lib/motion/smooth-scroll";
 import { formatAzerbaijaniPhone } from "@/lib/phone";
 
@@ -30,7 +30,7 @@ import { LanguageMenu, LanguageList } from "./language-switch";
 
 export type HeaderLink = { id: string; label: string; href: string };
 
-type HeaderState = "top" | "island" | "hidden";
+type HeaderState = "clear" | "solid";
 
 type Labels = {
   navigation: string;
@@ -39,10 +39,6 @@ type Labels = {
   closeMenu: string;
   home: string;
 };
-
-const topLimit = 80;
-const hideAfter = 600;
-const revealDistance = 8;
 
 function isCurrent(pathname: string, href: string) {
   if (href === "/" || /^\/(ru|en|de)$/.test(href)) return pathname === href;
@@ -57,69 +53,41 @@ function focusable(root: HTMLElement) {
   ];
 }
 
-function useHeaderState(headerRef: React.RefObject<HTMLElement | null>) {
-  const [state, setState] = useState<HeaderState>("top");
-
-  useEffect(() => {
-    let current: HeaderState = "top";
-    let direction = 0;
-    let turn = window.scrollY;
-    const apply = (next: HeaderState) => {
-      if (next === current) return;
-      current = next;
-      setState(next);
-    };
-    const update = (y: number, previous: number) => {
-      const moving = y > previous ? 1 : y < previous ? -1 : 0;
-      if (moving && moving !== direction) {
-        direction = moving;
-        turn = previous;
-      }
-      if (y < topLimit) return apply("top");
-      const holdsFocus = headerRef.current?.contains(document.activeElement) ?? false;
-      const pinned = document.documentElement.hasAttribute("data-pin-active");
-      const landscape = window.innerHeight < 500;
-      if (direction > 0 && y > hideAfter && !holdsFocus && !pinned && !landscape) {
-        return apply("hidden");
-      }
-      if (pinned || current === "top" || (direction < 0 && turn - y >= revealDistance)) {
-        apply("island");
-      }
-    };
-    const start = Math.max(readScroll().y, window.scrollY);
-    update(start, start);
-    return onScroll(update);
-  }, [headerRef]);
-
-  return state;
+function filmEnd(header: HTMLElement): number | null {
+  const film = document.querySelector<HTMLElement>("[data-hero-film]");
+  const stage = film?.querySelector<HTMLElement>(".hero-stage");
+  if (!film || !stage) return null;
+  if (getComputedStyle(stage).position !== "sticky") return 1;
+  const unpinned = documentTop(film) + film.offsetHeight - window.innerHeight;
+  const panel = film.querySelector<HTMLElement>(".panel-push");
+  const covered = panel ? documentTop(panel) - header.offsetHeight : unpinned;
+  return Math.min(unpinned, covered);
 }
 
-function useIslandGeometry(headerRef: React.RefObject<HTMLElement | null>) {
+function useHeaderState(headerRef: React.RefObject<HTMLElement | null>, pathname: string) {
+  const [state, setState] = useState<HeaderState>("clear");
+
   useEffect(() => {
     const header = headerRef.current;
     if (!header) return;
-    const measure = () => {
-      const width = window.innerWidth;
-      const content = header.querySelector<HTMLElement>("[data-header-row]");
-      const gutter = content ? parseFloat(getComputedStyle(content).paddingLeft) : 20;
-      const natural = content
-        ? [...content.children].reduce((sum, child) => sum + (child as HTMLElement).offsetWidth, 0)
-        : 0;
-      const wide = width >= 1280;
-      const island = wide
-        ? Math.min(width - 2 * gutter, Math.max(56 * 16, natural + 96))
-        : width - 16;
-      const inset = Math.max(0, (width - island) / 2);
-      const shift = Math.max(0, inset + (wide ? 24 : 12) - gutter);
-      header.style.setProperty("--island-x", `${inset}px`);
-      header.style.setProperty("--island-shift", `${shift}px`);
+    let limit = filmEnd(header);
+    const update = (y: number) => setState(limit !== null && y < limit ? "clear" : "solid");
+    const remeasure = () => {
+      limit = filmEnd(header);
+      update(Math.max(readScroll().y, window.scrollY));
     };
-    measure();
-    const observer = new ResizeObserver(measure);
-    observer.observe(document.documentElement);
-    void document.fonts?.ready.then(measure);
-    return () => observer.disconnect();
-  }, [headerRef]);
+    const stopMeasure = measure(document.body, remeasure);
+    addEventListener("resize", remeasure, { passive: true });
+    remeasure();
+    const stopScroll = onScroll(update);
+    return () => {
+      stopMeasure();
+      removeEventListener("resize", remeasure);
+      stopScroll();
+    };
+  }, [headerRef, pathname]);
+
+  return state;
 }
 
 export function HeaderBar({
@@ -150,8 +118,7 @@ export function HeaderBar({
   const menuButtonRef = useRef<HTMLButtonElement>(null);
   const [openPath, setOpenPath] = useState<string | null>(null);
   const open = openPath === pathname;
-  const state = useHeaderState(headerRef);
-  useIslandGeometry(headerRef);
+  const state = useHeaderState(headerRef, pathname);
 
   const close = useCallback(() => {
     setOpenPath(null);
@@ -164,7 +131,7 @@ export function HeaderBar({
     <header
       ref={headerRef}
       data-site-header=""
-      data-state={open ? "island" : state}
+      data-state={open ? "solid" : state}
       style={{ viewTransitionName: "site-header" } as CSSProperties}
       className="site-header h-header fixed inset-x-0 top-0 z-50 text-white"
     >
@@ -174,7 +141,7 @@ export function HeaderBar({
         <Link
           href={home}
           aria-label={`${siteName}: ${labels.home}`}
-          className="site-header-start inline-flex min-h-11 shrink-0 items-center"
+          className="inline-flex min-h-11 shrink-0 items-center"
         >
           {brand}
         </Link>
@@ -199,7 +166,7 @@ export function HeaderBar({
             })}
           </ul>
         </nav>
-        <div className="site-header-end ml-auto flex shrink-0 items-center gap-2 xl:ml-0">
+        <div className="ml-auto flex shrink-0 items-center gap-2 xl:ml-0">
           <LanguageMenu locale={locale} label={labels.language} names={names} />
           {contact ? (
             <Link

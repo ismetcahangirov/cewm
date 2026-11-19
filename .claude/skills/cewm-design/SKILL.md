@@ -58,22 +58,25 @@ output into the references.
    marks. The admin uses the same set.
 5. **No emojis anywhere**, including pictographs used as bullets or icons.
 6. **Motion runs on the compositor and has a reduced-motion form.** `transform` and `opacity`;
-   `clip-path` only in ClipExpand and the header morph. One shared rAF loop, no layout reads in
+   `clip-path` only in ClipExpand. One shared rAF loop, no layout reads in
    it. Every primitive lists its reduced-motion behaviour. Content is complete without JS.
 7. **Smooth scroll is Lenis on fine pointers only** (5.3 KB gzip, `lerp: 0.08`), native on touch
    and under reduced motion. No GSAP.
 8. **The hero film is a canvas over a real poster `<img>`.** The poster is the LCP element;
    frames load after `load`, decode in a worker to `ImageBitmap`, within 6.0 MB desktop and
    3.0 MB mobile; Save-Data, low memory and reduced motion get the poster only.
-9. **Radius:** 0 for photos, bands and tables; 2 px controls; 4 px dropdowns; 8 px the header
-   island, stacked cards and dialogs; pills for tags and icon buttons. Nothing else.
+9. **Radius:** 0 for photos, bands and tables; 2 px controls and thumbnails; 4 px dropdowns;
+   8 px stacked cards and dialogs; pills for tags and icon buttons. Nothing else.
 10. **Real content only.** No invented facts, numbers, customers or quotes; unknown values are
     `[placeholders]` editable in the admin. Images and videos are uploaded once and shared by
     all locales.
+11. **The header never shrinks.** Full width, full `h-header` height, the same logo size and
+    padding at every scroll position on every page; it never hides. Only its background
+    changes: clear over the pinned house film, solid `navy` everywhere else.
 
 ## Visual language in short
 
-- Surfaces: white, `mist` bands, `navy` bands and header island, `navy-deep` footer and scrims.
+- Surfaces: white, `mist` bands, `navy` bands and the header bar, `navy-deep` footer and scrims.
 - Type: split display words (56-184 px) around the film; headings 500 with negative tracking;
   13 px uppercase labels with 0.08em tracking as eyebrows; tabular figures in every table.
 - Layout: `container-page`, 12 / 8 / 4 columns, `gap-column`, `py-section` (64-160 px); six
@@ -100,9 +103,10 @@ everything scroll-linked.
 | Labelled parts | `Callouts` | Film, machine detail |
 | Image takes over | `ClipExpand` (gable to full bleed) | Home, project opener |
 | Steps that build up | `CardStack` | Service process |
-| List with previews | `RowPreview` | Categories, brands, projects |
+| Sticky card stack | `StackCards` | Home catalogue (machine areas) |
+| List with previews | `RowPreview` | Category index, posts, brands, projects |
 | Closing signature | `FooterWordmark` | Footer |
-| Navigation | `Header` (top, island, hidden) | Every page |
+| Navigation | `Header` (full size always; clear over the film, solid elsewhere) | Every page |
 | Wheel smoothing | `SmoothScroll` | Fine pointers |
 | Scroll-scrubbed film | `HeroFilm` | Home hero |
 

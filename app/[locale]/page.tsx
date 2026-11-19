@@ -9,11 +9,11 @@ import { HeroFilm } from "@/components/home/hero-film";
 import { FactBlockView } from "@/components/seo/fact-block";
 import type { HeroChapter } from "@/components/home/hero-film-player";
 import { ArrowRightIcon } from "@/components/icons/iconsax";
-import { previewImage } from "@/components/motion/preview-image";
 import { RowPreview } from "@/components/motion/row-preview";
 import { PanelPush } from "@/components/motion/scenes";
 import { LineReveal, Reveal, WordReveal } from "@/components/motion/text";
 import { button, buttonArrow } from "@/components/site/button";
+import { CategoryStack } from "@/components/site/category-stack";
 import { ConsultationSection } from "@/components/site/consultation/consultation-section";
 import { JsonLdScript } from "@/components/site/json-ld";
 import { ProductGrid } from "@/components/site/product-card";
@@ -22,6 +22,7 @@ import { cx } from "@/lib/cx";
 import { env } from "@/lib/env";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { fill } from "@/lib/i18n/format";
 import { pickExact } from "@/lib/i18n/localized";
 import { getRequestDictionary } from "@/lib/i18n/server";
 import {
@@ -36,6 +37,7 @@ import {
   type HomeHero,
   type HomeSection,
 } from "@/lib/public/home";
+import { getCatalogueOverview } from "@/lib/public/catalogue-overview";
 import { getLogoTones } from "@/lib/public/logo-tone";
 import { getSiteSettings } from "@/lib/public/settings";
 import { staticPaths } from "@/lib/public/slug";
@@ -111,31 +113,48 @@ async function BuiltInSection({
   const id = `home-${section.key}`;
   switch (section.key) {
     case "categories": {
-      const categories = await getHomeCategories(locale);
+      const [categories, overview] = await Promise.all([
+        getHomeCategories(locale),
+        getCatalogueOverview(locale, null),
+      ]);
       if (!categories.length) return null;
+      const totals = new Map(overview.areas.map((area) => [area.id, area.total]));
+      const title = section.title ?? dict.home.categoriesTitle;
       return (
-        <SectionShell
-          id={id}
-          eyebrow={dict.home.categoriesEyebrow}
-          title={section.title ?? dict.home.categoriesTitle}
-        >
-          <RowPreview
-            label={section.title ?? dict.home.categoriesTitle}
-            rows={categories.map((category) => ({
-              id: category.id,
-              href: category.href,
-              title: category.name,
-              image: previewImage(category.image),
-            }))}
-          />
-          <Link
-            href={localePath(locale, routes.catalogue())}
-            className={cx(button({ variant: "outline" }), "mt-10")}
-          >
-            {dict.common.allProducts}
-            <ArrowRightIcon size={20} className={buttonArrow} />
-          </Link>
-        </SectionShell>
+        <section aria-labelledby={id}>
+          <div className="container-page py-section">
+            <div className="flex flex-wrap items-end justify-between gap-x-10 gap-y-6 pb-9">
+              <div className="grid justify-items-start gap-4">
+                <p className="text-label text-cyan-ink uppercase">{dict.home.categoriesEyebrow}</p>
+                <LineReveal id={id} text={title} className="text-h2" />
+                <Reveal as="p" className="text-ink-muted max-w-2xl text-lead">
+                  {dict.catalog.indexDescription}
+                </Reveal>
+              </div>
+              <Link
+                href={localePath(locale, routes.catalogue())}
+                className={button({ variant: "outline" })}
+              >
+                {dict.common.allProducts}
+                <ArrowRightIcon size={20} className={buttonArrow} />
+              </Link>
+            </div>
+            <CategoryStack
+              label={title}
+              items={categories.map((category) => {
+                const total = totals.get(category.id) ?? 0;
+                return {
+                  id: category.id,
+                  name: category.name,
+                  summary: category.summary,
+                  href: category.href,
+                  image: category.image,
+                  tags: total ? [fill(dict.catalog.areaCount, { count: total })] : [],
+                };
+              })}
+            />
+          </div>
+        </section>
       );
     }
     case "products": {
