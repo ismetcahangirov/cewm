@@ -16,7 +16,9 @@
     "db:seed": "tsx scripts/seed.mts",
     "db:studio": "drizzle-kit studio",
     "auth:owner": "tsx scripts/create-owner.mts",
-    "storage:cors": "tsx scripts/storage-cors.mts"
+    "storage:cors": "tsx scripts/storage-cors.mts",
+    "migrate:wp": "tsx --conditions=react-server scripts/migrate-wp/index.mts",
+    "check:redirects": "tsx scripts/check-redirects.mts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.1152.0",
@@ -64,6 +66,7 @@
     "drizzle-kit": "^0.31.11",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "node-html-parser": "^9.0.7",
     "prettier": "^3.9.10",
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "^4",

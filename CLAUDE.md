@@ -208,22 +208,24 @@ pnpm auth:owner --email you@example.com --name "Your Name"   # prints a set-pass
 pnpm dev                        # http://localhost:3020/admin
 ```
 
-| Command                        | What it does                                                 |
-| ------------------------------ | ------------------------------------------------------------ |
-| `pnpm dev`                     | Development server (Turbopack) on port 3020                  |
-| `pnpm build`                   | Production build, `output: "standalone"`                     |
-| `pnpm start`                   | Runs `.next/standalone/server.js` (set `PORT=3020`)          |
-| `pnpm lint`                    | ESLint, zero warnings allowed                                |
-| `pnpm typecheck`               | Generates route types, then `tsc --noEmit`                   |
-| `pnpm format` / `format:check` | Prettier (with the Tailwind class sorter)                    |
-| `pnpm test`                    | Vitest; needs the database, storage and Mailpit from compose |
-| `pnpm db:generate`             | Generates a SQL migration in `drizzle/` from `lib/db/schema` |
-| `pnpm db:migrate`              | Applies pending migrations to `DATABASE_URL`                 |
-| `pnpm db:seed`                 | Idempotent seed (`lib/db/seed.ts`)                           |
-| `pnpm db:studio`               | Drizzle Studio                                               |
-| `pnpm auth:owner`              | Creates or promotes an owner and prints a set-password link  |
-| `pnpm storage:cors [origin]`   | Lets the browser upload to the bucket from the app origin    |
-| `docker build -t cewm .`       | Production image; `GET /api/health` answers 200              |
+| Command                        | What it does                                                                             |
+| ------------------------------ | ---------------------------------------------------------------------------------------- |
+| `pnpm dev`                     | Development server (Turbopack) on port 3020                                              |
+| `pnpm build`                   | Production build, `output: "standalone"`                                                 |
+| `pnpm start`                   | Runs `.next/standalone/server.js` (set `PORT=3020`)                                      |
+| `pnpm lint`                    | ESLint, zero warnings allowed                                                            |
+| `pnpm typecheck`               | Generates route types, then `tsc --noEmit`                                               |
+| `pnpm format` / `format:check` | Prettier (with the Tailwind class sorter)                                                |
+| `pnpm test`                    | Vitest; needs the database, storage and Mailpit from compose                             |
+| `pnpm db:generate`             | Generates a SQL migration in `drizzle/` from `lib/db/schema`                             |
+| `pnpm db:migrate`              | Applies pending migrations to `DATABASE_URL`                                             |
+| `pnpm db:seed`                 | Idempotent seed (`lib/db/seed.ts`)                                                       |
+| `pnpm db:studio`               | Drizzle Studio                                                                           |
+| `pnpm auth:owner`              | Creates or promotes an owner and prints a set-password link                              |
+| `pnpm storage:cors [origin]`   | Lets the browser upload to the bucket from the app origin                                |
+| `pnpm migrate:wp --from <dir>` | Imports the WordPress crawl (`--dry-run`, `--update`), writes `reports/import-report.md` |
+| `pnpm check:redirects`         | `--base <url> --from <dir>`: every old address must be one 301 to a 200 page             |
+| `docker build -t cewm .`       | Production image; `GET /api/health` answers 200                                          |
 
 Do not run `pnpm build` while your own `pnpm dev` runs in the same folder: both
 use `.next`. Stop your dev server by its PID, never every `node.exe`.
@@ -313,7 +315,11 @@ app origin (`pnpm storage:cors`).
 Old URLs live in the `redirects` table (admin: `/admin/redirects`). `proxy.ts`
 answers them with one hop from an in-memory map (`lib/redirects/legacy.ts`,
 refreshed every 60 s and right after an admin change), and it also removes
-trailing slashes. The WordPress importer is not part of this codebase yet.
+trailing slashes. `pnpm migrate:wp` fills the table from a crawl folder kept outside the repository
+(`scripts/migrate-wp/`; it reuses the admin services, is idempotent by `legacy_key`,
+and needs `NODE_OPTIONS=--use-system-ca` when a local proxy breaks the homag.com
+certificate chain). Run it with `--dry-run` first; `--update` overwrites imported
+records, the default only creates what is missing.
 
 ---
 
