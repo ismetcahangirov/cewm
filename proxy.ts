@@ -7,6 +7,7 @@ import { localeHeader } from "@/lib/i18n/request-locale";
 import { isLegacySitemap, normalizeLegacyPath, sitemapPath } from "@/lib/legacy-redirects";
 import { publicPathExists } from "@/lib/public/exists";
 import { legacyRedirects } from "@/lib/redirects/legacy";
+import { normalizePathname, seoRewrite } from "@/lib/seo/rewrites";
 
 const unmatchedPath = "/_/not-found";
 
@@ -87,18 +88,19 @@ async function legacyRedirect(request: NextRequest): Promise<NextResponse | null
   return redirectTo(request, target.toPath, keepQuery ? search : "", target.statusCode);
 }
 
-function removeTrailingSlash(request: NextRequest): NextResponse {
-  const { pathname, search } = request.nextUrl;
-  return redirectTo(request, pathname.replace(/\/+$/, "") || "/", search, 308);
-}
-
 export async function proxy(request: NextRequest): Promise<NextResponse> {
   const legacy = await legacyRedirect(request);
   if (legacy) return legacy;
 
   const { pathname } = request.nextUrl;
-  if (pathname.length > 1 && pathname.endsWith("/")) return removeTrailingSlash(request);
+  const normalized = normalizePathname(
+    pathname,
+    !isUnder(pathname, "/admin") && !isUnder(pathname, "/api"),
+  );
+  if (normalized !== pathname) return redirectTo(request, normalized, request.nextUrl.search, 308);
   if (isUnder(pathname, "/admin") || isUnder(pathname, "/api/admin")) return guardAdmin(request);
+  const rewritten = seoRewrite(pathname);
+  if (rewritten) return NextResponse.rewrite(new URL(rewritten, request.url));
   if (isUnder(pathname, "/api") || pathname.includes(".")) return NextResponse.next();
   return routeLocale(request);
 }
