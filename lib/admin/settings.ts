@@ -53,6 +53,7 @@ export async function getAdminSettings(): Promise<SettingsDto> {
     legalName: row?.legalName ?? null,
     consultationNotifyEmail: row?.consultationNotifyEmail ?? null,
     searchIndexing: row?.searchIndexing ?? true,
+    seo: row?.seo ?? {},
     updatedAt: row?.updatedAt.toISOString() ?? null,
   };
 }
@@ -115,6 +116,7 @@ export async function saveSettings(
     ogImageId: values.ogImageId,
     catalogueFileId: values.catalogueFileId,
     searchIndexing: values.searchIndexing,
+    ...(values.seo ? { seo: values.seo } : {}),
   };
   await getDb()
     .insert(settings)

@@ -20,6 +20,13 @@ import { SeoFields } from "@/components/admin/seo-fields";
 import { useUnsavedChangesGuard } from "@/components/admin/unsaved-changes";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { formatDateTime } from "@/lib/admin/format";
@@ -64,6 +71,13 @@ function toFormValues(settings: SettingsDto): SettingsInput {
     consultationNotifyEmail: settings.consultationNotifyEmail ?? "",
     catalogueFileId: settings.catalogueFileId,
     searchIndexing: settings.searchIndexing,
+    seo: {
+      googleVerification: settings.seo.googleVerification ?? "",
+      yandexVerification: settings.seo.yandexVerification ?? "",
+      bingVerification: settings.seo.bingVerification ?? "",
+      aiCrawlers: settings.seo.aiCrawlers ?? "open",
+      indexNowKey: settings.seo.indexNowKey ?? "",
+    },
   };
 }
 
@@ -345,6 +359,108 @@ export function SettingsForm({ settings }: { settings: SettingsDto }) {
           }
           aside={
             <>
+              <FormSection title={t("Axtarış sistemləri və süni intellekt")}>
+                <p className="text-meta text-muted-foreground">
+                  {t(
+                    "Hər sistemin verdiyi təsdiq kodunu (meta teqin content dəyəri) yazın. Boş qalsa, teq əlavə olunmur.",
+                  )}
+                </p>
+                <FormField
+                  control={form.control}
+                  name="seo.googleVerification"
+                  label={t("Google Search Console kodu")}
+                  render={({ field, id, invalid, describedBy }) => (
+                    <Input
+                      {...field}
+                      value={field.value ?? ""}
+                      id={id}
+                      maxLength={120}
+                      autoComplete="off"
+                      aria-invalid={invalid}
+                      aria-describedby={describedBy}
+                    />
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="seo.yandexVerification"
+                  label={t("Yandex Webmaster kodu")}
+                  render={({ field, id, invalid, describedBy }) => (
+                    <Input
+                      {...field}
+                      value={field.value ?? ""}
+                      id={id}
+                      maxLength={120}
+                      autoComplete="off"
+                      aria-invalid={invalid}
+                      aria-describedby={describedBy}
+                    />
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="seo.bingVerification"
+                  label={t("Bing Webmaster Tools kodu")}
+                  render={({ field, id, invalid, describedBy }) => (
+                    <Input
+                      {...field}
+                      value={field.value ?? ""}
+                      id={id}
+                      maxLength={120}
+                      autoComplete="off"
+                      aria-invalid={invalid}
+                      aria-describedby={describedBy}
+                    />
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="seo.aiCrawlers"
+                  label={t("Süni intellekt köməkçiləri")}
+                  description={t(
+                    "Süni intellekt axtarışı və cavabları (ChatGPT, Claude, Perplexity, Gemini, Copilot) sayta necə baxsın.",
+                  )}
+                  render={({ field, id, invalid, describedBy }) => (
+                    <Select value={field.value ?? "open"} onValueChange={field.onChange}>
+                      <SelectTrigger
+                        id={id}
+                        className="w-full"
+                        aria-invalid={invalid}
+                        aria-describedby={describedBy}
+                        onBlur={field.onBlur}
+                      >
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="open">{t("Açıq: hər şey icazəlidir")}</SelectItem>
+                        <SelectItem value="search-only">
+                          {t("Yalnız cavab verən sistemlər: modelləri öyrədən robotlar bağlıdır")}
+                        </SelectItem>
+                        <SelectItem value="closed">{t("Hamısı bağlıdır")}</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="seo.indexNowKey"
+                  label={t("IndexNow açarı")}
+                  description={t(
+                    "Boş qalsa, Bing və Yandex-ə yeniləmə bildirişi göndərilmir. 8 ilə 128 simvol: hərf, rəqəm, «-».",
+                  )}
+                  render={({ field, id, invalid, describedBy }) => (
+                    <Input
+                      {...field}
+                      value={field.value ?? ""}
+                      id={id}
+                      maxLength={128}
+                      autoComplete="off"
+                      aria-invalid={invalid}
+                      aria-describedby={describedBy}
+                    />
+                  )}
+                />
+              </FormSection>
               <FormSection title={t("Loqo və ikon")}>
                 <p className="text-meta text-muted-foreground">
                   {t("Yeni loqo hazırlanır: gələndə burada dəyişin. SVG faylı da seçmək olar.")}

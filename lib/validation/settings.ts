@@ -3,7 +3,9 @@ import { z } from "zod";
 import "./locale";
 
 import {
+  aiCrawlerPolicies,
   socialNetworks,
+  type SettingsSeo,
   type SettingsPhone,
   type SettingsSocial,
   type SocialNetwork,
@@ -48,6 +50,38 @@ const optionalHttpsUrl = (message: string) =>
     .union([z.literal(""), httpsUrl(message)])
     .nullish()
     .transform((value) => value || null);
+
+const verificationToken = z
+  .string()
+  .trim()
+  .max(120, "Kod çox uzundur.")
+  .regex(/^[A-Za-z0-9_-]*$/, "Yalnız hərf, rəqəm, «-» və «_» yazın.")
+  .nullish()
+  .transform((value) => value || undefined);
+
+const indexNowKey = z
+  .string()
+  .trim()
+  .regex(/^[A-Za-z0-9-]{8,128}$/, "8 ilə 128 arası hərf, rəqəm və ya «-» yazın.")
+  .or(z.literal(""))
+  .nullish()
+  .transform((value) => value || undefined);
+
+export const seoSettingsSchema = z
+  .object({
+    googleVerification: verificationToken,
+    yandexVerification: verificationToken,
+    bingVerification: verificationToken,
+    aiCrawlers: z
+      .enum(aiCrawlerPolicies)
+      .nullish()
+      .transform((value) => value ?? "open"),
+    indexNowKey,
+  })
+  .transform((value): SettingsSeo => {
+    const entries = Object.entries(value).filter(([, item]) => item !== undefined);
+    return Object.fromEntries(entries) as SettingsSeo;
+  });
 
 export const whatsappDigitsWithCountryCode = z
   .string()
@@ -161,6 +195,7 @@ export const settingsInputSchema = z.object({
   consultationNotifyEmail: optionalEmail,
   catalogueFileId: uuid().nullable(),
   searchIndexing: z.boolean().optional().default(true),
+  seo: seoSettingsSchema.optional(),
 });
 
 export type SettingsInput = z.input<typeof settingsInputSchema>;
@@ -186,5 +221,6 @@ export type SettingsDto = {
   legalName: string | null;
   consultationNotifyEmail: string | null;
   searchIndexing: boolean;
+  seo: SettingsSeo;
   updatedAt: string | null;
 };
