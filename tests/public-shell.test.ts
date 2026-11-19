@@ -57,7 +57,10 @@ beforeAll(async () => {
         tiers: {
           desktop: { width: 1600, height: 900, count: 300 },
           mobile: { width: 540, height: 960, count: 240 },
+          wide: { width: 1920, height: 1080, count: 300 },
         },
+        motion: [[1, 0, 0]],
+        pace: [0, 1, 2],
         posters: {
           desktop: { key: `${prefix}/poster-desktop.jpg`, width: 1920, height: 1080 },
           mobile: { key: `${prefix}/poster-mobile.jpg`, width: 540, height: 960 },
@@ -110,8 +113,8 @@ afterAll(async () => {
   s3.destroy();
 });
 
-describe("hero film with two tiers", () => {
-  it("reads the manifest from the bucket and builds frame and poster URLs per tier", async () => {
+describe("hero film with three tiers", () => {
+  it("reads the manifest from the bucket and builds frame, poster and motion URLs per tier", async () => {
     const hero = await getHero("de");
     expect(hero?.headline).toBe("Überschrift");
     expect(hero?.film).toMatchObject({
@@ -132,7 +135,14 @@ describe("hero film with two tiers", () => {
           height: 960,
           frames: `/media/${prefix}/mobile/{frame}.avif`,
         },
+        wide: {
+          count: 300,
+          width: 1920,
+          height: 1080,
+          frames: `/media/${prefix}/wide/{frame}.avif`,
+        },
       },
+      motion: `/media/${heroFilmManifestKey(prefix)}`,
       poster: { src: `/media/${prefix}/poster-desktop.jpg`, width: 1920, height: 1080 },
       mobilePoster: { src: `/media/${prefix}/poster-mobile.jpg`, width: 540, height: 960 },
     });

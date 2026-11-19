@@ -142,9 +142,10 @@ export function HeroFilm({
       {panel}
       {film && !staticOnly ? (
         <HeroFilmPlayer
-          version={film.version}
           desktop={film.tiers.desktop}
           mobile={film.tiers.mobile}
+          wide={film.tiers.wide}
+          motion={film.motion}
         />
       ) : null}
     </section>

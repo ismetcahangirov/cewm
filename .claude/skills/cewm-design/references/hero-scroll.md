@@ -21,17 +21,23 @@ marked **estimate** and must be re-measured on the real render.
 
 ## Frames, sizes, pin length
 
-| Tier | Used when | Frame size | Frames | Pin wrapper | Scroll distance | Scroll per frame |
-|---|---|---|---|---|---|---|
-| Desktop | viewport >= 1024 CSS px and `navigator.deviceMemory` > 4 (or unknown) | 1600 x 900 | 120 | `400svh` | 300svh, about 2700 px at 900 px tall | 22.5 px |
-| Mobile | viewport < 1024 CSS px, or `deviceMemory` <= 4 | 720 x 1280 | 80 | `300svh` | 200svh, about 1690 px at 844 px tall | 21 px |
+All three tiers carry the same 300 frames of one continuous camera move (`manifest.json` version 3).
 
-- About 22 px of scroll per frame keeps a slow scroll smooth and a fast flick (the reference
-  peaks at 2400 px/s) within the decode budget, because the lerp below caps the displayed rate.
-- Canvas backing store: `width = round(cssWidth * min(devicePixelRatio, 1.5))`, height by the
-  stage aspect. DPR is capped at 1.5 for the moving film (the poster uses full DPR). Frames are
-  resized in the worker to cover the backing store, so a 1920 px wide screen at DPR 1 shows a
-  1600 px frame upscaled 1.2x; this is invisible in motion and the poster is sharp at rest.
+| Tier | Used when | Frame size | AVIF | Bytes (all frames) |
+|---|---|---|---|---|
+| Wide | viewport >= 1024 CSS px, `deviceMemory` > 4 (or unknown) and cover width x DPR > 1600 x 1.08 (1920 px screens at DPR 1, 1536 CSS px at DPR 1.25, 2560 px) | 1920 x 1080 | crf 34 | 9.95 MB |
+| Desktop | viewport >= 1024 CSS px and the wide condition is false (1440 px at DPR 1, laptops) | 1600 x 900 | crf 36 | 7.17 MB |
+| Mobile | viewport < 1024 CSS px, or `deviceMemory` <= 4 | 608 x 1080 (native centre crop of the landscape master) | crf 34 | 3.30 MB |
+
+- Canvas backing store ratio = `min(devicePixelRatio, 2, tier.width / coverCssWidth)`: the canvas
+  is never larger than the frame's native cover size, so the player never upscales; on a 2560 px
+  screen the 1920 px canvas is stretched by the compositor, which halved the refresh interval cost
+  against a 2560 px canvas (measured: 16.6 ms to 8.4 ms median while scrolling).
+  `imageSmoothingQuality = "high"`, set again after every canvas resize.
+- Why the film was re-made: v2 (1600 x 900 at crf 41, SSIM 0.947 against the master) was blotchy
+  and was upscaled 1.2x on a 1920 px canvas. v3 uses lower crf and a 1920 tier.
+- Scroll per frame is whatever the pin length gives (about 9 px per frame on desktop); the player
+  blends between frames every refresh (below), so a step of one frame is no longer a visible jump.
 
 ## Format: AVIF, WebP as fallback
 
@@ -74,17 +80,16 @@ values until the real film is measured.
 
 ## Byte budget
 
-| Item | Desktop | Mobile |
-|---|---|---|
-| Poster (frame 0, AVIF crf 24, via `next/image`) | about 90 KB at 1920 w (**estimate**) | about 60 KB at 1080 w (**estimate**) |
-| Every 8th frame (first scrub possible) | 15 x 47 KB = 0.7 MB | 10 x 35 KB = 0.35 MB |
-| All frames | 120 x 47 KB = 5.6 MB | 80 x 35 KB = 2.8 MB |
-| Worker script | 3 KB gzip | 3 KB gzip |
-| **Total, hard limit** | **6.0 MB** | **3.0 MB** |
+| Item | Wide | Desktop | Mobile |
+|---|---|---|---|
+| Poster (frame 0, via `next/image`) | about 350 KB source, served resized | same | about 150 KB source |
+| All 300 frames | 9.95 MB | 7.17 MB | 3.30 MB |
+| `manifest.json` with `motion` and `pace` | about 12 KB | same | same |
+| **Total, hard limit (all after `load`)** | **10.0 MB** | **7.2 MB** | **3.3 MB** |
 
 Frames are never downloaded before the LCP and never on Save-Data or slow connections (below).
-If the real render exceeds the limit, lower the frame count first (desktop 96, mobile 64), then
-raise the crf by 2, never the other way round.
+Bytes before interactive are unchanged: the poster only. If a new render exceeds the limit,
+raise the crf by 2 before dropping frames. v2 budget was 6.0 / 3.0 MB.
 
 ## Loading order
 
@@ -109,42 +114,49 @@ film is uploaded once in the admin and shared by all four locales.
 
 ## Decoding in a worker, with a memory window
 
-- The worker keeps every downloaded frame as a compressed `Blob` (5.6 MB desktop, 2.8 MB mobile)
-  and decodes on demand with `createImageBitmap(blob, { resizeWidth, resizeHeight })` straight to
-  the canvas cover size, then transfers the `ImageBitmap` to the main thread. Never decode or
-  resize on the main thread, and never draw an `<img>`: a decoded `<img>` is discarded by the
-  browser and re-decoded on every `drawImage` (measured on an earlier project: 8.6 ms per frame,
-  37 ms at 4x).
-- Window of decoded bitmaps, with the bias in the scroll direction:
+- The worker keeps every downloaded frame as a compressed `Blob` and decodes on demand with
+  `createImageBitmap(blob)` at the tier's native size, then transfers the `ImageBitmap` to the
+  main thread. Never decode or resize on the main thread, and never draw an `<img>`.
+- Window of decoded bitmaps, with the bias in the scroll direction (3x lead):
 
-| Tier | Ahead | Behind | Bitmap size | Window memory | Ladder (every 8th, half size) | Total |
-|---|---|---|---|---|---|---|
-| Desktop | 12 | 4 | 1600 x 900 x 4 B = 5.76 MB | 17 x 5.76 = 98 MB | 15 x 1.44 MB = 22 MB | about 120 MB |
-| Mobile | 8 | 3 | 720 x 1280 x 4 B = 3.69 MB | 12 x 3.69 = 44 MB | 10 x 0.92 MB = 9 MB | about 53 MB |
-| `deviceMemory` <= 4 | 6 | 2 | mobile tier | 9 x 3.69 = 33 MB | 9 MB | about 42 MB |
+| Tier | Ahead | Behind | Bitmap | Window memory |
+|---|---|---|---|---|
+| Wide | 10 | 3 | 1920 x 1080 x 4 B = 8.3 MB | about 108 MB (measured peak 124 MB) |
+| Desktop | 12 | 4 | 1600 x 900 x 4 B = 5.76 MB | about 98 MB |
+| Mobile | 12 | 4 | 608 x 1080 x 4 B = 2.6 MB | about 44 MB |
+| `deviceMemory` <= 4 | 8 | 3 | mobile tier | about 29 MB |
 
-  Bitmaps leaving the window are `close()`d on both sides. The half-size ladder is kept for the
-  whole session and is what the canvas shows during very fast scrolls.
-- On resize (debounced 200 ms): new cover size, the window is closed and re-decoded from the
-  current frame outwards; the ladder is re-decoded last.
+- There is **no half-size fallback ladder**. A frame that is not decoded yet is replaced by the
+  nearest decoded frame (preferring one at or before the position), warped toward the position
+  by up to 3 frames. A smaller bitmap is never drawn: v2 switched to 800 x 450 bitmaps on fast
+  scrolls and the picture visibly softened and stepped backwards.
+- Fetch order: the window around the fractional position first (3x lead in the scroll
+  direction), then every 8th, 4th, 2nd and remaining frame. Decode order: floor, floor + 1, ahead.
 
-## Scroll to frame
+## Scroll to frame, sub-frame blend
 
 ```ts
 const progress = clamp((scroll.y - stageTop) / (stageHeight - viewportHeight), 0, 1);
-const target = progress * (frameCount - 1);
-current += (target - current) * (1 - Math.exp(-dt / tau));
-const index = Math.round(current);
+const linear = progress * (frameCount - 1);
+const position = paceInverse(linear);
+const k = Math.floor(position);
+const fraction = position - k;
 ```
 
-- `stageTop`, `stageHeight` and `viewportHeight` are cached in a `ResizeObserver`; `scroll.y`
-  comes from the shared loop (`motion-recipes.md`), never from `window.scrollY` inside the tick.
-- `tau` = 60 ms with Lenis (fine pointers; Lenis already smooths the wheel) and 100 ms on touch
-  (native momentum, frames would otherwise step). About lerp 0.24 and 0.15 per 60 Hz frame.
-- Draw only when `index` changes or a better bitmap for `index` arrives:
-  `ctx.drawImage(bitmap, dx, dy)` on a `getContext("2d", { alpha: false })` canvas.
-- Tell the worker the current index and velocity (`target - current`) at most every 50 ms so the
-  window moves ahead of the scroll.
+- `pace` (manifest, 300 cumulative values from the measured motion of the master) maps the linear
+  position to the frame position, so every pixel of scroll moves the picture by the same amount
+  even where the source steps are uneven (measured 4.7 to 14.8 px per step). The shift is capped
+  at 0.75 frame so chapters stay aligned with their text.
+- Every refresh while the position moves: frame `k` is warped forward by `fraction` of the
+  measured step (`manifest.motion`, `[scale, tx, ty]` per step, translation in frame-height
+  units) and drawn at alpha 1, then frame `k + 1` is warped backward and drawn at alpha
+  `fraction`, both clamped to cover. Measured on the master: interpolating a frame from its
+  neighbours gives 32.0 dB with this warp against 26.3 dB for a plain blend and 23.4 dB for
+  holding the frame. Without `motion` the player cross-fades plainly.
+- Reason: at slow scroll 86 % of refreshes showed no new image and then the picture jumped one
+  whole frame (6.7 px). With the blend 0 % of refreshes are blank.
+- `scroll.y` comes from the shared loop (`motion-recipes.md`), never from `window.scrollY`.
+- Tell the worker the position and velocity at most every 50 ms so the window moves ahead.
 
 ## LCP strategy
 
@@ -156,6 +168,10 @@ const index = Math.round(current);
   request competes with the LCP request.
 - The headline, lead and CTA are HTML text, server rendered, visible at first paint. The header
   scrim and the text scrim are CSS gradients, not baked into the poster.
+- Scrim rule: the gradients are shown only while text is on screen: opacity is `1 - headlineFade`
+  (the headline group), and 1 while a chapter on that side is active, with a CSS transition. A
+  permanent scrim put at least 25 % navy over every pixel and up to 88 % at the edges, which
+  dulled the film.
 
 ## Fallbacks
 
@@ -215,5 +231,7 @@ run it as a background job or a CLI script, not inside a request.
       `drawImage` under 3 ms.
 - [ ] Memory in the DevTools Memory panel stays under the window total for the tier.
 - [ ] Reduced motion, Save-Data and `deviceMemory` 2 each show the poster layout.
-- [ ] Bytes transferred for the full film are within 6.0 MB desktop / 3.0 MB mobile.
+- [ ] Bytes transferred for the full film are within 10.0 MB wide / 7.2 MB desktop / 3.3 MB mobile.
+- [ ] Slow wheel scroll: 0 % of refreshes without a new image, no reversal; fast scroll: no draw from a smaller bitmap.
+- [ ] 100 % crops of window frames, door frame and cabinet gaps mid-fraction show no double edges.
 - [ ] White text passes 4.5:1 on every frame under the scrim.

@@ -9,7 +9,7 @@ export { heroFilmFormats, type HeroFilmFormat };
 
 export const heroFilmKeyPattern = /^[a-z0-9]+(?:[-_/][a-z0-9]+)*$/;
 
-export const heroFilmTiers = ["desktop", "mobile"] as const;
+export const heroFilmTiers = ["desktop", "mobile", "wide"] as const;
 
 export type HeroFilmTier = (typeof heroFilmTiers)[number];
 
@@ -43,10 +43,18 @@ const manifestPoster = z.object({
   height: z.number().int().positive(),
 });
 
+const manifestStep = z.tuple([z.number().min(0.5).max(2), z.number(), z.number()]);
+
 export const heroFilmManifestSchema = z.object({
   version: z.number().int().positive(),
   format: z.enum(heroFilmFormats),
-  tiers: z.object({ desktop: manifestTier, mobile: manifestTier.optional() }),
+  tiers: z.object({
+    desktop: manifestTier,
+    mobile: manifestTier.optional(),
+    wide: manifestTier.optional(),
+  }),
+  motion: z.array(manifestStep).max(2000).optional(),
+  pace: z.array(z.number().min(0)).max(2001).optional(),
   posters: z
     .object({ desktop: manifestPoster.optional(), mobile: manifestPoster.optional() })
     .optional(),

@@ -25,32 +25,42 @@ export type HeroChapter = {
 
 type Size = { width: number; height: number };
 
-type Budget = { ahead: number; behind: number; ladderStep: number };
+type Budget = { ahead: number; behind: number };
+
+type Step = [number, number, number];
+
+type Motion = { steps: Step[]; pace: number[] | null };
+
+type Similarity = { scale: number; x: number; y: number };
 
 type FrameMessage =
   | {
       type: "frame";
       index: number;
-      ladder: boolean;
       generation: number;
       decodeMs: number;
       bitmap: ImageBitmap;
     }
-  | { type: "progress"; loaded: number; bytes: number }
+  | { type: "progress"; loaded: number; bytes: number; total: number }
   | { type: "unsupported" };
 
 type NetworkInformation = { saveData?: boolean; effectiveType?: string };
 
 const budgets = {
-  desktop: { ahead: 12, behind: 4, ladderStep: 16 },
-  mobile: { ahead: 16, behind: 6, ladderStep: 16 },
-  lowMemory: { ahead: 10, behind: 3, ladderStep: 32 },
+  wide: { ahead: 10, behind: 3 },
+  desktop: { ahead: 12, behind: 4 },
+  mobile: { ahead: 12, behind: 4 },
+  lowMemory: { ahead: 8, behind: 3 },
 } satisfies Record<string, Budget>;
 
 const headlineFade = 0.18;
 const ctaFade = 0.12;
 const underPanel = 0.35;
-const maxPixelRatio = 1.5;
+const maxPixelRatio = 2;
+const wideThreshold = 1.08;
+const maxWarp = 3;
+const settled = 0.002;
+const identity: Similarity = { scale: 1, x: 0, y: 0 };
 
 function constrained() {
   const nav = navigator as Navigator & { connection?: NetworkInformation; deviceMemory?: number };
@@ -88,10 +98,52 @@ function afterLoad(start: () => void) {
   };
 }
 
+function isStep(value: unknown): value is Step {
+  return (
+    Array.isArray(value) &&
+    value.length === 3 &&
+    value.every((part) => typeof part === "number" && Number.isFinite(part))
+  );
+}
+
+async function loadMotion(url: string, count: number): Promise<Motion | null> {
+  const response = await fetch(url, { priority: "low" } as RequestInit);
+  if (!response.ok) return null;
+  const data = (await response.json()) as { motion?: unknown; pace?: unknown };
+  const steps = Array.isArray(data.motion) ? data.motion : [];
+  if (steps.length !== count - 1 || !steps.every(isStep)) return null;
+  const pace =
+    Array.isArray(data.pace) &&
+    data.pace.length === count &&
+    data.pace.every(
+      (value, index, list) =>
+        typeof value === "number" && (index === 0 || value >= (list[index - 1] as number)),
+    )
+      ? (data.pace as number[])
+      : null;
+  return { steps, pace };
+}
+
+function compose(first: Similarity, second: Similarity): Similarity {
+  return {
+    scale: first.scale * second.scale,
+    x: second.scale * first.x + second.x,
+    y: second.scale * first.y + second.y,
+  };
+}
+
+function invert(value: Similarity): Similarity {
+  return { scale: 1 / value.scale, x: -value.x / value.scale, y: -value.y / value.scale };
+}
+
 function runFilm(
   section: HTMLElement,
-  desktop: HeroFilmTierFrames,
-  mobile: HeroFilmTierFrames | null,
+  tiers: {
+    desktop: HeroFilmTierFrames;
+    mobile: HeroFilmTierFrames | null;
+    wide: HeroFilmTierFrames | null;
+  },
+  motionUrl: string | null,
 ) {
   const stage = section.querySelector<HTMLElement>(".hero-stage");
   const spacer = section.querySelector<HTMLElement>(".hero-spacer");
@@ -100,23 +152,32 @@ function runFilm(
   const groupA = section.querySelector<HTMLElement>("[data-hero-a]");
   const groupB = section.querySelector<HTMLElement>("[data-hero-b]");
   const cta = section.querySelector<HTMLElement>("[data-hero-cta]");
+  const scrimTop = section.querySelector<HTMLElement>(".hero-scrim-top");
+  const scrimBottom = section.querySelector<HTMLElement>(".hero-scrim-bottom");
   const chapters = [...section.querySelectorAll<HTMLElement>("[data-chapter]")].map((element) => ({
     element,
     from: Number(element.dataset.from),
     to: Number(element.dataset.to),
+    top: element.classList.contains("is-top"),
     active: false,
   }));
   if (!stage || !spacer || !slot) return () => undefined;
 
   const nav = navigator as Navigator & { deviceMemory?: number };
   const lowMemory = nav.deviceMemory !== undefined && nav.deviceMemory <= 4;
-  const wide = window.innerWidth >= 1024;
-  const tier = !wide || lowMemory ? (mobile ?? desktop) : desktop;
-  const budget = lowMemory
-    ? budgets.lowMemory
-    : tier === desktop
-      ? budgets.desktop
-      : budgets.mobile;
+  const pixelRatio = Math.min(window.devicePixelRatio || 1, maxPixelRatio);
+  const coverWidth = (frames: HeroFilmTierFrames) =>
+    Math.max(slot.clientWidth, (slot.clientHeight * frames.width) / frames.height);
+  const tier = (() => {
+    if (window.innerWidth < 1024 || lowMemory) return tiers.mobile ?? tiers.desktop;
+    const wide = tiers.wide;
+    if (wide && coverWidth(tiers.desktop) * pixelRatio > tiers.desktop.width * wideThreshold) {
+      return wide;
+    }
+    return tiers.desktop;
+  })();
+  const tierName = tier === tiers.wide ? "wide" : tier === tiers.mobile ? "mobile" : "desktop";
+  const budget = lowMemory ? budgets.lowMemory : budgets[tierName];
   const count = tier.count;
 
   const box = { top: 0, height: 0, filmEnd: 1, shift: 0 };
@@ -125,18 +186,18 @@ function runFilm(
   let canvasSize: Size = { width: 0, height: 0 };
   let decodeSize: Size = { width: tier.width, height: tier.height };
   let generation = 0;
-  const windowFrames = new Map<number, ImageBitmap>();
-  const ladderFrames = new Map<number, ImageBitmap>();
+  const frames = new Map<number, ImageBitmap>();
   let worker: Worker | null = null;
-  let center = 0;
+  let motion: Motion | null = null;
   let current = 0;
-  let drawnBitmap: ImageBitmap | null = null;
+  let drawnAt = Number.NaN;
+  let dirty = true;
   let lastSeek = 0;
-  let lastSeekIndex = -1;
+  let lastSeekPosition = Number.NaN;
   let direction = 1;
   let posterHidden = false;
   let pinActive = false;
-  const written = { a: Number.NaN, cta: Number.NaN };
+  const written = { a: Number.NaN, cta: Number.NaN, top: Number.NaN, bottom: Number.NaN };
   const stats = { drawMs: [] as number[], decodeMs: [] as number[] };
 
   const tau = smoothScroller() ? 60 : 100;
@@ -152,7 +213,7 @@ function runFilm(
   }
 
   function sizes() {
-    const ratio = Math.min(window.devicePixelRatio || 1, maxPixelRatio);
+    const ratio = Math.min(pixelRatio, tier.width / coverWidth(tier));
     const width = Math.round(slot!.clientWidth * ratio);
     const height = Math.round(slot!.clientHeight * ratio);
     const scale = Math.min(Math.max(width / tier.width, height / tier.height), 1);
@@ -162,66 +223,153 @@ function runFilm(
     };
   }
 
+  function frameAt(film: number) {
+    const linear = film * (count - 1);
+    const pace = motion?.pace;
+    if (!pace) return linear;
+    let low = 0;
+    let high = pace.length - 1;
+    while (high - low > 1) {
+      const middle = (low + high) >> 1;
+      if ((pace[middle] as number) <= linear) low = middle;
+      else high = middle;
+    }
+    const from = pace[low] as number;
+    const to = pace[high] as number;
+    return low + (to > from ? clamp((linear - from) / (to - from)) : 0);
+  }
+
+  function travel(from: number, to: number): Similarity {
+    const steps = motion?.steps;
+    if (!steps || from === to) return identity;
+    if (to < from) return invert(travel(to, from));
+    let result = identity;
+    let at = from;
+    while (at < to - 1e-6) {
+      const index = Math.floor(at + 1e-6);
+      const step = steps[index];
+      const end = Math.min(index + 1, to);
+      const fraction = end - at;
+      if (step) {
+        result = compose(result, {
+          scale: step[0] ** fraction,
+          x: step[1] * fraction,
+          y: step[2] * fraction,
+        });
+      }
+      at = end;
+    }
+    return result;
+  }
+
+  function windowRange() {
+    const base = Math.floor(current);
+    const before = direction >= 0 ? budget.behind : budget.ahead;
+    const after = direction >= 0 ? budget.ahead + 1 : budget.behind + 1;
+    return { from: base - before, to: base + after };
+  }
+
   function windowHas(index: number) {
-    const ahead = direction >= 0 ? budget.ahead : budget.behind;
-    const behind = direction >= 0 ? budget.behind : budget.ahead;
-    return index >= center - behind && index <= center + ahead;
+    const range = windowRange();
+    return index >= range.from && index <= range.to;
   }
 
   function evict() {
-    for (const [index, bitmap] of windowFrames) {
+    for (const [index, bitmap] of frames) {
       if (windowHas(index)) continue;
       bitmap.close();
-      windowFrames.delete(index);
+      frames.delete(index);
     }
   }
 
-  function pick(index: number): ImageBitmap | null {
-    const exact = windowFrames.get(index);
-    if (exact) return exact;
-    for (let distance = 1; distance <= 8; distance += 1) {
-      const near =
-        windowFrames.get(index - distance * direction) ??
-        windowFrames.get(index + distance * direction);
-      if (near) return near;
+  function source(position: number): number | null {
+    let below: number | null = null;
+    let above: number | null = null;
+    for (const index of frames.keys()) {
+      if (index <= position) {
+        if (below === null || index > below) below = index;
+      } else if (above === null || index < above) {
+        above = index;
+      }
     }
-    const step = budget.ladderStep;
-    const below = Math.floor(index / step) * step;
-    return ladderFrames.get(Math.round(index / step) * step) ?? ladderFrames.get(below) ?? null;
+    if (below !== null && position - below <= maxWarp) return below;
+    if (above !== null && above - position <= maxWarp) return above;
+    if (below === null) return above;
+    if (above === null) return below;
+    return position - below <= above - position ? below : above;
   }
 
-  function draw(index: number) {
-    const bitmap = pick(index);
-    if (!bitmap || !context || !canvas) return;
-    if (bitmap === drawnBitmap) return;
+  function place(bitmap: ImageBitmap, warp: Similarity, cover: boolean) {
+    const fit = Math.max(canvasSize.width / bitmap.width, canvasSize.height / bitmap.height);
+    const base = { width: bitmap.width * fit, height: bitmap.height * fit };
+    let scale = warp.scale;
+    if (cover) {
+      scale = Math.max(scale, canvasSize.width / base.width, canvasSize.height / base.height);
+    }
+    const width = base.width * scale;
+    const height = base.height * scale;
+    let x = (canvasSize.width - width) / 2 + warp.x * base.height;
+    let y = (canvasSize.height - height) / 2 + warp.y * base.height;
+    if (cover) {
+      x = clamp(x, canvasSize.width - width, 0);
+      y = clamp(y, canvasSize.height - height, 0);
+    }
+    return { x, y, width, height };
+  }
+
+  function paint(bitmap: ImageBitmap, warp: Similarity, alpha: number) {
+    if (!context) return;
+    const rect = place(bitmap, warp, alpha === 1);
+    context.globalAlpha = alpha;
+    context.drawImage(bitmap, rect.x, rect.y, rect.width, rect.height);
+  }
+
+  function render(position: number) {
+    if (!context || !canvas) return;
+    if (!dirty && Math.abs(position - drawnAt) < settled) return;
+    const base = Math.floor(position);
+    const fraction = position - base;
+    const near = frames.get(base);
+    const next = frames.get(base + 1);
     const started = performance.now();
-    const scale = Math.max(canvasSize.width / bitmap.width, canvasSize.height / bitmap.height);
-    const width = bitmap.width * scale;
-    const height = bitmap.height * scale;
-    context.drawImage(
-      bitmap,
-      (canvasSize.width - width) / 2,
-      (canvasSize.height - height) / 2,
-      width,
-      height,
-    );
+    if (near && next && fraction >= settled) {
+      paint(near, travel(base, position), 1);
+      paint(next, travel(base + 1, position), fraction);
+    } else if (near && fraction < settled) {
+      paint(near, identity, 1);
+    } else {
+      const index = source(position);
+      if (index === null) return;
+      const bitmap = frames.get(index);
+      if (!bitmap) return;
+      const reach = clamp(position, index - maxWarp, index + maxWarp);
+      paint(bitmap, travel(index, reach), 1);
+    }
+    context.globalAlpha = 1;
     stats.drawMs.push(performance.now() - started);
     if (stats.drawMs.length > 2000) stats.drawMs.splice(0, 1000);
-    drawnBitmap = bitmap;
-    if (!posterHidden && windowFrames.has(index)) {
+    drawnAt = position;
+    dirty = false;
+    if (!posterHidden && (near || next)) {
       posterHidden = true;
       poster?.setAttribute("data-hidden", "");
     }
   }
 
-  function seek(index: number, now: number) {
-    if (!worker || index === lastSeekIndex || now - lastSeek < 50) return;
-    direction = index >= lastSeekIndex ? 1 : -1;
+  function seek(position: number, now: number) {
+    if (!worker || now - lastSeek < 50) return;
+    if (Math.floor(position) === Math.floor(lastSeekPosition)) return;
+    direction = Number.isNaN(lastSeekPosition) || position >= lastSeekPosition ? 1 : -1;
     lastSeek = now;
-    lastSeekIndex = index;
-    center = index;
+    lastSeekPosition = position;
     evict();
-    worker.postMessage({ type: "seek", index, direction });
+    worker.postMessage({ type: "seek", position, direction });
+  }
+
+  function writeOpacity(element: HTMLElement | null, key: "top" | "bottom", value: number) {
+    if (!element || value === written[key]) return;
+    written[key] = value;
+    element.style.opacity = String(value);
   }
 
   function choreograph(film: number) {
@@ -243,12 +391,20 @@ function runFilm(
       cta.style.opacity = String(ctaOpacity);
       cta.style.visibility = ctaOpacity < 0.02 ? "hidden" : "";
     }
+    let topText = false;
+    let bottomText = false;
     for (const chapter of chapters) {
       const active = film >= chapter.from && film < chapter.to;
+      if (active) {
+        if (chapter.top) topText = true;
+        else bottomText = true;
+      }
       if (active === chapter.active) continue;
       chapter.active = active;
       chapter.element.toggleAttribute("data-active", active);
     }
+    writeOpacity(scrimTop, "top", topText ? 1 : 1 - fade);
+    writeOpacity(scrimBottom, "bottom", bottomText ? 1 : 1 - fade);
   }
 
   function tick(_time: number, dt: number) {
@@ -261,12 +417,17 @@ function runFilm(
       document.documentElement.toggleAttribute("data-pin-active", pinned);
     }
     choreograph(film);
-    const target = film * (count - 1);
+    const target = frameAt(film);
     current += (target - current) * (1 - Math.exp(-dt / tau));
-    if (Math.abs(target - current) < 0.01) current = target;
-    const index = Math.round(current);
-    seek(index, performance.now());
-    draw(index);
+    if (Math.abs(target - current) < settled) current = target;
+    seek(current, performance.now());
+    render(current);
+  }
+
+  function prepareContext() {
+    if (!context) return;
+    context.imageSmoothingEnabled = true;
+    context.imageSmoothingQuality = "high";
   }
 
   function createCanvas() {
@@ -278,21 +439,28 @@ function runFilm(
     canvas.height = canvasSize.height;
     canvas.setAttribute("aria-hidden", "true");
     context = canvas.getContext("2d", { alpha: false });
+    prepareContext();
     slot!.append(canvas);
-  }
-
-  function ladderSize(): Size {
-    return { width: Math.round(decodeSize.width / 2), height: Math.round(decodeSize.height / 2) };
   }
 
   function startWorker() {
     createCanvas();
+    if (motionUrl) {
+      void loadMotion(motionUrl, count)
+        .then((loaded) => {
+          if (!loaded) return;
+          motion = loaded;
+          dirty = true;
+        })
+        .catch(() => undefined);
+    }
     worker = new Worker(new URL("./hero-film.worker.ts", import.meta.url), { type: "module" });
     worker.onmessage = (event: MessageEvent<FrameMessage>) => {
       const message = event.data;
       if (message.type === "progress") {
         section.dataset.filmLoaded = String(message.loaded);
         section.dataset.filmBytes = String(message.bytes);
+        section.dataset.filmTotal = String(message.total);
         return;
       }
       if (message.type === "unsupported") {
@@ -300,37 +468,28 @@ function runFilm(
         section.setAttribute("data-hero-static", "");
         return;
       }
-      if (message.generation !== generation) {
+      if (message.generation !== generation || !windowHas(message.index)) {
         message.bitmap.close();
         return;
       }
       stats.decodeMs.push(message.decodeMs);
-      if (message.ladder) {
-        ladderFrames.get(message.index)?.close();
-        ladderFrames.set(message.index, message.bitmap);
-      } else if (windowHas(message.index)) {
-        windowFrames.get(message.index)?.close();
-        windowFrames.set(message.index, message.bitmap);
-      } else {
-        message.bitmap.close();
-        return;
-      }
-      if (Math.abs(message.index - Math.round(current)) <= 8 || message.ladder) {
-        drawnBitmap = null;
-        draw(Math.round(current));
+      if (stats.decodeMs.length > 2000) stats.decodeMs.splice(0, 1000);
+      frames.get(message.index)?.close();
+      frames.set(message.index, message.bitmap);
+      if (Math.abs(message.index - current) <= maxWarp + 1) {
+        dirty = true;
+        render(current);
       }
     };
-    center = Math.round(current);
     worker.postMessage({
       type: "init",
       frames: frameUrls(tier),
       decode: decodeSize,
-      ladder: ladderSize(),
-      ladderStep: budget.ladderStep,
       ahead: budget.ahead,
       behind: budget.behind,
     });
-    worker.postMessage({ type: "seek", index: center, direction: 1 });
+    lastSeekPosition = current;
+    worker.postMessage({ type: "seek", position: current, direction: 1 });
   }
 
   let resizeTimer = 0;
@@ -342,16 +501,19 @@ function runFilm(
       if (next.canvas.width === canvasSize.width && next.canvas.height === canvasSize.height)
         return;
       canvasSize = next.canvas;
-      decodeSize = next.decode;
       canvas.width = canvasSize.width;
       canvas.height = canvasSize.height;
+      prepareContext();
+      dirty = true;
+      if (next.decode.width === decodeSize.width && next.decode.height === decodeSize.height) {
+        render(current);
+        return;
+      }
+      decodeSize = next.decode;
       generation += 1;
-      for (const bitmap of windowFrames.values()) bitmap.close();
-      for (const bitmap of ladderFrames.values()) bitmap.close();
-      windowFrames.clear();
-      ladderFrames.clear();
-      drawnBitmap = null;
-      worker.postMessage({ type: "resize", decode: decodeSize, ladder: ladderSize(), generation });
+      for (const bitmap of frames.values()) bitmap.close();
+      frames.clear();
+      worker.postMessage({ type: "resize", decode: decodeSize, generation });
     }, 200);
   }
 
@@ -373,9 +535,15 @@ function runFilm(
   document.addEventListener("visibilitychange", onVisibility);
   (window as Window & { __heroFilm?: unknown }).__heroFilm = {
     stats,
-    tier: tier === desktop ? "desktop" : "mobile",
+    tier: tierName,
     budget,
-    frames: () => ({ window: windowFrames.size, ladder: ladderFrames.size, decode: decodeSize }),
+    frames: () => ({
+      window: frames.size,
+      decode: decodeSize,
+      canvas: canvasSize,
+      motion: Boolean(motion),
+      pace: Boolean(motion?.pace),
+    }),
   };
 
   function stop() {
@@ -388,12 +556,12 @@ function runFilm(
     document.removeEventListener("visibilitychange", onVisibility);
     worker?.terminate();
     worker = null;
-    for (const bitmap of windowFrames.values()) bitmap.close();
-    for (const bitmap of ladderFrames.values()) bitmap.close();
-    windowFrames.clear();
-    ladderFrames.clear();
+    for (const bitmap of frames.values()) bitmap.close();
+    frames.clear();
     canvas?.remove();
     poster?.removeAttribute("data-hidden");
+    scrimTop?.style.removeProperty("opacity");
+    scrimBottom?.style.removeProperty("opacity");
     document.documentElement.removeAttribute("data-pin-active");
   }
 
@@ -403,10 +571,13 @@ function runFilm(
 export function HeroFilmPlayer({
   desktop,
   mobile,
+  wide,
+  motion,
 }: {
-  version: number;
   desktop: HeroFilmTierFrames;
   mobile: HeroFilmTierFrames | null;
+  wide: HeroFilmTierFrames | null;
+  motion: string | null;
 }) {
   useEffect(() => {
     const section = document.querySelector<HTMLElement>("[data-hero-film]");
@@ -415,8 +586,8 @@ export function HeroFilmPlayer({
       section.setAttribute("data-hero-static", "");
       return () => section.removeAttribute("data-hero-static");
     }
-    return runFilm(section, desktop, mobile);
-  }, [desktop, mobile]);
+    return runFilm(section, { desktop, mobile, wide }, motion);
+  }, [desktop, mobile, wide, motion]);
 
   return null;
 }
