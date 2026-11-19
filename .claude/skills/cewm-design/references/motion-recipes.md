@@ -423,20 +423,25 @@ behaviour only; colours, type, icons and copy are ours).
   min(66svh, 40rem)`, `rounded-md`, `shadow-stack`, a 1 px `white/15` top edge, surfaces
   rotating `navy`, `navy-raised`, `navy-deep`.
 - Card grid (from 768 px): three columns, `align-items: center` on the card row. Left: the area
-  name set upright and horizontal (`aria-hidden`, display weight 500, `-0.045em`, left aligned,
-  at most two balanced lines, hyphenated in the language), in a `28cqw` column. Middle: the
-  body, vertically centred: number (`text-label` cyan), the name as `text-h3` (the real heading
-  and the link), the description summary (`on-navy-muted`, 160 characters) and one tag with the
-  product count. Right: the image box, `clamp(10rem, 30cqw, 26rem)` wide and as tall as the
-  card, full bleed to the top, right and bottom edges, `object-cover`. Every card in the list
-  has the same height (`grid-auto-rows: 1fr` on the list, `min-height: min(66svh, 40rem)`) and
-  so the same image box, whatever the source aspect ratio; a card without a cover keeps the box
-  as a plain `navy-raised` panel.
-- The name is split server-side into at most two balanced lines (names over 14 characters) and
-  sized to fit its column: `clamp(1.75rem, (column - 2.25rem) / (chars x 0.52), min(5.5rem,
-  9.5svh))`, with `cqw` units (the card is an inline-size container).
-- Below 768 px the card stacks: image on top (full width, 16:9, identical on every card), then
-  the name and the body as one block centred in the remaining height.
+  name set vertically (`writing-mode: vertical-rl` rotated 180 degrees, reading upwards,
+  `aria-hidden`, display weight 500, `-0.045em`, centred in a `max(5.25rem, 26cqw)` column, as
+  tall as the card so it is centred against the image). Middle: the body, vertically centred:
+  number (`text-label` cyan), the name as `text-h3` (the real heading and the link), the
+  description summary (`on-navy-muted`, 160 characters) and one tag with the product count.
+  Right: the image box, `clamp(10rem, 30cqw, 26rem)` wide and as tall as the card, full bleed to
+  the top, right and bottom edges, `object-cover`. Every card in the list has the same height
+  (`grid-auto-rows: 1fr` on the list, `min-height: min(66svh, 40rem)`) and so the same image box,
+  whatever the source aspect ratio; a card without a cover keeps the box as a plain `navy-raised`
+  panel.
+- The vertical name is split server-side into at most two balanced lines (names over 14
+  characters) and sized to fit both the height it has and the column:
+  `min(clamp(3rem, 9.5svh, 8rem), room / (chars x 0.56), (column - 1rem) / (lines x 0.95))`,
+  with `cqw` units (the card is an inline-size container; `cqi` resolves against the vertical
+  text's own inline axis and must not be used). `room` is the card height minus 2.75rem.
+- Below 768 px the card stacks: image on top (full width, 16:9, identical on every card), then a
+  row of the rotated name in a 30 % column and the body beside it. `room` there is the card height
+  minus the image height (`56.25cqw`) minus 2.75rem, and the column used for sizing is `27cqw` so
+  the glyphs never touch the edge at 360 px.
 - Scroll-linked: while a later card covers card `i`, card `i` scales down by 0.045 per covering
   card (`transform-origin: 50% 0`), from cached positions in the shared loop, written only when
   the value changes.
