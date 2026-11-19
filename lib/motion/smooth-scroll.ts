@@ -60,6 +60,16 @@ export function resetScroll() {
   lenis?.scrollTo(0, { immediate: true, force: true });
 }
 
+export function scrollToTop() {
+  if (matchMedia("(prefers-reduced-motion: reduce)").matches) {
+    lenis?.scrollTo(0, { immediate: true, force: true });
+    scrollTo({ top: 0, behavior: "instant" });
+    return;
+  }
+  if (lenis) lenis.scrollTo(0, { force: true });
+  else scrollTo({ top: 0, behavior: "smooth" });
+}
+
 export function lockScroll(locked: boolean) {
   if (locked) lenis?.stop();
   else lenis?.start();

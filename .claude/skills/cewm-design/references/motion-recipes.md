@@ -422,18 +422,21 @@ behaviour only; colours, type, icons and copy are ours).
   card stops 16 px lower and the earlier ones show as a pile of 16 px edges. `min-height:
   min(66svh, 40rem)`, `rounded-md`, `shadow-stack`, a 1 px `white/15` top edge, surfaces
   rotating `navy`, `navy-raised`, `navy-deep`.
-- Card grid: a decorative column (`minmax(5.25rem, 26%)`, 30 % below 768 px) with the area name
-  set vertically (`writing-mode: vertical-rl` rotated 180 degrees, reading upwards, display
-  weight 500, `-0.045em`), then the body bottom-aligned: number (`text-label` cyan), the name as
-  `text-h3` (the real heading and the link), the description summary (`on-navy-muted`, 160
-  characters) and one tag with the product count. The cover image sits top-right
-  (`clamp(7.5rem, 22cqw, 18.75rem)` wide, 16:9, `rounded-xs`); a card without a cover simply has
-  no image.
-- The vertical name is split server-side into at most two balanced lines (names over 14
-  characters) and sized to fit both the card height and the column:
-  `min(clamp(3rem, 9.5svh, 8rem), (stack height - 2.75rem) / (chars x 0.56), (column - 1rem) /
-  (lines x 0.95))`, with `cqw` units (the card is an inline-size container; `cqi` resolves
-  against the vertical text's own inline axis and must not be used). It is `aria-hidden`.
+- Card grid (from 768 px): three columns, `align-items: center` on the card row. Left: the area
+  name set upright and horizontal (`aria-hidden`, display weight 500, `-0.045em`, left aligned,
+  at most two balanced lines, hyphenated in the language), in a `28cqw` column. Middle: the
+  body, vertically centred: number (`text-label` cyan), the name as `text-h3` (the real heading
+  and the link), the description summary (`on-navy-muted`, 160 characters) and one tag with the
+  product count. Right: the image box, `clamp(10rem, 30cqw, 26rem)` wide and as tall as the
+  card, full bleed to the top, right and bottom edges, `object-cover`. Every card in the list
+  has the same height (`grid-auto-rows: 1fr` on the list, `min-height: min(66svh, 40rem)`) and
+  so the same image box, whatever the source aspect ratio; a card without a cover keeps the box
+  as a plain `navy-raised` panel.
+- The name is split server-side into at most two balanced lines (names over 14 characters) and
+  sized to fit its column: `clamp(1.75rem, (column - 2.25rem) / (chars x 0.52), min(5.5rem,
+  9.5svh))`, with `cqw` units (the card is an inline-size container).
+- Below 768 px the card stacks: image on top (full width, 16:9, identical on every card), then
+  the name and the body as one block centred in the remaining height.
 - Scroll-linked: while a later card covers card `i`, card `i` scales down by 0.045 per covering
   card (`transform-origin: 50% 0`), from cached positions in the shared loop, written only when
   the value changes.
@@ -470,6 +473,11 @@ used.
 | `clear` | Home only, while the pinned house film is behind the header: until the statement panel reaches the header or the film unpins, whichever comes first; at scroll 0 when the film is static (reduced motion, Save-Data, no film) | Full width, transparent background, white logo and links, a top scrim `from-navy-deep/60` (10 rem) over the film's own top scrim keeps 4.5:1 over bright frames | none |
 | `solid` | Every other scroll position, every other page, and while the mobile menu is open | Full width, solid `bg-navy` | Background `opacity` 0 to 1 (scrim 1 to 0), `--motion-base`, `--ease-standard` |
 
+- The logo is a real link to the locale home. Clicking it on the home page scrolls to 0
+  (Lenis on fine pointers, instant with reduced motion); from any other page it navigates and the
+  new page starts at 0. Reloading any page starts at 0 (`history.scrollRestoration = "manual"`
+  until the first user input, so later back/forward keeps the browser's restoration); a URL with a
+  hash still lands on its target.
 - Same height (`h-header`, 64 to 76 px), same logo (40 / 48 px), same container padding and
   same position in both states. No `clip-path`, no `translate`, no hide on scroll: the header is
   always in view, so sticky elements offset by `--spacing-header` (spec table heads, the card

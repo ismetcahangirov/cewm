@@ -22,7 +22,7 @@ import { mailtoHref, telHref } from "@/lib/contact-links";
 import { cx } from "@/lib/cx";
 import type { Locale } from "@/lib/i18n/config";
 import { documentTop, measure, onScroll, readScroll } from "@/lib/motion/loop";
-import { lockScroll } from "@/lib/motion/smooth-scroll";
+import { lockScroll, scrollToTop } from "@/lib/motion/smooth-scroll";
 import { formatAzerbaijaniPhone } from "@/lib/phone";
 
 import { button, buttonArrow } from "./button";
@@ -140,6 +140,19 @@ export function HeaderBar({
       <div data-header-row="" className="relative container-page flex h-full items-center gap-6">
         <Link
           href={home}
+          onClick={(event) => {
+            const plain =
+              event.button === 0 &&
+              !event.metaKey &&
+              !event.ctrlKey &&
+              !event.shiftKey &&
+              !event.altKey;
+            if (plain && pathname === home) {
+              event.preventDefault();
+              setOpenPath(null);
+              scrollToTop();
+            }
+          }}
           aria-label={`${siteName}: ${labels.home}`}
           className="inline-flex min-h-11 shrink-0 items-center"
         >

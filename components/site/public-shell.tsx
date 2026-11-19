@@ -10,6 +10,8 @@ import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
 import { VisitBeacon } from "./visit-beacon";
 
+const restoreTopOnReload = `(function(){try{var n=performance.getEntriesByType("navigation")[0];if(n&&n.type==="reload"){history.scrollRestoration="manual";var h=location.hash,go=function(){var t=h&&document.getElementById(decodeURIComponent(h.slice(1)));if(t)t.scrollIntoView();else if(!h)scrollTo(0,0)};go();addEventListener("load",go);var e=["wheel","touchstart","keydown","pointerdown","pagehide"],r=function(){history.scrollRestoration="auto";e.forEach(function(t){removeEventListener(t,r,true)})};e.forEach(function(t){addEventListener(t,r,{capture:true,passive:true})})}}catch(x){}})()`;
+
 export function PublicShell({
   locale,
   dict,
@@ -22,6 +24,7 @@ export function PublicShell({
   return (
     <html lang={locale} className={fontClassName}>
       <body>
+        <script dangerouslySetInnerHTML={{ __html: restoreTopOnReload }} />
         <a
           href="#main"
           className="text-ink sr-only bg-white px-4 py-3 text-small focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-60"
