@@ -52,7 +52,7 @@ async function ContactDetails({ locale, dict }: { locale: Locale; dict: Dictiona
       <dl className="flex flex-col gap-4">
         {address ? (
           <div>
-            <dt className="text-meta text-muted">{dict.contact.address}</dt>
+            <dt className="text-ink-muted text-small">{dict.contact.address}</dt>
             <dd>
               {address}
               {settings.mapUrl ? (
@@ -70,7 +70,7 @@ async function ContactDetails({ locale, dict }: { locale: Locale; dict: Dictiona
         ) : null}
         {settings.phones.length ? (
           <div>
-            <dt className="text-meta text-muted">{dict.contact.phone}</dt>
+            <dt className="text-ink-muted text-small">{dict.contact.phone}</dt>
             {settings.phones.map((phone) => (
               <dd key={phone.number}>
                 <a href={`tel:${phone.number}`}>{formatAzerbaijaniPhone(phone.number)}</a>
@@ -80,7 +80,7 @@ async function ContactDetails({ locale, dict }: { locale: Locale; dict: Dictiona
         ) : null}
         {settings.emails.length ? (
           <div>
-            <dt className="text-meta text-muted">{dict.contact.email}</dt>
+            <dt className="text-ink-muted text-small">{dict.contact.email}</dt>
             {settings.emails.map((email) => (
               <dd key={email}>
                 <a href={`mailto:${email}`}>{email}</a>
@@ -98,7 +98,7 @@ async function ContactDetails({ locale, dict }: { locale: Locale; dict: Dictiona
             {persons.map((person) => (
               <li key={person.id}>
                 <p className="font-semibold text-navy">{person.name}</p>
-                <p className="text-meta text-muted">{person.role}</p>
+                <p className="text-ink-muted text-small">{person.role}</p>
                 {person.phones.map((phone) => (
                   <a key={phone} href={`tel:${phone}`} className="block min-h-11 py-2">
                     {formatAzerbaijaniPhone(phone)}

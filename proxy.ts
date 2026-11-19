@@ -2,8 +2,10 @@ import { getSessionCookie } from "better-auth/cookies";
 import { NextResponse, type NextRequest } from "next/server";
 
 import { adminPaths, publicAdminPaths } from "@/lib/auth/paths";
-import { defaultLocale, locales } from "@/lib/i18n/config";
+import { defaultLocale, locales, type Locale } from "@/lib/i18n/config";
+import { localeHeader } from "@/lib/i18n/request-locale";
 import { isLegacySitemap, normalizeLegacyPath, sitemapPath } from "@/lib/legacy-redirects";
+import { publicPathExists } from "@/lib/public/exists";
 import { legacyRedirects } from "@/lib/redirects/legacy";
 
 const prefixed = locales.filter((locale) => locale !== defaultLocale);
@@ -34,7 +36,7 @@ function guardAdmin(request: NextRequest): NextResponse {
   return NextResponse.redirect(url);
 }
 
-function routeLocale(request: NextRequest): NextResponse {
+async function routeLocale(request: NextRequest): Promise<NextResponse> {
   const { pathname } = request.nextUrl;
   const [, first] = pathname.split("/");
 
@@ -44,11 +46,22 @@ function routeLocale(request: NextRequest): NextResponse {
     return NextResponse.redirect(url, 308);
   }
 
-  if ((prefixed as string[]).includes(first)) return NextResponse.next();
+  const prefixedLocale = (prefixed as string[]).includes(first) ? (first as Locale) : null;
+  const locale = prefixedLocale ?? defaultLocale;
+  const segments = pathname
+    .split("/")
+    .filter(Boolean)
+    .slice(prefixedLocale ? 1 : 0);
+  const headers = new Headers(request.headers);
+  headers.set(localeHeader, locale);
 
   const url = request.nextUrl.clone();
-  url.pathname = `/${defaultLocale}${pathname === "/" ? "" : pathname}`;
-  return NextResponse.rewrite(url);
+  if (!prefixedLocale) url.pathname = `/${defaultLocale}${pathname === "/" ? "" : pathname}`;
+  if (!(await publicPathExists(locale, segments))) {
+    return NextResponse.rewrite(url, { status: 404, request: { headers } });
+  }
+  if (prefixedLocale) return NextResponse.next({ request: { headers } });
+  return NextResponse.rewrite(url, { request: { headers } });
 }
 
 const internalPrefixes = ["/admin", "/api", "/_next", "/media"];

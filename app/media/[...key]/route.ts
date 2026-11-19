@@ -5,6 +5,10 @@ import { portraitCrop, portraitCropSize } from "@/lib/media-crop";
 
 const cacheControl = "public, max-age=86400, stale-while-revalidate=604800";
 
+const immutableCacheControl = "public, max-age=31536000, immutable";
+
+const immutablePrefixes = ["film/"];
+
 const croppable = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 async function cropToPortrait(body: ReadableStream): Promise<Uint8Array<ArrayBuffer> | null> {
@@ -35,7 +39,11 @@ export async function GET(request: Request, { params }: RouteContext<"/media/[..
   if (object.status === "missing") return new Response(null, { status: 404 });
   if (object.status === "unsatisfiable") return new Response(null, { status: 416 });
 
-  const headers = new Headers({ "Cache-Control": cacheControl, "Accept-Ranges": "bytes" });
+  const immutable = immutablePrefixes.some((prefix) => key.join("/").startsWith(prefix));
+  const headers = new Headers({
+    "Cache-Control": immutable ? immutableCacheControl : cacheControl,
+    "Accept-Ranges": "bytes",
+  });
   if (object.etag) headers.set("ETag", object.etag);
   if (object.status === "not-modified") return new Response(null, { status: 304, headers });
 

@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRightIcon, CloseIcon, SpinnerIcon } from "@/components/icons/iconsax";
+import { ArrowRightIcon, CloseIcon, DangerIcon } from "@/components/icons/iconsax";
 import Image from "next/image";
 import Link from "next/link";
 import { useId, useState, type FormEvent, type ReactNode } from "react";
@@ -77,7 +77,7 @@ function TextField({
 }) {
   return (
     <div className="flex flex-col">
-      <label htmlFor={id} className="text-meta text-graphite">
+      <label htmlFor={id} className="text-ink text-small font-medium">
         {label}
         {required && (
           <>
@@ -88,12 +88,13 @@ function TextField({
       </label>
       {children}
       {hint && !error && (
-        <p id={`${id}-hint`} className="mt-1.5 text-meta text-graphite">
+        <p id={`${id}-hint`} className="text-ink-muted mt-2 text-small">
           {hint}
         </p>
       )}
       {error && (
-        <p id={`${id}-error`} className="mt-1.5 text-meta text-error">
+        <p id={`${id}-error`} className="text-danger mt-2 flex items-center gap-2 text-small">
+          <DangerIcon size={16} className="shrink-0" />
           {error}
         </p>
       )}
@@ -102,9 +103,9 @@ function TextField({
 }
 
 const fieldClass =
-  "mt-2 w-full rounded-none border-0 border-b border-black bg-white px-4.5 text-small text-graphite transition-colors duration-300 placeholder:text-graphite aria-invalid:border-error";
+  "mt-2 w-full rounded-xs border border-line-strong bg-white px-4 text-base text-ink transition-colors duration-200 placeholder:text-ink-muted hover:border-ink aria-invalid:border-danger";
 
-const inputClass = `${fieldClass} h-15`;
+const inputClass = `${fieldClass} h-12`;
 
 export function ConsultationForm({
   locale,
@@ -192,17 +193,17 @@ export function ConsultationForm({
   if (status === "sent") {
     return (
       <div role="status" className="flex flex-col items-start gap-4">
-        <p className="text-h3 text-heading">{labels.successTitle}</p>
+        <p className="text-ink text-h3">{labels.successTitle}</p>
         <p>{labels.successBody}</p>
         <Link
           href={productsHref}
-          className="group inline-flex min-h-11 items-center gap-3.75 text-small text-graphite"
+          className="group text-cyan-ink hover:text-ink inline-flex min-h-11 items-center gap-2 text-small underline decoration-1 underline-offset-4"
         >
-          <ArrowRightIcon
-            aria-hidden="true"
-            className="size-4 transition-transform duration-300 group-hover:translate-x-1"
-          />
           {labels.successLink}
+          <ArrowRightIcon
+            size={16}
+            className="transition-transform duration-200 group-hover:translate-x-1"
+          />
         </Link>
       </div>
     );
@@ -216,16 +217,16 @@ export function ConsultationForm({
       noValidate
       onSubmit={onSubmit}
       onFocus={() => void loadConsultation().catch(() => undefined)}
-      className="flex flex-col gap-7.5"
+      className="flex flex-col gap-6"
     >
       {products.length > 0 && (
         <fieldset>
-          <legend className="text-meta text-graphite">{labels.products}</legend>
+          <legend className="text-ink text-small">{labels.products}</legend>
           <ul className="mt-2 flex flex-col gap-2">
             {products.map((product) => (
               <li key={product.id} className="flex items-center gap-4 bg-white pr-1 pl-2">
                 {product.image && (
-                  <span className="relative size-14 shrink-0 bg-surface">
+                  <span className="bg-mist relative size-14 shrink-0">
                     <Image
                       src={product.image.src}
                       alt=""
@@ -235,16 +236,16 @@ export function ConsultationForm({
                     />
                   </span>
                 )}
-                <span className="min-w-0 flex-1 text-small text-fg">{product.name}</span>
+                <span className="text-ink min-w-0 flex-1 text-small">{product.name}</span>
                 <button
                   type="button"
                   onClick={() =>
                     setProducts((current) => current.filter((item) => item.id !== product.id))
                   }
                   aria-label={`${labels.removeProduct}: ${product.name}`}
-                  className="inline-flex size-11 shrink-0 items-center justify-center text-graphite hover:text-black"
+                  className="text-ink hover:text-ink inline-flex size-11 shrink-0 items-center justify-center"
                 >
-                  <CloseIcon aria-hidden="true" className="size-4" />
+                  <CloseIcon size={20} />
                 </button>
               </li>
             ))}
@@ -295,7 +296,7 @@ export function ConsultationForm({
         />
       </TextField>
 
-      <div className="grid gap-7.5 sm:grid-cols-2">
+      <div className="grid gap-6 sm:grid-cols-2">
         <TextField
           id={`${uid}-email`}
           label={labels.email}
@@ -348,7 +349,7 @@ export function ConsultationForm({
           onChange={(event) => update("message", event.target.value)}
           aria-invalid={errors.message ? true : undefined}
           aria-describedby={describedBy("message")}
-          className={cx(fieldClass, "min-h-25 resize-y py-4")}
+          className={cx(fieldClass, "min-h-32 resize-y py-3")}
         />
       </TextField>
 
@@ -366,7 +367,7 @@ export function ConsultationForm({
       </div>
 
       {formError && (
-        <p role="alert" className="text-meta text-error">
+        <p role="alert" className="text-danger text-small">
           {formError}
         </p>
       )}
@@ -375,12 +376,10 @@ export function ConsultationForm({
         type="submit"
         disabled={isLoading}
         aria-busy={isLoading || undefined}
-        className={cx(button(), "self-start disabled:opacity-50 max-sm:w-full")}
+        className={cx(button(), "relative self-start overflow-clip max-sm:w-full")}
       >
-        {isLoading && (
-          <SpinnerIcon aria-hidden="true" className="size-4 motion-safe:animate-spin" />
-        )}
         {isLoading ? labels.sending : labels.submit}
+        {isLoading ? <span aria-hidden="true" className="form-progress" /> : null}
       </button>
     </form>
   );

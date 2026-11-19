@@ -16,7 +16,10 @@
     "breadcrumb": "Naviqasiya yolu",
     "contactUs": "Bizimlə əlaqə",
     "previous": "Əvvəlki",
-    "next": "Növbəti"
+    "next": "Növbəti",
+    "contact": "Əlaqə",
+    "openMenu": "Menyunu aç",
+    "closeMenu": "Menyunu bağla"
   },
   "contact": {
     "title": "Əlaqə",
@@ -34,14 +37,42 @@
   "footer": {
     "contacts": "Əlaqə",
     "followUs": "Bizi izləyin",
-    "rights": "Bütün hüquqlar qorunur."
+    "rights": "Bütün hüquqlar qorunur.",
+    "navigation": "Naviqasiya",
+    "brands": "Brendlər"
   },
   "home": {
     "categoriesTitle": "Məhsul kateqoriyaları",
     "productsTitle": "Seçilmiş avadanlıqlar",
     "brandsTitle": "Təmsil etdiyimiz brendlər",
     "clientsTitle": "Müştərilərimiz",
-    "postsTitle": "Bloq"
+    "postsTitle": "Bloq",
+    "categoriesEyebrow": "Kataloq",
+    "productsEyebrow": "Avadanlıq",
+    "brandsEyebrow": "Tərəfdaşlar",
+    "clientsEyebrow": "Müştərilər",
+    "postsEyebrow": "Bloq",
+    "consultationEyebrow": "Müraciət",
+    "statementEyebrow": "CEWM",
+    "statement": "CEWM HOMAG-ın Azərbaycandakı tərəfdaşıdır. Mebel və ağac emalı istehsalçılarına kəsmə, kənar örtmə, CNC emalı, deşmə, montaj və qablaşdırma üçün avadanlıq seçməkdə kömək edirik.",
+    "chapters": {
+      "exterior": {
+        "label": "Fasad",
+        "text": "Fasad panelləri, pəncərə və qapı blokları: CNC emalı və kəsmə."
+      },
+      "threshold": {
+        "label": "Pilləkən və qapılar",
+        "text": "Pilləkən pillələri, qapı çərçivələri və arakəsmələr."
+      },
+      "living": {
+        "label": "Qonaq otağı",
+        "text": "Korpus mebeli və rəflər: kəsmə, kənar örtmə, deşmə."
+      },
+      "kitchen": {
+        "label": "Mətbəx",
+        "text": "Mətbəx fasadları və korpusları: kəsmədən montaja və qablaşdırmaya qədər."
+      }
+    }
   },
   "catalog": {
     "title": "Məhsullar",

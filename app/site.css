@@ -1,7 +1,407 @@
 @import "tailwindcss" source(none);
 @import "./globals.css";
+@import "../lib/motion/motion.css";
 
 @source ".";
 @source not "./admin";
 @source "../components/site";
 @source "../components/icons";
+@source "../components/motion";
+@source "../components/home";
+
+.site-main {
+  position: relative;
+  z-index: 1;
+  background: var(--color-white);
+  padding-top: var(--spacing-header);
+}
+
+:root:has([data-hero-film]) .site-main {
+  padding-top: 0;
+}
+
+.site-header {
+  transition: transform var(--motion-base) var(--ease-out-expo);
+}
+
+.site-header[data-state="hidden"] {
+  transform: translateY(-120%);
+  transition-timing-function: var(--ease-in);
+}
+
+.site-header-bg {
+  position: absolute;
+  inset: 0;
+  background-color: var(--color-navy);
+  clip-path: inset(0 0 0 0 round 0);
+  transition:
+    clip-path var(--motion-slow) var(--ease-out-expo),
+    background-color var(--motion-slow) var(--ease-out-expo);
+}
+
+.site-header-scrim {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 10rem;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--color-navy-deep) 60%, transparent),
+    transparent
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity var(--motion-slow) var(--ease-out-expo);
+}
+
+.site-header-start,
+.site-header-end {
+  transition: transform var(--motion-slow) var(--ease-out-expo);
+}
+
+.site-header:not([data-state="top"]) .site-header-bg {
+  clip-path: inset(0.5rem var(--island-x, 0.5rem) 0.5rem round var(--radius-md));
+  background-color: color-mix(in oklab, var(--color-navy) 88%, transparent);
+}
+
+.site-header:not([data-state="top"]) .site-header-start {
+  transform: translateX(var(--island-shift, 0px));
+}
+
+.site-header:not([data-state="top"]) .site-header-end {
+  transform: translateX(calc(-1 * var(--island-shift, 0px)));
+}
+
+@media (pointer: fine) and (prefers-reduced-transparency: no-preference) {
+  .site-header:not([data-state="top"]) .site-header-bg {
+    backdrop-filter: blur(var(--blur-glass));
+  }
+}
+
+@media (pointer: coarse), (prefers-reduced-transparency: reduce) {
+  .site-header:not([data-state="top"]) .site-header-bg {
+    background-color: var(--color-navy);
+  }
+}
+
+:root:has([data-hero-film]) .site-header[data-state="top"] .site-header-bg {
+  background-color: transparent;
+}
+
+:root:has([data-hero-film]) .site-header[data-state="top"] .site-header-scrim {
+  opacity: 1;
+}
+
+.site-footer {
+  position: relative;
+  overflow-x: clip;
+}
+
+@media (min-width: 1024px) and (min-height: 860px) {
+  .site-footer {
+    position: sticky;
+    bottom: 0;
+    z-index: 0;
+  }
+}
+
+.footer-wordmark {
+  margin-top: 2rem;
+  font-family: var(--font-display);
+  font-size: 32cqi;
+  font-weight: var(--font-weight-semibold);
+  line-height: 0.8;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+  color: var(--color-white);
+}
+
+.footer-wordmark > span {
+  padding: 0.06em 0.04em;
+  margin: -0.06em -0.04em;
+}
+
+@layer components {
+  .rich-text {
+    color: var(--color-ink);
+    > * + * {
+      margin-top: 1.25rem;
+    }
+    h2,
+    h3,
+    h4 {
+      margin-top: 2.25rem;
+    }
+    h2 {
+      font-size: var(--text-h3);
+      line-height: var(--text-h3--line-height);
+      letter-spacing: var(--text-h3--letter-spacing);
+      font-weight: var(--font-weight-medium);
+    }
+    h3,
+    h4 {
+      font-size: var(--text-h4);
+      line-height: var(--text-h4--line-height);
+      font-weight: var(--font-weight-medium);
+    }
+    strong {
+      font-weight: var(--font-weight-semibold);
+    }
+    a {
+      color: var(--color-cyan-ink);
+      text-decoration-line: underline;
+      text-decoration-thickness: 1px;
+      text-underline-offset: 4px;
+    }
+    a:hover {
+      color: var(--color-ink);
+      text-underline-offset: 2px;
+    }
+    ul,
+    ol {
+      padding-left: 1.25rem;
+    }
+    ul {
+      list-style-type: disc;
+    }
+    ol {
+      list-style-type: decimal;
+    }
+    li + li {
+      margin-top: 0.5rem;
+    }
+    blockquote {
+      border-left: 2px solid var(--color-cyan-ink);
+      padding-left: 1.25rem;
+      font-size: var(--text-lead);
+      line-height: var(--text-lead--line-height);
+    }
+    figure img {
+      width: 100%;
+      height: auto;
+    }
+    figcaption {
+      margin-top: 0.625rem;
+      font-size: var(--text-small);
+      color: var(--color-ink-muted);
+    }
+    .rich-table {
+      overflow-x: auto;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: var(--text-small);
+    }
+    th,
+    td {
+      border-bottom: 1px solid var(--color-line);
+      padding: 0.75rem 1rem 0.75rem 0;
+      text-align: left;
+      vertical-align: top;
+    }
+    th > p,
+    td > p {
+      margin: 0;
+    }
+  }
+}
+
+.hero-film {
+  position: relative;
+}
+
+.hero-stage {
+  position: sticky;
+  top: 0;
+  z-index: 0;
+  height: 100svh;
+  overflow: clip;
+}
+
+.hero-frame {
+  position: absolute;
+  inset: 0;
+}
+
+.hero-poster,
+.hero-canvas,
+.hero-canvas > canvas {
+  position: absolute;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hero-poster {
+  object-fit: cover;
+  transition: opacity var(--motion-fast) var(--ease-standard);
+}
+
+.hero-poster[data-hidden] {
+  opacity: 0;
+}
+
+.hero-scrim-top,
+.hero-scrim-bottom {
+  position: absolute;
+  inset-inline: 0;
+  height: 55%;
+  pointer-events: none;
+}
+
+.hero-scrim-top {
+  top: 0;
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--color-navy-deep) 80%, transparent) 0%,
+    color-mix(in oklab, var(--color-navy-deep) 70%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+.hero-scrim-bottom {
+  bottom: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in oklab, var(--color-navy-deep) 80%, transparent) 0%,
+    color-mix(in oklab, var(--color-navy-deep) 70%, transparent) 45%,
+    transparent 100%
+  );
+}
+
+.hero-copy {
+  position: relative;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  height: 100%;
+  padding-top: calc(var(--spacing-header) + 1.5rem);
+  padding-bottom: 2.5rem;
+  container-type: inline-size;
+}
+
+.hero-title {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  font-family: var(--font-display);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--text-h1--line-height);
+  letter-spacing: var(--text-h1--letter-spacing);
+  text-wrap: balance;
+}
+
+.hero-title-a,
+.hero-title-b {
+  display: block;
+  max-width: 100%;
+  will-change: transform, opacity;
+}
+
+.hero-title-b {
+  grid-row: 3;
+  justify-self: end;
+  text-align: right;
+}
+
+.hero-lead {
+  display: flex;
+  flex-direction: column;
+  max-width: 36rem;
+  margin-top: 1.5rem;
+}
+
+.hero-chapters {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.hero-chapter {
+  position: absolute;
+  bottom: 2.5rem;
+  left: var(--spacing-gutter);
+  max-width: min(36rem, calc(100% - 2 * var(--spacing-gutter)));
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity var(--motion-fast) var(--ease-in),
+    transform var(--motion-fast) var(--ease-in);
+}
+
+.hero-chapter.is-top {
+  top: calc(var(--spacing-header) + 1.5rem);
+  bottom: auto;
+}
+
+.hero-chapter[data-active] {
+  opacity: 1;
+  transform: none;
+  transition-duration: var(--motion-base);
+  transition-timing-function: var(--ease-out-expo);
+}
+
+.hero-spacer {
+  height: 300svh;
+}
+
+@media (min-width: 1024px) {
+  .hero-spacer {
+    height: 400svh;
+  }
+}
+
+.hero-film[data-hero-static] .hero-stage {
+  position: relative;
+  height: auto;
+}
+
+.hero-film[data-hero-static] .hero-frame {
+  position: relative;
+  height: 100svh;
+}
+
+.hero-film[data-hero-static] .hero-spacer {
+  display: none;
+}
+
+.hero-film[data-hero-static] .hero-chapters {
+  position: relative;
+  display: grid;
+  gap: var(--spacing-column);
+  padding-block: 3rem;
+  grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+}
+
+.hero-film[data-hero-static] .hero-chapter {
+  position: static;
+  max-width: none;
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce), (scripting: none), (max-height: 500px) {
+  .hero-stage {
+    position: relative;
+    height: auto;
+  }
+  .hero-frame {
+    position: relative;
+    height: 100svh;
+  }
+  .hero-spacer {
+    display: none;
+  }
+  .hero-chapters {
+    position: relative;
+    display: grid;
+    gap: var(--spacing-column);
+    padding-block: 3rem;
+    grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+  }
+  .hero-chapter {
+    position: static;
+    max-width: none;
+    opacity: 1;
+    transform: none;
+  }
+}

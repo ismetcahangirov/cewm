@@ -1,12 +1,22 @@
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Image from "next/image";
 import Link from "next/link";
 import { connection } from "next/server";
+import type { ReactNode } from "react";
 
-import { button } from "@/components/site/button";
+import { HeroFilm } from "@/components/home/hero-film";
+import type { HeroChapter } from "@/components/home/hero-film-player";
+import { ArrowRightIcon } from "@/components/icons/iconsax";
+import { RowPreview } from "@/components/motion/row-preview";
+import { PanelPush } from "@/components/motion/scenes";
+import { LineReveal, Reveal, WordReveal } from "@/components/motion/text";
+import { button, buttonArrow } from "@/components/site/button";
+import { ConsultationSection } from "@/components/site/consultation/consultation-section";
 import { JsonLdScript } from "@/components/site/json-ld";
 import { ProductGrid } from "@/components/site/product-card";
 import { RichText } from "@/components/site/rich-text";
+import { cx } from "@/lib/cx";
 import { env } from "@/lib/env";
 import { localePath, type Locale } from "@/lib/i18n/config";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
@@ -21,6 +31,7 @@ import {
   getHomeSections,
   getLatestPosts,
   type CustomBlock,
+  type HomeHero,
   type HomeSection,
 } from "@/lib/public/home";
 import { getSiteSettings } from "@/lib/public/settings";
@@ -28,6 +39,13 @@ import { staticPaths } from "@/lib/public/slug";
 import { routes } from "@/lib/routes";
 import { businessJsonLd, websiteJsonLd } from "@/lib/seo/json-ld";
 import { pageMetadata } from "@/lib/seo/metadata";
+
+const chapterWindows = [
+  { key: "exterior", from: 0.19, to: 0.27, placement: "bottom" },
+  { key: "threshold", from: 0.3, to: 0.5, placement: "bottom" },
+  { key: "living", from: 0.56, to: 0.77, placement: "bottom" },
+  { key: "kitchen", from: 0.83, to: 1.01, placement: "top" },
+] as const satisfies Pick<HeroChapter, "key" | "from" | "to" | "placement">[];
 
 export async function generateMetadata(): Promise<Metadata> {
   await connection();
@@ -53,19 +71,26 @@ export async function generateMetadata(): Promise<Metadata> {
 
 function SectionShell({
   id,
+  eyebrow,
   title,
+  tone = "white",
   children,
 }: {
   id: string;
+  eyebrow: string;
   title: string;
-  children: React.ReactNode;
+  tone?: "white" | "mist";
+  children: ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="container-page py-section">
-      <h2 id={id} className="text-h2">
-        {title}
-      </h2>
-      <div className="mt-8">{children}</div>
+    <section aria-labelledby={id} className={tone === "mist" ? "surface-mist" : undefined}>
+      <div className="container-page py-section">
+        <div className="gap-x-column grid gap-y-6 lg:grid-cols-12">
+          <p className="text-label text-cyan-ink uppercase lg:col-span-3 lg:pt-3">{eyebrow}</p>
+          <LineReveal id={id} text={title} className="text-h2 lg:col-span-9" />
+        </div>
+        <Reveal className="mt-12 lg:mt-16">{children}</Reveal>
+      </div>
     </section>
   );
 }
@@ -85,19 +110,27 @@ async function BuiltInSection({
       const categories = await getHomeCategories(locale);
       if (!categories.length) return null;
       return (
-        <SectionShell id={id} title={section.title ?? dict.home.categoriesTitle}>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {categories.map((category) => (
-              <li key={category.id}>
-                <Link
-                  href={category.href}
-                  className="flex min-h-24 items-end border border-line bg-light p-4 text-card font-semibold text-navy hover:border-cyan"
-                >
-                  {category.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <SectionShell
+          id={id}
+          eyebrow={dict.home.categoriesEyebrow}
+          title={section.title ?? dict.home.categoriesTitle}
+        >
+          <RowPreview
+            label={section.title ?? dict.home.categoriesTitle}
+            rows={categories.map((category) => ({
+              id: category.id,
+              href: category.href,
+              title: category.name,
+              image: category.image,
+            }))}
+          />
+          <Link
+            href={localePath(locale, routes.catalogue())}
+            className={cx(button({ variant: "outline" }), "mt-10")}
+          >
+            {dict.common.allProducts}
+            <ArrowRightIcon size={20} className={buttonArrow} />
+          </Link>
         </SectionShell>
       );
     }
@@ -105,7 +138,11 @@ async function BuiltInSection({
       const products = await getFeaturedProducts(locale);
       if (!products.length) return null;
       return (
-        <SectionShell id={id} title={section.title ?? dict.home.productsTitle}>
+        <SectionShell
+          id={id}
+          eyebrow={dict.home.productsEyebrow}
+          title={section.title ?? dict.home.productsTitle}
+        >
           <ProductGrid products={products} />
         </SectionShell>
       );
@@ -114,27 +151,56 @@ async function BuiltInSection({
       const brands = await getBrands(locale);
       if (!brands.length) return null;
       return (
-        <SectionShell id={id} title={section.title ?? dict.home.brandsTitle}>
-          <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {brands.map((brand) => (
-              <li
-                key={brand.id}
-                className="flex min-h-24 items-center justify-center border border-line p-4"
-              >
-                {brand.image ? (
-                  <Image
-                    src={brand.image.src}
-                    alt={brand.image.alt}
-                    width={brand.image.width}
-                    height={brand.image.height}
-                    sizes="240px"
-                    className="max-h-16 w-auto"
-                  />
-                ) : (
-                  <span className="text-card font-semibold text-navy">{brand.name}</span>
-                )}
-              </li>
-            ))}
+        <SectionShell
+          id={id}
+          eyebrow={dict.home.brandsEyebrow}
+          title={section.title ?? dict.home.brandsTitle}
+          tone="mist"
+        >
+          <ul className="grid gap-px border border-line bg-line sm:grid-cols-2 lg:grid-cols-4">
+            {brands.map((brand) => {
+              const body = (
+                <>
+                  {brand.image ? (
+                    <Image
+                      src={brand.image.src}
+                      alt={brand.image.alt}
+                      width={brand.image.width}
+                      height={brand.image.height}
+                      sizes="240px"
+                      className="h-12 w-auto object-contain object-left"
+                    />
+                  ) : (
+                    <span className="text-h3">{brand.name}</span>
+                  )}
+                  {brand.description ? (
+                    <span className="text-ink-muted text-small">{brand.description}</span>
+                  ) : null}
+                  {brand.url ? (
+                    <span className="text-cyan-ink group-hover/brand:text-ink mt-auto inline-flex min-h-11 items-end text-small underline decoration-1 underline-offset-4 transition-colors duration-200">
+                      {dict.brands.visit}
+                    </span>
+                  ) : null}
+                </>
+              );
+              return (
+                <li key={brand.id} className="bg-mist flex">
+                  {brand.url ? (
+                    <a
+                      href={brand.url}
+                      target="_blank"
+                      rel="noopener"
+                      aria-label={`${brand.name}: ${dict.brands.visit}`}
+                      className="group/brand flex min-h-48 w-full flex-col gap-4 p-8 transition-colors duration-200 hover:bg-white"
+                    >
+                      {body}
+                    </a>
+                  ) : (
+                    <div className="flex min-h-48 w-full flex-col gap-4 p-8">{body}</div>
+                  )}
+                </li>
+              );
+            })}
           </ul>
         </SectionShell>
       );
@@ -143,10 +209,14 @@ async function BuiltInSection({
       const logos = await getClientLogos(locale);
       if (!logos.length) return null;
       return (
-        <SectionShell id={id} title={section.title ?? dict.home.clientsTitle}>
-          <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <SectionShell
+          id={id}
+          eyebrow={dict.home.clientsEyebrow}
+          title={section.title ?? dict.home.clientsTitle}
+        >
+          <ul className="grid grid-cols-2 gap-px border border-line bg-line sm:grid-cols-3 lg:grid-cols-6">
             {logos.map((logo) => (
-              <li key={logo.id} className="flex min-h-20 items-center justify-center p-2">
+              <li key={logo.id} className="flex min-h-32 items-center justify-center bg-white p-6">
                 <Image
                   src={logo.image.src}
                   alt={logo.image.alt}
@@ -165,19 +235,15 @@ async function BuiltInSection({
       const posts = await getLatestPosts(locale);
       if (!posts.length) return null;
       return (
-        <SectionShell id={id} title={section.title ?? dict.home.postsTitle}>
-          <ul className="grid gap-4 md:grid-cols-3">
-            {posts.map((post) => (
-              <li key={post.id}>
-                <Link
-                  href={post.href}
-                  className="block border border-line p-4 text-card text-navy hover:border-cyan"
-                >
-                  {post.title}
-                </Link>
-              </li>
-            ))}
-          </ul>
+        <SectionShell
+          id={id}
+          eyebrow={dict.home.postsEyebrow}
+          title={section.title ?? dict.home.postsTitle}
+        >
+          <RowPreview
+            label={section.title ?? dict.home.postsTitle}
+            rows={posts.map((post) => ({ id: post.id, href: post.href, title: post.title }))}
+          />
         </SectionShell>
       );
     }
@@ -185,66 +251,108 @@ async function BuiltInSection({
 }
 
 function CustomSection({ id, block }: { id: string; block: CustomBlock }) {
+  const navy = block.tone === "navy";
   return (
     <section
       aria-labelledby={block.title ? `custom-${id}` : undefined}
-      className={
-        block.tone === "navy" ? "bg-navy text-white" : block.tone === "light" ? "bg-light" : ""
-      }
+      className={navy ? "surface-navy" : block.tone === "light" ? "surface-mist" : undefined}
     >
-      <div className="container-page grid gap-8 py-section md:grid-cols-2">
-        <div>
-          {block.eyebrow ? <p className="text-meta">{block.eyebrow}</p> : null}
+      <div className="gap-x-column container-page grid gap-y-10 py-section lg:grid-cols-12">
+        <Reveal className={block.image || block.video ? "lg:col-span-6" : "lg:col-span-8"}>
+          {block.eyebrow ? (
+            <p className={cx("text-label uppercase", navy ? "text-cyan" : "text-cyan-ink")}>
+              {block.eyebrow}
+            </p>
+          ) : null}
           {block.title ? (
-            <h2
-              id={`custom-${id}`}
-              className={block.tone === "navy" ? "text-h2 text-white" : "text-h2"}
-            >
+            <h2 id={`custom-${id}`} className="mt-4 text-h2">
               {block.title}
             </h2>
           ) : null}
-          {block.body ? <RichText doc={block.body} className="mt-4" /> : null}
+          {block.body ? <RichText doc={block.body} className="mt-6" /> : null}
           {block.link ? (
-            <Link href={block.link.href} className={button({ className: "mt-6" })}>
+            <Link
+              href={block.link.href}
+              className={cx(button({ variant: navy ? "accent" : "filled" }), "mt-8")}
+            >
               {block.link.label}
+              <ArrowRightIcon size={20} className={buttonArrow} />
             </Link>
           ) : null}
-        </div>
+        </Reveal>
         {block.image ? (
-          <Image
-            src={block.image.src}
-            alt={block.image.alt}
-            width={block.image.width}
-            height={block.image.height}
-            sizes="(min-width: 768px) 50vw, 100vw"
-            className="h-auto w-full"
-          />
+          <Reveal className="lg:col-span-6">
+            <Image
+              src={block.image.src}
+              alt={block.image.alt}
+              width={block.image.width}
+              height={block.image.height}
+              sizes="(min-width: 1024px) 50vw, 100vw"
+              className="h-auto w-full"
+            />
+          </Reveal>
         ) : block.video ? (
-          <video
-            controls
-            muted={!block.video.sound}
-            playsInline
-            preload="metadata"
-            poster={block.poster?.src}
-            aria-label={block.video.label ?? undefined}
-            className="h-auto w-full"
-          >
-            <source src={block.video.src} type={block.video.type} />
-          </video>
+          <Reveal className="lg:col-span-6">
+            <video
+              controls
+              muted={!block.video.sound}
+              playsInline
+              preload="metadata"
+              poster={block.poster?.src}
+              aria-label={block.video.label ?? undefined}
+              className="h-auto w-full"
+            >
+              <source src={block.video.src} type={block.video.type} />
+            </video>
+          </Reveal>
         ) : null}
       </div>
     </section>
   );
 }
 
+function Statement({ locale, dict }: { locale: Locale; dict: Dictionary }) {
+  return (
+    <PanelPush labelledBy="home-statement" className="flex items-center">
+      <div className="gap-x-column container-page grid w-full gap-y-8 py-section lg:grid-cols-12">
+        <h2 id="home-statement" className="text-label text-cyan uppercase lg:col-span-3 lg:pt-3">
+          {dict.home.statementEyebrow}
+        </h2>
+        <div className="lg:col-span-9">
+          <WordReveal text={dict.home.statement} className="text-h3" />
+          <Reveal className="mt-10">
+            <Link
+              href={localePath(locale, routes.catalogue())}
+              className={button({ variant: "accent" })}
+            >
+              {dict.common.allProducts}
+              <ArrowRightIcon size={20} className={buttonArrow} />
+            </Link>
+          </Reveal>
+        </div>
+      </div>
+    </PanelPush>
+  );
+}
+
+function fallbackHero(dict: Dictionary): HomeHero {
+  return { headline: dict.meta.homeTitle, subline: null, cta: null, film: null };
+}
+
 export default async function HomePage() {
   await connection();
   const { locale, dict } = await getRequestDictionary();
-  const [hero, sections, settings] = await Promise.all([
+  const [hero, sections, settings, requestHeaders] = await Promise.all([
     getHero(locale),
     getHomeSections(locale),
     getSiteSettings(),
+    headers(),
   ]);
+  const saveData = requestHeaders.get("save-data")?.toLowerCase() === "on";
+  const chapters: HeroChapter[] = chapterWindows.map((window) => ({
+    ...window,
+    ...dict.home.chapters[window.key],
+  }));
 
   return (
     <>
@@ -254,37 +362,12 @@ export default async function HomePage() {
           websiteJsonLd(settings, locale, env.NEXT_PUBLIC_SITE_URL),
         ]}
       />
-      <section data-hero="" className="bg-navy text-white">
-        <div className="container-page py-section">
-          <h1 className="max-w-4xl text-h1 text-white">{hero?.headline ?? dict.meta.homeTitle}</h1>
-          {hero?.subline ? <p className="mt-4 max-w-2xl text-lead">{hero.subline}</p> : null}
-          <div className="mt-8 flex flex-wrap gap-4">
-            {hero?.cta ? (
-              <Link href={hero.cta.href} className={button({ className: "bg-cyan text-navy" })}>
-                {hero.cta.label}
-              </Link>
-            ) : (
-              <Link
-                href={localePath(locale, routes.catalogue())}
-                className={button({ className: "bg-cyan text-navy" })}
-              >
-                {dict.common.allProducts}
-              </Link>
-            )}
-          </div>
-          {hero?.film?.poster ? (
-            <Image
-              src={hero.film.poster.src}
-              alt={hero.film.poster.alt}
-              width={hero.film.poster.width}
-              height={hero.film.poster.height}
-              sizes="100vw"
-              priority
-              className="mt-10 h-auto w-full"
-            />
-          ) : null}
-        </div>
-      </section>
+      <HeroFilm
+        hero={hero ?? fallbackHero(dict)}
+        staticOnly={saveData}
+        chapters={hero?.film ? chapters : []}
+        panel={<Statement locale={locale} dict={dict} />}
+      />
       {sections
         .filter((section) => section.visible)
         .map((section) =>
@@ -294,6 +377,7 @@ export default async function HomePage() {
             <BuiltInSection key={section.key} section={section} locale={locale} dict={dict} />
           ),
         )}
+      <ConsultationSection locale={locale} dict={dict} />
     </>
   );
 }
