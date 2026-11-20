@@ -62,12 +62,12 @@
         "text": "Fassadenplatten, Fenster- und Türelemente: CNC-Bearbeitung und Zuschnitt."
       },
       "threshold": {
-        "label": "Treppe und Türen",
-        "text": "Treppenstufen, Türzargen und Trennwände."
+        "label": "Tor und Türen",
+        "text": "Torflügel, Haustüren und Türzargen."
       },
       "living": {
-        "label": "Wohnraum",
-        "text": "Korpusmöbel und Regale: Zuschnitt, Kantenanleimen, Bohren."
+        "label": "Innenraum",
+        "text": "Wandpaneele und Einbaumöbel: Zuschnitt, Kantenanleimen, Bohren."
       },
       "kitchen": {
         "label": "Küche",

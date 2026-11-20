@@ -1,13 +1,23 @@
 # Hero: the scroll-scrubbed house film
 
-The home hero is a photoreal film of a house (timber frame, glazing, interior joinery: the
-things CEWM's customers build on HOMAG machines), drawn frame by frame on a canvas while the
-section is pinned. Scrolling moves the film forward and back. This file gives the exact numbers;
+The home hero is a photoreal film of a house (timber gate and front door, slatted wall panelling,
+walnut kitchen joinery: the things CEWM's customers build on HOMAG machines), drawn frame by frame
+on a canvas while the section is pinned. Scrolling moves the film forward and back. This file gives the exact numbers;
 measurements were taken on 2026-11-19 from `C:\dev\cewm-ref\homag-hero.mp4` (the sample film:
 20.04 s, 980 x 420, 25 fps, H.264) and are marked **measured**; everything derived from them is
 marked **estimate** and must be re-measured on the real render.
 
 ## The film itself
+
+The current film (`cewm-hero-house`, frames rendered for v4; set v6 adds the per-step blend data to the same frames) is a Cycles render of `C:\dev\cewm-hero-blender\cewm_hero.blend`:
+one continuous camera move, 300 frames, from the street in front of a rendered house in daylight,
+through the timber gate as it opens, across the forecourt, through the front door as it opens, into
+the hall with its slatted timber wall and bench, with a left turn into the kitchen with walnut
+fronts and a stone island. Chapters follow it (`app/[locale]/page.tsx`, texts in the four
+dictionaries): facade and gate (frames 1-89), gates and doors (90-175), interior (176-215), kitchen
+(216-300). Exposure rises gradually across the threshold (camera exposure animated). The old Veo
+film (v3, generated clips) is retired; its masters are not used any more. Frame 1 is a pale
+facade, so the header scrim and the bottom/top text scrims carry the contrast for white text.
 
 - The sample is 980 px wide: too small for production (it would be upscaled 1.6x on a 1600 px
   canvas). The owner supplies, or we render, two masters: **desktop 1920 x 1080 (16:9)** and
@@ -21,23 +31,35 @@ marked **estimate** and must be re-measured on the real render.
 
 ## Frames, sizes, pin length
 
-All three tiers carry the same 300 frames of one continuous camera move (`manifest.json` version 3).
+All three tiers carry the same 300 frames of one continuous camera move (`manifest.json` version 6; v4 and v5 carry the same frames).
 
 | Tier | Used when | Frame size | AVIF | Bytes (all frames) |
 |---|---|---|---|---|
-| Wide | viewport >= 1024 CSS px, `deviceMemory` > 4 (or unknown) and cover width x DPR > 1600 x 1.08 (1920 px screens at DPR 1, 1536 CSS px at DPR 1.25, 2560 px) | 1920 x 1080 | crf 34 | 9.95 MB |
-| Desktop | viewport >= 1024 CSS px and the wide condition is false (1440 px at DPR 1, laptops) | 1600 x 900 | crf 36 | 7.17 MB |
-| Mobile | viewport < 1024 CSS px, or `deviceMemory` <= 4 | 608 x 1080 (native centre crop of the landscape master) | crf 34 | 3.30 MB |
+| Wide | viewport >= 1024 CSS px, `deviceMemory` > 4 (or unknown) and cover width x DPR > 1600 x 1.08 (1920 px screens at DPR 1, 1536 CSS px at DPR 1.25, 2560 px) | 1920 x 1080 | crf 28 | 9.50 MB |
+| Desktop | viewport >= 1024 CSS px and the wide condition is false (1440 px at DPR 1, laptops) | 1600 x 900 | crf 30 | 6.48 MB |
+| Mobile | viewport < 1024 CSS px, or `deviceMemory` <= 4 | 608 x 1080 (its own native portrait render, not a crop) | crf 26 | 3.22 MB |
 
 - Canvas backing store ratio = `min(devicePixelRatio, 2, tier.width / coverCssWidth)`: the canvas
   is never larger than the frame's native cover size, so the player never upscales; on a 2560 px
   screen the 1920 px canvas is stretched by the compositor, which halved the refresh interval cost
   against a 2560 px canvas (measured: 16.6 ms to 8.4 ms median while scrolling).
   `imageSmoothingQuality = "high"`, set again after every canvas resize.
+- The frame is centred on whole canvas pixels (`place()` rounds the centring offset; warps are
+  added on top). A 608 px mobile frame on the 499 px canvas of a 390 x 844 DPR 3 phone was
+  centred at -54.5 px, so every frame, at rest too, was resampled half a pixel: **measured** 26-58 %
+  of the fine detail energy lost on the resting frames 159 and 223. Now the resting canvas equals
+  the decoded frame pixel for pixel on every tier tested (1920 x 1080, 1440 x 900, 2560 x 1440,
+  390 x 844 DPR 3).
 - Why the film was re-made: v2 (1600 x 900 at crf 41, SSIM 0.947 against the master) was blotchy
-  and was upscaled 1.2x on a 1920 px canvas. v3 uses lower crf and a 1920 tier.
-- Scroll per frame is whatever the pin length gives (about 9 px per frame on desktop); the player
-  blends between frames every refresh (below), so a step of one frame is no longer a visible jump.
+  and was upscaled 1.2x on a 1920 px canvas. v3 uses lower crf and a 1920 tier. v4 replaces the
+  generated film with the Blender render: the render is clean, so the same bytes buy a lower crf
+  (wide 28, desktop 30, mobile 26); wood grain of the walnut fronts and the gate timber survives
+  at those values and was visibly smoothed at crf 34. SSIM against the PNG (luma, 5 frames per
+  tier): wide 0.963, desktop 0.957, mobile 0.962.
+- Scroll per frame is whatever the pin length gives (measured 15.7 px per frame at 1920 x 1080);
+  the player warps the nearer frame to the scroll position every refresh (below), so the camera
+  move is continuous; only what moves differently from the camera (a door leaf, near parallax)
+  changes in steps, through a short cross-fade.
 
 ## Format: AVIF, WebP as fallback
 
@@ -147,22 +169,45 @@ const fraction = position - k;
   position to the frame position, so every pixel of scroll moves the picture by the same amount
   even where the source steps are uneven (measured 4.7 to 14.8 px per step). The shift is capped
   at 0.75 frame so chapters stay aligned with their text.
-- Every refresh while the position moves: frame `k` is warped forward by `fraction` of the
-  measured step (`manifest.motion`, `[scale, tx, ty]` per step, translation in frame-height
-  units) and drawn at alpha 1, then frame `k + 1` is warped backward and drawn at alpha
-  `fraction`, both clamped to cover. Measured on the master: interpolating a frame from its
-  neighbours gives 32.0 dB with this warp against 26.3 dB for a plain blend and 23.4 dB for
-  holding the frame. Without `motion` the player cross-fades plainly.
-- Reason: at slow scroll 86 % of refreshes showed no new image and then the picture jumped one
-  whole frame (6.7 px). With the blend 0 % of refreshes are blank.
-- The blend is dropped on devices that cannot afford it (`frameBudget()` in
+- Every refresh while the position moves, both neighbours are warped to the position by the
+  measured camera step (`manifest.motion`, `[scale, tx, ty]` per step, translation in
+  frame-height units; the mobile tier uses `manifest.mobileMotion`, measured on the portrait
+  render): frame `k` forward by `fraction`, frame `k + 1` backward by `1 - fraction`. Neither is
+  clamped to cover (a clamp moves one layer away from the other: in v4 the turn showed every
+  pendant lamp twice). The dominant frame is drawn opaque; when its warp leaves an edge of the
+  canvas uncovered, the other frame is drawn under it first (a strip of at most a few px during
+  the turn, never at rest). See `lib/motion/film-steps.ts`.
+- **The cross-fade is allowed per step, not everywhere** (`manifest.blend`, `manifest.mobileBlend`,
+  one number per step, `dissolve()` in `film-steps.ts`): `1` cross-fades over the whole step, a
+  smaller value confines the cross-fade to that share of the step around its middle, outside it
+  only the nearer frame is drawn. Rule (film set v6): `1` only when a 50/50 cross-fade of the two
+  warped neighbours keeps at least 0.8 of the nearer frame's structure energy in every structured
+  tile, measured offline on every canvas of that orientation (below); otherwise `0.25`. A
+  similarity cannot describe a swinging gate or door, nor the parallax of a forward move past
+  near objects, so a full cross-fade shows two copies of every such edge. **Measured** residual
+  flow left after the similarity warp (90th percentile of structured pixels, landscape at
+  1920 px): median 4.6 px, gate 20-40 px, door leaf 30-250 px, turn 30-80 px; only 24 of 299
+  steps at most 2 px, and only 1 step passes the ghost test on both landscape canvases.
+  Portrait (608 px): 80 of 299 steps pass. The blend therefore helps in a minority of steps; the
+  rest of the film moves by the warp alone and changes pose in a short cross-fade.
+- **At rest the film always shows a whole frame** (`filmSettle()`): about 140 ms after the target
+  stops moving, the position eases to the next whole frame in the direction of travel (to the
+  nearer one when it is within 0.12 of a frame), drawn at identity, so the resting picture is the
+  decoded AVIF itself, never a warp or a blend. When scrolling resumes the same way, the picture
+  holds that frame until the scroll catches up (never a step back); reversing releases it at once.
+- History: v4 cross-faded every step over the whole step. At slow scroll 86 % of refreshes had
+  shown no new image without a blend, so the blend was added; it made 0 % blank but drew a ghost
+  wherever the scene does not move as one plane (measurements below).
+- The cross-fade is dropped on devices that cannot afford it (`frameBudget()` in
   `lib/motion/frame-budget.ts`). Every refresh in which the pinned film moves records its
   interval; when more than 25 % of the last 32 such refreshes took longer than 24 ms (a 60 Hz
-  screen missing frames), the player draws only frame `k` warped to the position (one
-  `drawImage`, so one texture upload per new film frame instead of two per refresh). The picture
-  still moves every refresh, without the cross-fade. After 120 calm refreshes (at most 3 % slow)
-  it blends again, and each later return waits twice as long, so a borderline device does not
-  flip back and forth. `window.__heroFilm.smoothness` shows `rich` and `switches`.
+  screen missing frames), the player draws only the dominant frame warped to the position (one
+  `drawImage` unless an edge needs filling). The picture still moves every refresh, without the
+  cross-fade. After 120 calm refreshes (at most 3 % slow) it blends again, and each later return
+  waits twice as long, so a borderline device does not flip back and forth.
+  `window.__heroFilm.smoothness` shows `rich` and `switches`; `__heroFilm.position()` the drawn
+  position and the rest frame; `__heroFilm.trace(true)` starts and `trace(false)` returns a
+  per-refresh record (`target`, `drawn`, `alpha`).
 - Why: the drawn bitmaps come from the worker as CPU bitmaps, so every new one is uploaded to
   the GPU on the main thread (`GpuImageDecodeCache::UploadImage` in a trace, 4.1 ms per refresh
   for a 1600 x 900 frame at 4x CPU, measured 2026-11-19 on AC power). Measured at 4x, 1440 x 900,
@@ -173,6 +218,77 @@ const fraction = position - k;
   still drop frames.
 - `scroll.y` comes from the shared loop (`motion-recipes.md`), never from `window.scrollY`.
 - Tell the worker the position and velocity at most every 50 ms so the window moves ahead.
+
+### Sharpness, ghosting and smoothness: how they are measured
+
+Tools in `C:\dev\cewm-hero\tools\v5` (Python, `C:\dev\cewm-hero\.venv`): `replica.py` redraws the
+player offline (same `place`, `travel`, compositing, bilinear sampling) and reproduces the real
+canvas captured from headless Chromium (`capture.cjs`, `capture_moving.cjs`) at 49.3 dB PSNR or better (pixel-identical at rest),
+p99 error at most 3 levels, on 201 captures (1920 x 1080, 1440 x 900, 2560 x 1440 and
+390 x 844 at DPR 3; sets v4, v5 and v6; at rest, sub-frame and while scrolling);
+`profile.py` then measures every step at fractions 0.25 / 0.5 / 0.75. Metrics, per tile of a
+12 x 6 grid (3 x 6 portrait): structure energy = mean squared Laplacian of luma at half resolution;
+**ghost ratio** = canvas structure energy / that of the nearest real frame warped to the same
+position (below 0.8 = a visible double edge); sharpness = canvas / PNG source. Smoothness from a
+recorded slow scroll (`scroll_trace.cjs`, `smoothness.py`): share of refreshes without a new
+image, largest picture jump per refresh (global warp plus the residual a switch or a cross-fade
+moves), share of refreshes that show a cross-fade on a step with more than 2 px residual.
+
+**Measured 2026-11-20, v4 player against v6** (structure energy of the canvas / PNG source, mean
+over the range; ghosted = structured tiles below 0.8 ghost ratio; 1920 x 1080 canvas, which is
+also what a 2560 x 1440 screen gets, stretched 1.33x by the compositor):
+
+| Range (file numbers) | AVIF / PNG | v4 canvas at 0.25 / 0.5 / 0.75 | v6 canvas | v4 ghosted | v6 ghosted |
+|---|---|---|---|---|---|
+| street 1-48 | 0.89 | 0.57 / 0.54 / 0.58 | 0.70 / 0.54 / 0.71 | 23 / 34 / 24 % | 0 / 34 / 1 % |
+| gate 49-90 | 0.88 | 0.53 / 0.46 / 0.53 | 0.72 / 0.46 / 0.72 | 51 / 59 / 52 % | 0 / 59 / 0 % |
+| forecourt 91-140 | 0.81 | 0.57 / 0.54 / 0.56 | 0.63 / 0.54 / 0.62 | 14 / 32 / 18 % | 0 / 32 / 1 % |
+| door 141-176 | 0.92 | 0.55 / 0.47 / 0.56 | 0.77 / 0.47 / 0.78 | 64 / 67 / 60 % | 0 / 67 / 0 % |
+| hall 177-206 | 0.98 | 0.63 / 0.54 / 0.61 | 0.79 / 0.58 / 0.80 | 52 / 61 / 63 % | 0 / 53 / 0 % |
+| turn 207-241 | 0.94 | 0.53 / 0.42 / 0.51 | 0.78 / 0.43 / 0.78 | 88 / 89 / 87 % | 0 / 86 / 0 % |
+| kitchen 242-299 | 0.92 | 0.72 / 0.71 / 0.72 | 0.77 / 0.71 / 0.77 | 13 / 23 / 16 % | 0 / 23 / 3 % |
+
+- At 0.5 the v6 canvas is inside the dissolve window by design (the same 50/50 mix as v4); at
+  0.25 and 0.75 it is a single warped frame. Ghosted tiles away from the frame border, all
+  steps: 1920 x 1080 v4 37 / 45 / 39 %, v6 0 / 44 / 0 %; 1440 x 900 v4 33 / 40 / 33 %, v6
+  0 / 40 / 0 %; mobile v4 38 / 42 / 39 %, v6 0 / 24 / 0 %. The few border tiles left at 0.75 are
+  the fill strip of an uncovered edge (a few px wide).
+- At rest the canvas is the decoded AVIF itself, so its sharpness is the AVIF / PNG column (the
+  compression floor: structure median 0.92 wide, 0.93 desktop, 0.96 mobile; worst tiles are the
+  flamed granite paving of the forecourt, 0.16-0.19, smoothed by the encoder at the byte limit).
+- Mobile (390 x 844 DPR 3): v6 canvas structure against v4 +4 to +53 % at 0.25 / 0.75, whole
+  frames +6 to +24 % (the half-pixel centring fixed).
+- The warp itself costs detail while moving (single warped frame 0.61-0.80 of the PNG against
+  0.80-0.98 at rest): bilinear sampling at sub-pixel offsets. It is the price of continuous camera
+  motion and is gone the moment the scroll stops.
+
+Slow scroll, 1920 x 1080, recorded in headless Chromium with Lenis (15.7 px of scroll per frame;
+the v4 row replays the same scroll input through the v4 rules):
+
+| Trace | Player | Refreshes without a new image | Largest jump per refresh | p99 jump | Refreshes inside a ghosting cross-fade |
+|---|---|---|---|---|---|
+| trackpad, 2 px every 33 ms, door 139-179 | v4 | 0 % | 1.7 px | 0.9 px | 96 % |
+| | v6 | 0.6 % | 5.7 px | 3.0 px | 21 % |
+| | nearest frame only | 99 % | 58 px | 21 px | 0 % |
+| trackpad, turn 206-241 | v4 | 0 % | 4.9 px | 1.8 px | 95 % |
+| | v6 | 0.7 % | 9.3 px | 3.2 px | 20 % |
+| wheel, 100 px every 600 ms, whole film | v4 | 0 % | 17.5 px | 8.5 px | 89 % |
+| | v6 | 0 % | 32.4 px | 10.6 px | 23 % |
+
+The larger single jumps in v6 are the door leaf and near parallax changing pose inside the short
+dissolve instead of being smeared over the whole step; the camera move itself stays continuous.
+More frames would shrink them: 600 frames halve the residual (the door leaf still moves 15-125 px
+per step, far above the 2 px a cross-fade hides), cost about 2.2 h landscape + 40 min portrait
+render for the whole film (21 min for the door alone), and do not fit the byte limits: the door's
+36 extra frames alone add 0.77 / 0.55 / 0.21 MB (wide 10.27 MB against 10.0, mobile 3.43 against
+3.3).
+
+Render stage, measured on probe renders of frames 159 and 71 (Blender 5.2, same settings): depth
+of field (f/9, focus 9.8-13 m) costs at most 5 % of the structure on the door leaf and up to 17 %
+on the nearest jambs at the frame edges (no-DOF / DOF); not the reported blur. Motion blur is
+off. The OpenImageDenoise pass flattens the veneer figure of the wood (quarter-resolution structure
+median 0.85 of a 1024-sample undenoised render) on every frame alike; removing that needs a full
+re-render at more samples (about 4x the render time) and was not done.
 
 ## LCP strategy
 
@@ -220,8 +336,11 @@ Progress `p` of the pin, 0 to 1. All copy is admin-editable per locale; nothing 
 | 0.88 to 1 | The statement fades with `--motion-fast`; the navy panel of the next section scrolls up over the canvas while the last frames keep playing under it | `PanelPush` |
 
 Text contrast over the film: white text sits on a scrim layer (`bg-linear-to-t from-navy-deep/70
-to-transparent` under the bottom group, `bg-linear-to-b from-navy-deep/60 to-transparent` 160 px
-under the header). Check every frame: the relative luminance of the scrimmed frame under each text
+to-transparent` under the bottom group; the header scrim in `app/site.css` is `navy-deep` 66 % at
+the top, 60 % at 40 % of its 10 rem, then transparent: the pale facade and the daylight hall behind
+the nav needed more than the old 60 % fading straight to nothing, which gave 3.6:1 on the front door
+at film progress 0.44 (4.2:1 at 0.72); measured now: at least 5.8:1 for the header on 51 steps of
+progress at 1440 x 900). Check every frame: the relative luminance of the scrimmed frame under each text
 box must stay at or below 0.183 (white on it then gives at least 4.5:1). Run it over all frames
 with a script before publishing a new film.
 
@@ -249,6 +368,11 @@ run it as a background job or a CLI script, not inside a request.
 - [ ] Memory in the DevTools Memory panel stays under the window total for the tier.
 - [ ] Reduced motion, Save-Data and `deviceMemory` 2 each show the poster layout.
 - [ ] Bytes transferred for the full film are within 10.0 MB wide / 7.2 MB desktop / 3.3 MB mobile.
-- [ ] Slow wheel scroll: 0 % of refreshes without a new image, no reversal; fast scroll: no draw from a smaller bitmap.
-- [ ] 100 % crops of window frames, door frame and cabinet gaps mid-fraction show no double edges.
+- [ ] Slow scroll (`scroll_trace.cjs` + `smoothness.py`): at most 2 % of refreshes without a new
+      image, no reversal, at most 25 % of refreshes inside a cross-fade on a step with more than 2 px
+      residual; fast scroll: no draw from a smaller bitmap.
+- [ ] At rest the canvas equals the decoded frame (replica PSNR infinite); outside the dissolve
+      windows no structured tile below 0.8 ghost ratio except on steps whose `blend` is 1.
+- [ ] A new film gets `blend`, `mobileBlend` and `mobileMotion` measured with `C:\dev\cewm-hero\tools\v5`
+      (`measure_motion.py`, `motion_fit.py`, `profile.py`, then the build script) before upload.
 - [ ] White text passes 4.5:1 on every frame under the scrim.

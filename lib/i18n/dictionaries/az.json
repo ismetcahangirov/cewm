@@ -62,12 +62,12 @@
         "text": "Fasad panelləri, pəncərə və qapı blokları: CNC emalı və kəsmə."
       },
       "threshold": {
-        "label": "Pilləkən və qapılar",
-        "text": "Pilləkən pillələri, qapı çərçivələri və arakəsmələr."
+        "label": "Darvaza və qapılar",
+        "text": "Darvaza qanadları, giriş qapıları və qapı çərçivələri."
       },
       "living": {
-        "label": "Qonaq otağı",
-        "text": "Korpus mebeli və rəflər: kəsmə, kənar bantlama, deşmə."
+        "label": "Interyer",
+        "text": "Divar panelləri və quraşdırma mebel: kəsmə, kənar bantlama, deşmə."
       },
       "kitchen": {
         "label": "Mətbəx",

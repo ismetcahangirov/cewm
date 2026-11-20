@@ -42,8 +42,9 @@
   height: 10rem;
   background: linear-gradient(
     to bottom,
-    color-mix(in oklab, var(--color-navy-deep) 60%, transparent),
-    transparent
+    color-mix(in oklab, var(--color-navy-deep) 66%, transparent) 0%,
+    color-mix(in oklab, var(--color-navy-deep) 60%, transparent) 40%,
+    transparent 100%
   );
   opacity: 0;
   pointer-events: none;
