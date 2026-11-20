@@ -51,9 +51,9 @@ import { markdownHref } from "@/lib/seo/rewrites";
 
 const chapterWindows = [
   { key: "exterior", from: 0.19, to: 0.27, placement: "bottom" },
-  { key: "threshold", from: 0.3, to: 0.5, placement: "bottom" },
-  { key: "living", from: 0.56, to: 0.77, placement: "bottom" },
-  { key: "kitchen", from: 0.83, to: 1.01, placement: "top" },
+  { key: "threshold", from: 0.31, to: 0.57, placement: "bottom" },
+  { key: "living", from: 0.61, to: 0.73, placement: "bottom" },
+  { key: "kitchen", from: 0.79, to: 1.01, placement: "top" },
 ] as const satisfies Pick<HeroChapter, "key" | "from" | "to" | "placement">[];
 
 export const instant = false;

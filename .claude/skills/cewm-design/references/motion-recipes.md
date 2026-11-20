@@ -475,7 +475,7 @@ used.
 
 | State | When | Look | Motion |
 |---|---|---|---|
-| `clear` | Home only, while the pinned house film is behind the header: until the statement panel reaches the header or the film unpins, whichever comes first; at scroll 0 when the film is static (reduced motion, Save-Data, no film) | Full width, transparent background, white logo and links, a top scrim `from-navy-deep/60` (10 rem) over the film's own top scrim keeps 4.5:1 over bright frames | none |
+| `clear` | Home only, while the pinned house film is behind the header: until the statement panel reaches the header or the film unpins, whichever comes first; at scroll 0 when the film is static (reduced motion, Save-Data, no film) | Full width, transparent background, white logo and links, a top scrim `navy-deep` 66 % fading to 60 % at 4 rem then to nothing at 10 rem over the film's own top scrim keeps 4.5:1 over bright frames | none |
 | `solid` | Every other scroll position, every other page, and while the mobile menu is open | Full width, solid `bg-navy` | Background `opacity` 0 to 1 (scrim 1 to 0), `--motion-base`, `--ease-standard` |
 
 - The logo is a real link to the locale home. Clicking it on the home page scrolls to 0

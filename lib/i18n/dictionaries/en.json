@@ -62,12 +62,12 @@
         "text": "Facade panels, window and door units: CNC machining and cutting."
       },
       "threshold": {
-        "label": "Stairs and doors",
-        "text": "Stair treads, door frames and partitions."
+        "label": "Gates and doors",
+        "text": "Gate leaves, front doors and door frames."
       },
       "living": {
-        "label": "Living room",
-        "text": "Cabinet furniture and shelving: cutting, edge banding, drilling."
+        "label": "Interior",
+        "text": "Wall panelling and built-in furniture: cutting, edge banding, drilling."
       },
       "kitchen": {
         "label": "Kitchen",

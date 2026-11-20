@@ -1,13 +1,23 @@
 # Hero: the scroll-scrubbed house film
 
-The home hero is a photoreal film of a house (timber frame, glazing, interior joinery: the
-things CEWM's customers build on HOMAG machines), drawn frame by frame on a canvas while the
-section is pinned. Scrolling moves the film forward and back. This file gives the exact numbers;
+The home hero is a photoreal film of a house (timber gate and front door, slatted wall panelling,
+walnut kitchen joinery: the things CEWM's customers build on HOMAG machines), drawn frame by frame
+on a canvas while the section is pinned. Scrolling moves the film forward and back. This file gives the exact numbers;
 measurements were taken on 2026-11-19 from `C:\dev\cewm-ref\homag-hero.mp4` (the sample film:
 20.04 s, 980 x 420, 25 fps, H.264) and are marked **measured**; everything derived from them is
 marked **estimate** and must be re-measured on the real render.
 
 ## The film itself
+
+The current film (`cewm-hero-house` v4) is a Cycles render of `C:\dev\cewm-hero-blender\cewm_hero.blend`:
+one continuous camera move, 300 frames, from the street in front of a rendered house in daylight,
+through the timber gate as it opens, across the forecourt, through the front door as it opens, into
+the hall with its slatted timber wall and bench, with a left turn into the kitchen with walnut
+fronts and a stone island. Chapters follow it (`app/[locale]/page.tsx`, texts in the four
+dictionaries): facade and gate (frames 1-89), gates and doors (90-175), interior (176-215), kitchen
+(216-300). Exposure rises gradually across the threshold (camera exposure animated). The old Veo
+film (v3, generated clips) is retired; its masters are not used any more. Frame 1 is a pale
+facade, so the header scrim and the bottom/top text scrims carry the contrast for white text.
 
 - The sample is 980 px wide: too small for production (it would be upscaled 1.6x on a 1600 px
   canvas). The owner supplies, or we render, two masters: **desktop 1920 x 1080 (16:9)** and
@@ -21,13 +31,13 @@ marked **estimate** and must be re-measured on the real render.
 
 ## Frames, sizes, pin length
 
-All three tiers carry the same 300 frames of one continuous camera move (`manifest.json` version 3).
+All three tiers carry the same 300 frames of one continuous camera move (`manifest.json` version 4).
 
 | Tier | Used when | Frame size | AVIF | Bytes (all frames) |
 |---|---|---|---|---|
-| Wide | viewport >= 1024 CSS px, `deviceMemory` > 4 (or unknown) and cover width x DPR > 1600 x 1.08 (1920 px screens at DPR 1, 1536 CSS px at DPR 1.25, 2560 px) | 1920 x 1080 | crf 34 | 9.95 MB |
-| Desktop | viewport >= 1024 CSS px and the wide condition is false (1440 px at DPR 1, laptops) | 1600 x 900 | crf 36 | 7.17 MB |
-| Mobile | viewport < 1024 CSS px, or `deviceMemory` <= 4 | 608 x 1080 (native centre crop of the landscape master) | crf 34 | 3.30 MB |
+| Wide | viewport >= 1024 CSS px, `deviceMemory` > 4 (or unknown) and cover width x DPR > 1600 x 1.08 (1920 px screens at DPR 1, 1536 CSS px at DPR 1.25, 2560 px) | 1920 x 1080 | crf 28 | 9.50 MB |
+| Desktop | viewport >= 1024 CSS px and the wide condition is false (1440 px at DPR 1, laptops) | 1600 x 900 | crf 30 | 6.48 MB |
+| Mobile | viewport < 1024 CSS px, or `deviceMemory` <= 4 | 608 x 1080 (its own native portrait render, not a crop) | crf 26 | 3.22 MB |
 
 - Canvas backing store ratio = `min(devicePixelRatio, 2, tier.width / coverCssWidth)`: the canvas
   is never larger than the frame's native cover size, so the player never upscales; on a 2560 px
@@ -35,7 +45,11 @@ All three tiers carry the same 300 frames of one continuous camera move (`manife
   against a 2560 px canvas (measured: 16.6 ms to 8.4 ms median while scrolling).
   `imageSmoothingQuality = "high"`, set again after every canvas resize.
 - Why the film was re-made: v2 (1600 x 900 at crf 41, SSIM 0.947 against the master) was blotchy
-  and was upscaled 1.2x on a 1920 px canvas. v3 uses lower crf and a 1920 tier.
+  and was upscaled 1.2x on a 1920 px canvas. v3 uses lower crf and a 1920 tier. v4 replaces the
+  generated film with the Blender render: the render is clean, so the same bytes buy a lower crf
+  (wide 28, desktop 30, mobile 26); wood grain of the walnut fronts and the gate timber survives
+  at those values and was visibly smoothed at crf 34. SSIM against the PNG (luma, 5 frames per
+  tier): wide 0.963, desktop 0.957, mobile 0.962.
 - Scroll per frame is whatever the pin length gives (about 9 px per frame on desktop); the player
   blends between frames every refresh (below), so a step of one frame is no longer a visible jump.
 
@@ -220,8 +234,11 @@ Progress `p` of the pin, 0 to 1. All copy is admin-editable per locale; nothing 
 | 0.88 to 1 | The statement fades with `--motion-fast`; the navy panel of the next section scrolls up over the canvas while the last frames keep playing under it | `PanelPush` |
 
 Text contrast over the film: white text sits on a scrim layer (`bg-linear-to-t from-navy-deep/70
-to-transparent` under the bottom group, `bg-linear-to-b from-navy-deep/60 to-transparent` 160 px
-under the header). Check every frame: the relative luminance of the scrimmed frame under each text
+to-transparent` under the bottom group; the header scrim in `app/site.css` is `navy-deep` 66 % at
+the top, 60 % at 40 % of its 10 rem, then transparent: the pale facade and the daylight hall behind
+the nav needed more than the old 60 % fading straight to nothing, which gave 3.6:1 on the front door
+at film progress 0.44 (4.2:1 at 0.72); measured now: at least 5.8:1 for the header on 51 steps of
+progress at 1440 x 900). Check every frame: the relative luminance of the scrimmed frame under each text
 box must stay at or below 0.183 (white on it then gives at least 4.5:1). Run it over all frames
 with a script before publishing a new film.
 
