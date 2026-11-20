@@ -160,7 +160,7 @@ function runFilm(
     from: Number(element.dataset.from),
     to: Number(element.dataset.to),
     top: element.classList.contains("is-top"),
-    active: false,
+    active: null as boolean | null,
   }));
   if (!stage || !spacer || !slot) return () => undefined;
 
@@ -566,6 +566,13 @@ function runFilm(
     poster?.removeAttribute("data-hidden");
     scrimTop?.style.removeProperty("opacity");
     scrimBottom?.style.removeProperty("opacity");
+    for (const chapter of chapters) chapter.element.removeAttribute("data-active");
+    for (const group of [groupA, groupB]) {
+      group?.style.removeProperty("transform");
+      group?.style.removeProperty("opacity");
+    }
+    cta?.style.removeProperty("opacity");
+    cta?.style.removeProperty("visibility");
     document.documentElement.removeAttribute("data-pin-active");
   }
 
