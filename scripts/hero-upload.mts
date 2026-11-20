@@ -52,6 +52,9 @@ const localManifestSchema = z.object({
     wide: tierSchema.optional(),
   }),
   motion: z.array(z.tuple([z.number(), z.number(), z.number()])).optional(),
+  blend: z.array(z.number()).optional(),
+  mobileMotion: z.array(z.tuple([z.number(), z.number(), z.number()])).optional(),
+  mobileBlend: z.array(z.number()).optional(),
   pace: z.array(z.number()).optional(),
   posters: z.object({ desktop: posterSchema, mobile: posterSchema.optional() }),
 });
@@ -176,6 +179,9 @@ const bucketManifest = films.heroFilmManifestSchema.parse({
     wide: bucketTier(manifest.tiers.wide),
   },
   motion: manifest.motion,
+  blend: manifest.blend,
+  mobileMotion: manifest.mobileMotion,
+  mobileBlend: manifest.mobileBlend,
   pace: manifest.pace,
   posters: {
     desktop: {

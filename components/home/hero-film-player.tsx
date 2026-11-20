@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 
+import { dissolve, filmSettle } from "@/lib/motion/film-steps";
 import { frameBudget } from "@/lib/motion/frame-budget";
 import {
   clamp,
@@ -30,7 +31,7 @@ type Budget = { ahead: number; behind: number };
 
 type Step = [number, number, number];
 
-type Motion = { steps: Step[]; pace: number[] | null };
+type Motion = { steps: Step[]; pace: number[] | null; blend: number[] | null };
 
 type Similarity = { scale: number; x: number; y: number };
 
@@ -107,12 +108,29 @@ function isStep(value: unknown): value is Step {
   );
 }
 
-async function loadMotion(url: string, count: number): Promise<Motion | null> {
+function isBlend(value: unknown, count: number): value is number[] {
+  return (
+    Array.isArray(value) &&
+    value.length === count - 1 &&
+    value.every((part) => typeof part === "number" && part >= 0 && part <= 1)
+  );
+}
+
+async function loadMotion(url: string, count: number, portrait: boolean): Promise<Motion | null> {
   const response = await fetch(url, { priority: "low" } as RequestInit);
   if (!response.ok) return null;
-  const data = (await response.json()) as { motion?: unknown; pace?: unknown };
-  const steps = Array.isArray(data.motion) ? data.motion : [];
-  if (steps.length !== count - 1 || !steps.every(isStep)) return null;
+  const data = (await response.json()) as {
+    motion?: unknown;
+    pace?: unknown;
+    blend?: unknown;
+    mobileMotion?: unknown;
+    mobileBlend?: unknown;
+  };
+  const ownSteps = portrait && Array.isArray(data.mobileMotion);
+  const steps = ownSteps ? data.mobileMotion : data.motion;
+  if (!Array.isArray(steps) || steps.length !== count - 1 || !steps.every(isStep)) return null;
+  const ownBlend = portrait ? data.mobileBlend : data.blend;
+  const blend = isBlend(ownBlend, count) ? ownBlend : null;
   const pace =
     Array.isArray(data.pace) &&
     data.pace.length === count &&
@@ -122,7 +140,7 @@ async function loadMotion(url: string, count: number): Promise<Motion | null> {
     )
       ? (data.pace as number[])
       : null;
-  return { steps, pace };
+  return { steps, pace, blend };
 }
 
 function compose(first: Similarity, second: Similarity): Similarity {
@@ -201,6 +219,9 @@ function runFilm(
   const written = { a: Number.NaN, cta: Number.NaN, top: Number.NaN, bottom: Number.NaN };
   const stats = { drawMs: [] as number[], decodeMs: [] as number[] };
   const smoothness = frameBudget();
+  const settle = filmSettle({ count });
+  let trace: { at: number; target: number; drawn: number; alpha: number }[] | null = null;
+  let drawnAlpha = 0;
 
   const tau = smoothScroller() ? 60 : 100;
 
@@ -310,8 +331,10 @@ function runFilm(
     }
     const width = base.width * scale;
     const height = base.height * scale;
-    let x = (canvasSize.width - width) / 2 + warp.x * base.height;
-    let y = (canvasSize.height - height) / 2 + warp.y * base.height;
+    const left = Math.round((canvasSize.width - base.width) / 2);
+    const top = Math.round((canvasSize.height - base.height) / 2);
+    let x = left + (base.width - width) / 2 + warp.x * base.height;
+    let y = top + (base.height - height) / 2 + warp.y * base.height;
     if (cover) {
       x = clamp(x, canvasSize.width - width, 0);
       y = clamp(y, canvasSize.height - height, 0);
@@ -319,11 +342,41 @@ function runFilm(
     return { x, y, width, height };
   }
 
+  function covers(rect: { x: number; y: number; width: number; height: number }) {
+    return (
+      rect.x <= 0.5 &&
+      rect.y <= 0.5 &&
+      rect.x + rect.width >= canvasSize.width - 0.5 &&
+      rect.y + rect.height >= canvasSize.height - 0.5
+    );
+  }
+
   function paint(bitmap: ImageBitmap, warp: Similarity, alpha: number) {
     if (!context) return;
     const rect = place(bitmap, warp, alpha === 1);
     context.globalAlpha = alpha;
     context.drawImage(bitmap, rect.x, rect.y, rect.width, rect.height);
+  }
+
+  function step(near: ImageBitmap, next: ImageBitmap, base: number, position: number) {
+    if (!context) return 0;
+    let alpha = dissolve(motion?.blend?.[base] ?? 1, position - base);
+    if (!smoothness.rich) alpha = alpha < 0.5 ? 0 : 1;
+    const front = alpha < 0.5 ? near : next;
+    const back = alpha < 0.5 ? next : near;
+    const frontRect = place(front, travel(alpha < 0.5 ? base : base + 1, position), false);
+    const backRect = place(back, travel(alpha < 0.5 ? base + 1 : base, position), false);
+    const backAlpha = alpha < 0.5 ? alpha : 1 - alpha;
+    context.globalAlpha = 1;
+    if (!covers(frontRect)) {
+      context.drawImage(back, backRect.x, backRect.y, backRect.width, backRect.height);
+    }
+    context.drawImage(front, frontRect.x, frontRect.y, frontRect.width, frontRect.height);
+    if (backAlpha >= 1 / 255) {
+      context.globalAlpha = backAlpha;
+      context.drawImage(back, backRect.x, backRect.y, backRect.width, backRect.height);
+    }
+    return alpha;
   }
 
   function render(position: number) {
@@ -334,11 +387,15 @@ function runFilm(
     const near = frames.get(base);
     const next = frames.get(base + 1);
     const started = performance.now();
-    if (near && next && fraction >= settled && smoothness.rich) {
-      paint(near, travel(base, position), 1);
-      paint(next, travel(base + 1, position), fraction);
-    } else if (near && fraction < settled) {
+    let alpha = fraction;
+    if (near && fraction < settled) {
       paint(near, identity, 1);
+      alpha = 0;
+    } else if (next && fraction > 1 - settled) {
+      paint(next, identity, 1);
+      alpha = 1;
+    } else if (near && next) {
+      alpha = step(near, next, base, position);
     } else {
       const index = source(position);
       if (index === null) return;
@@ -348,6 +405,7 @@ function runFilm(
       paint(bitmap, travel(index, reach), 1);
     }
     context.globalAlpha = 1;
+    drawnAlpha = alpha;
     stats.drawMs.push(performance.now() - started);
     if (stats.drawMs.length > 2000) stats.drawMs.splice(0, 1000);
     drawnAt = position;
@@ -419,12 +477,14 @@ function runFilm(
       document.documentElement.toggleAttribute("data-pin-active", pinned);
     }
     choreograph(film);
-    const target = frameAt(film);
+    const linear = frameAt(film);
+    const target = settle.goal(linear, performance.now());
     current += (target - current) * (1 - Math.exp(-dt / tau));
     if (Math.abs(target - current) < settled) current = target;
     if (pinned && Math.abs(current - drawnAt) >= settled) smoothness.record(dt);
     seek(current, performance.now());
     render(current);
+    trace?.push({ at: performance.now(), target: linear, drawn: drawnAt, alpha: drawnAlpha });
   }
 
   function prepareContext() {
@@ -449,7 +509,7 @@ function runFilm(
   function startWorker() {
     createCanvas();
     if (motionUrl) {
-      void loadMotion(motionUrl, count)
+      void loadMotion(motionUrl, count, tierName === "mobile")
         .then((loaded) => {
           if (!loaded) return;
           motion = loaded;
@@ -541,6 +601,12 @@ function runFilm(
     smoothness,
     tier: tierName,
     budget,
+    position: () => ({ current, drawn: drawnAt, resting: settle.resting }),
+    trace: (on: boolean) => {
+      const recorded = trace;
+      trace = on ? [] : null;
+      return recorded;
+    },
     frames: () => ({
       window: frames.size,
       decode: decodeSize,

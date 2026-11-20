@@ -45,6 +45,8 @@ const manifestPoster = z.object({
 
 const manifestStep = z.tuple([z.number().min(0.5).max(2), z.number(), z.number()]);
 
+const manifestBlend = z.array(z.number().min(0).max(1)).max(2000);
+
 export const heroFilmManifestSchema = z.object({
   version: z.number().int().positive(),
   format: z.enum(heroFilmFormats),
@@ -54,6 +56,9 @@ export const heroFilmManifestSchema = z.object({
     wide: manifestTier.optional(),
   }),
   motion: z.array(manifestStep).max(2000).optional(),
+  blend: manifestBlend.optional(),
+  mobileMotion: z.array(manifestStep).max(2000).optional(),
+  mobileBlend: manifestBlend.optional(),
   pace: z.array(z.number().min(0)).max(2001).optional(),
   posters: z
     .object({ desktop: manifestPoster.optional(), mobile: manifestPoster.optional() })
